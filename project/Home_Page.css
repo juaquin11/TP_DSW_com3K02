@@ -6,22 +6,18 @@
 :root{
     --color--one: #107a77;
 }
-.contenedor {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    background-color: white;
-    border: solid black 2px;
-    padding: 1rem;
-    font-size: 2rem;
-    display: flex;
-    flex-direction: column;
-}
-
 .header {
-    color: white;
+    /* position: fixed;
+    top: 0;
+    width: 100%; */
+    color: white; 
+    background-color: white;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    border: solid black 2px;
+    padding: 0rem;
+    font-size: 2rem;
 }
 .brand-logo a{
     color: var(--color--one);
@@ -34,12 +30,13 @@
 }
 .brand-logo a img {
     border-radius: 50%;
-    width: 3rem;
-    height: 3rem;
+    width: 5rem;
+    height: 5rem;
     object-fit: cover;
     border: 3px solid 
 }
 .Buttom-Login {
+    margin: 1rem;
     border-radius: 0.7rem;
     padding: 1rem;
     background-color: var(--color--one);
@@ -54,7 +51,109 @@
     color: white;
     display: flex;
     justify-content: center;
-    align-items: center;
     gap: 1rem;
     text-decoration: none;
+}
+
+.main { 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    justify-content: first baseline;
+    background-color: lightgray;
+    height: 100vh;
+
+}
+
+.descover-restaurant {
+    background-color: var(--color--one);
+    width: 100%;
+    height: fit-content;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.descover-restaurant h1 {
+    font-family: 'arial,sans-serif';
+    text-align: center;
+}
+
+.search-form {
+    display: flex;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.location-select {
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      border-right: 1px solid #ccc;
+      background-color: #fff;
+}
+
+.location-select select {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.search-input {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    padding: 0 10px;
+}
+
+.search-input input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #333;
+    padding: 10px;
+}
+
+.search-input input::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+.submit-button {
+    background-color: #00664b;
+    color: white;
+    padding: 0 20px;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+    background-color: #004d3a;
+}
+
+.icon {
+    font-size: 16px;
+}
+
+.restarants {
+    display: flex;
+    gap: 1rem;    
+    align-items: center;
+}
+
+.footer {
+    display: flex;
+    min-height: 6rem;
+    background-color: gray;
 }
