@@ -6,9 +6,13 @@
 :root{
     --color--one: #141f66;
 }
+
 .contenedor {
-    background-color: gray;
-    border: solid red 2px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: white;
+    border: solid black 2px;
     padding: 1rem;
     font-size: 2rem;
     display: flex;
