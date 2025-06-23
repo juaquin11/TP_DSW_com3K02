@@ -6,9 +6,8 @@
 :root{
     --color--one: #4031a3;
 }
-
 .contenedor {
-    background-color: gray;
+    background-color: var(--color--one);
     border: solid red 2px;
     padding: 1rem;
     font-size: 2rem;
