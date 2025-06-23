@@ -3,5 +3,39 @@
 	margin: 0;
 	box-sizing: border-box;
 }
+:root{
+    --color--one: #141f66;
+}
+.contenedor {
+    background-color: gray;
+    border: solid red 2px;
+    padding: 1rem;
+    font-size: 2rem;
+    display: flex;
+    flex-direction: column;
+}
 
+.header {
+    color: white;
+    display: flex;
+    justify-content: space-between;
+}
 
+.Buttom-Login {
+    border-radius: 0.7rem;
+    padding: 1rem;
+    background-color: var(--color--one);
+}
+
+.Buttom-Login img {
+    width: 3.2rem;
+    height: 3rem;
+    border-radius: 2rem;
+}
+.Buttom-Login a {
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
