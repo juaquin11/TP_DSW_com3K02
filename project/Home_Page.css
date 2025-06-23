@@ -4,11 +4,14 @@
 	box-sizing: border-box;
 }
 :root{
-    --color--one: #4031a3;
+    --color--one: #107a77;
 }
 .contenedor {
-    background-color: var(--color--one);
-    border: solid red 2px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: white;
+    border: solid black 2px;
     padding: 1rem;
     font-size: 2rem;
     display: flex;
@@ -21,13 +24,13 @@
     justify-content: space-between;
 }
 .brand-logo a{
+    color: var(--color--one);
     padding: 1rem;
-    background-color: lightgray;
-    border: solid 2px black;
     border-radius: 0.5rem;
     display: flex;
     align-items: center;
     gap: 1rem;
+    text-decoration: none;
 }
 .brand-logo a img {
     border-radius: 50%;
@@ -39,7 +42,7 @@
 .Buttom-Login {
     border-radius: 0.7rem;
     padding: 1rem;
-    background-color: lightgray;
+    background-color: var(--color--one);
 }
 
 .Buttom-Login img {
@@ -53,4 +56,5 @@
     justify-content: center;
     align-items: center;
     gap: 1rem;
+    text-decoration: none;
 }
