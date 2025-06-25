@@ -152,8 +152,29 @@
     align-items: center;
 }
 
-.footer {
+footer {
     display: flex;
+    gap: 2rem;
+    text-align: center;
+    padding: 1rem;
+    padding-bottom: 0.2rem;
     min-height: 6rem;
     background-color: gray;
+}
+.about-us {
+    flex: 2;
+}
+
+.our-service {
+    flex: 2;
+}
+.social-mesocialdia-icons {
+}
+
+.more-info {
+    flex: 1;
+}
+
+.rights {
+    font-size: 1.5rem;
 }
