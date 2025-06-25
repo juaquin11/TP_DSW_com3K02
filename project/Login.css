@@ -19,6 +19,7 @@ body {
     width: 100%;
     max-width: 400px;
     text-align: center;
+    position: relative;
 }
 
 h1 {
@@ -36,6 +37,7 @@ label {
     display: block;
     margin-bottom: 0.5rem;
     color: #333;
+    font-weight: bold;
 }
 
 input {
@@ -75,4 +77,5 @@ a {
 
 a:hover {
     text-decoration: underline;
+
 }
