@@ -146,10 +146,8 @@
     font-size: 16px;
 }
 
-.restarants {
+.better-restaurants {
     display: flex;
-    gap: 1rem;    
-    align-items: center;
 }
 
 footer {

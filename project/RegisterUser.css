@@ -19,7 +19,7 @@ body {
     text-decoration: none;
     color: var(--color--one);
     font-weight: bold;
-    font-size: 0.90rem; 
+    font-size: 2rem; 
     transition: color 0.3s ease;
 }
 
