@@ -6,6 +6,14 @@
 :root{
     --color--one: #107a77;
 }
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* ojo */
+    margin: 0; 
+    padding: 0;
+}
 .header {
     /* position: fixed;
     top: 0;
@@ -60,10 +68,9 @@
     flex-direction: column;
     align-items: center;
     gap: 2rem;
-    justify-content: first baseline;
     background-color: lightgray;
-    height: 100vh;
-
+    flex-grow: 1; /* Ocupa el espacio restante */
+    padding: 1rem 0; 
 }
 
 .descover-restaurant {
@@ -72,6 +79,7 @@
     height: fit-content;
     padding: 1rem;
     display: flex;
+    gap: 0.4rem;
     flex-direction: column;
     align-items: center;
 }
@@ -153,6 +161,8 @@
     flex-wrap: wrap;
     gap: 20px;
     justify-content: center;
+    /* margin-bottom: 2rem; Evita solapamiento con footer */
+
 }
 
 .restaurante-card {
@@ -200,14 +210,16 @@
     }
 }
 
+
+
 footer {
     display: flex;
     gap: 2rem;
     text-align: center;
     padding: 1rem;
-    padding-bottom: 0.2rem;
-    min-height: 6rem;
     background-color: gray;
+    width: 100%;
+
 }
 .about-us {
     flex: 2;
