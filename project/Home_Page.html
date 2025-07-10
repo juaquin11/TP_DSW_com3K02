@@ -1,127 +1,141 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantAddict</title>
-    <link rel="stylesheet" href="Home_Page.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RestaurantAddict</title>
+  <link rel="stylesheet" href="einf.css" />
 </head>
 <body>
-    <header class="header">
-        <div class="brand-logo">
-            <a href="Home_Page.html">
-                RestaurantAddict <img src="Images/Restaurant_Logojpg.jpg" alt="Por ahora">
-            </a>
+  <!-- Encabezado -->
+  <header class="header">
+    <div class="brand-logo">
+      <a href="Home_Page.html">
+        <span>RestaurantAddict</span>
+        <img src="Images/Restaurant_Logojpg.jpg" alt="Logo del sitio" />
+      </a>
+    </div>
+    <div class="button-login">
+      <a href="Login.html">
+        <img src="Images/login.png" alt="Iniciar sesión" />
+        <span>Log in</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="main">
+    <!-- Buscador de restaurantes -->
+    <section class="discover-restaurant">
+      <h1>¡Descubre los mejores restaurantes de Rosario!</h1>
+      <form class="search-form" action="#" method="GET">
+        <div class="location-select">
+          <label for="distrito" class="sr-only">Distrito</label>
+          <span class="icon">📍</span>
+          <select name="distrito" id="distrito">
+            <option value="centro">Centro</option>
+            <option value="norte">Norte</option>
+            <option value="sur">Sur</option>
+            <option value="oeste">Oeste</option>
+          </select>
         </div>
-        <div class="Buttom-Login">
-            <a href="Login.html">
-                <img src="Images/login.png" alt="IconoPersona">
-                Log in
-            </a>
+        <div class="search-input">
+          <label for="query" class="sr-only">Buscar</label>
+          <input type="text" id="query" name="query" placeholder="Cocina, nombre de restaurante..." />
         </div>
-    </header>
-    <main class="main">
-        <section class="descover-restaurant">
-            <h1>Descubre los mejores restaurantes de Rosario¡</h1>
-            <form class="search-form" action="#" method="GET">
-                <div class="location-select">
-                <label for="distrito" class="sr-only">Distrito</label> <!-- Oculta visualmente -->
-                <span class="icon">📍</span>
-                <select name="distrito" id="distrito">
-                    <option value="centro">Centro</option>
-                    <option value="norte">Norte</option>
-                    <option value="sur">Sur</option>
-                    <option value="oeste">Oeste</option>
-                </select>
-                </div>
+        <button type="submit" class="submit-button">Buscar</button>
+      </form>
+    </section>
 
-                <div class="search-input">
-                    <label for="query" class="sr-only">Buscar</label>
-                    <input type="text" id="query" name="query" placeholder="Cocina, nombre de restaurante...">
-                </div>
-                <button type="submit" class="submit-button">SEARCH</button>
-            </form>
-
-            
-        </section>
-        <article class="better-restaurants">
-
-            <div class="restaurantes-grid">
-                <!-- Luego solo haremos un for de 0 a 5 con datos de la DB filtrados  -->
-                <!-- Tarjeta 1 -->
-                <div class="restaurante-card">
-                    <div class="restaurante-info">
-                        <h3>Restaurante La Parrilla</h3> 
-                        <p>Carnes a la parrilla y especialidades argentinas en un ambiente rústico y acogedor.</p>
-                    </div>
-                    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Restaurante La Parrilla" class="restaurante-img">
-                </div>
-    
-                <!-- Tarjeta 2 -->
-                <div class="restaurante-card">
-                    <div class="restaurante-info">
-                        <h3>Marisquería El Puerto</h3>
-                        <p>Los mejores pescados y mariscos frescos, traídos directamente del puerto cada mañana.</p>
-                    </div>
-                    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Marisquería El Puerto" class="restaurante-img">
-                </div>
-    
-                <!-- Tarjeta 3 -->
-                <div class="restaurante-card">
-                    <div class="restaurante-info">
-                        <h3>Pizzería Napoli</h3>
-                        <p>Auténtica pizza napolitana preparada en horno de leña con ingredientes importados de Italia.</p>
-                    </div>
-                    <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Pizzería Napoli" class="restaurante-img">
-                </div>
-    
-                <!-- Tarjeta 4 -->
-                <div class="restaurante-card">
-                    <div class="restaurante-info">
-                        <h3>Sushi Garden</h3>
-                        <p>Comida japonesa tradicional y moderna en un ambiente minimalista inspirado en los jardines zen.</p>
-                    </div>
-                    <img src="https://images.unsplash.com/photo-1580828343064-fde4fc206bc6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Sushi Garden" class="restaurante-img">
-                </div>
-    
-                <!-- Tarjeta 5 -->
-                <div class="restaurante-card">
-                    <div class="restaurante-info">
-                        <h3>Café del Centro</h3>
-                        <p>El lugar perfecto para desayunos, brunch y meriendas con productos artesanales y de temporada.</p>
-                    </div>
-                    <img src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Café del Centro" class="restaurante-img">
-                </div>
-                <!-- Tarjeta 6 -->
-                <div class="restaurante-card">
-                    <div class="restaurante-info">
-                        <h3>Café del Sur</h3>
-                        <p>Un lugar destacado por sus platos abundamtes, sabrosos y variados con una peculiar decoracion urbana.</p>
-                    </div>
-                    <img src="https://images.unsplash.com/photo-1445116572670-236099ec97a0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Café del Centro" class="restaurante-img">
-                </div>
+    <!-- Tarjetas de restaurantes -->
+    <section class="restaurant-list">
+        <div class="restaurant-card">
+            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=500&q=60" alt="Restaurante La Parrilla" />
+            <div class="restaurant-info">
+                <h3>Restaurante La Parrilla</h3>
+                <p>Carnes a la parrilla y especialidades argentinas en un ambiente rústico y acogedor.</p>
             </div>
-        </article>
-    </main>
-    <footer>
-        <div class="about-us">
-            <h4>Acerca de nosotros</h4>
-            nosotros somos.. Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ea quidem, maiores quas impedit similique ducimus. Accusamus tempore ut rem molestiae ipsum maxime obcaecati, doloremque odit aut? Non facere mollitia nulla?
         </div>
-        <div class="our-service">
-            <h4>Nuestros Servicios</h4>
-            noestros servicios Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vero dolorum error ut harum perspiciatis a voluptatibus veniam iusto et, impedit quos provident modi deserunt ullam tempore nemo debitis quae reprehenderit.
-        </div>
-        <div class="more-info">
-            <h5>Contactanos</h5>
-            <div class="social-mesocialdia-icons">
-                <a href="#" aria-label="Instagram">iconoInstagram</a>
-                <a href="#" aria-label="TikTok">iconoTikTok</a>
-                <a href="#" aria-label="Facebook">iconoFacebook</a>
-                <a href="#" aria-label="Twitter">iconoTwitter</a>
+
+        <!-- Repetí las siguientes tarjetas según lo necesario -->
+
+        <div class="restaurant-card">
+            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=500&q=60" alt="Marisquería El Puerto" />
+            <div class="restaurant-info">
+                <h3>Marisquería El Puerto</h3>
+                <p>Los mejores pescados y mariscos frescos, traídos directamente del puerto cada mañana.</p>
             </div>
-            <h4>©Todos los derechos reservados a RestaurantAddict</h4>
         </div>
-    </footer>
+      
+        <div class="restaurant-card">
+            <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Pizzería Napoli" class="restaurante-img" alt="Marisquería El Puerto" />
+            <div class="restaurant-info">
+                <h3>Pizzería Napoli</h3>
+                <p>Auténtica pizza napolitana preparada en horno de leña con ingredientes importados de Italia.</p>
+            </div>
+        </div>
+
+        <div class="restaurant-card">
+            <img src="https://images.unsplash.com/photo-1580828343064-fde4fc206bc6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" />
+            <div class="restaurant-info">
+                <h3>Sushi Garden</h3>
+                <p>Comida japonesa tradicional y moderna en un ambiente minimalista inspirado en los jardines zen.</p>
+            </div>
+        </div>
+        
+        <div class="restaurant-card">
+            <img src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"/>
+            <div class="restaurant-info">
+                <h3>Café del Centro</h3>
+                <p>El lugar perfecto para desayunos, brunch y meriendas con productos artesanales y de temporada.</p>
+            </div>
+        </div>
+
+        <div class="restaurant-card">
+            <img src="https://images.unsplash.com/photo-1445116572670-236099ec97a0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"/>
+            <div class="restaurant-info">
+                <h3>Café del Sur</h3>
+                <p>Un lugarlugar perfecto para desayunos, brunch y meriendas con productos artesanales y de temporada.</p>
+            </div>
+        </div>
+
+        <div class="restaurant-card">
+            <img src="https://images.unsplash.com/photo-1445116572670-236099ec97a0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"/>
+            <div class="restaurant-info">
+                <h3>Café del Sur</h3>
+                <p>Un lugarlugar perfecto para desayunos, brunch y meriendas con productos artesanales y de temporada.</p>
+            </div>
+        </div>
+
+        <div class="restaurant-card">
+            <img src="https://images.unsplash.com/photo-1445116572670-236099ec97a0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"/>
+            <div class="restaurant-info">
+                <h3>Café del Sur</h3>
+                <p>Un lugarlugar perfecto para desayunos, brunch y meriendas con productos artesanales y de temporada.</p>
+            </div>
+        </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-section">
+      <h4>Acerca de nosotros</h4>
+      <p>Somos un equipo comprometido con conectar comensales con experiencias gastronómicas únicas en Rosario.</p>
+    </div>
+    <div class="footer-section">
+      <h4>Nuestros servicios</h4>
+      <p>Ofrecemos reservas online, valoraciones, y descuentos exclusivos en los mejores restaurantes.</p>
+    </div>
+    <div class="footer-section">
+      <h4>Contacto</h4>
+      <div class="social-icons">
+        <a href="#">Instagram</a> |
+        <a href="#">TikTok</a> |
+        <a href="#">Facebook</a> |
+        <a href="#">Twitter</a>
+      </div>
+      <p>© 2025 RestaurantAddict</p>
+    </div>
+  </footer>
 </body>
 </html>
