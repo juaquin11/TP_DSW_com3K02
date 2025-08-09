@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model category {
+  id_category         String                @id @default(dbgenerated("(uuid())")) @db.Char(36)
+  name                String                @unique(map: "name") @db.VarChar(50)
+  description         String?               @db.Text
+  restaurant_category restaurant_category[]
+}
+
+model consumption {
+  id_client     String      @db.Char(36)
+  dish_name     String      @db.VarChar(100)
+  id_restaurant String      @db.Char(36)
+  useraccount   useraccount @relation(fields: [id_client], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "consumption_ibfk_1")
+  dish          dish        @relation(fields: [dish_name, id_restaurant], references: [dish_name, id_restaurant], onDelete: NoAction, onUpdate: NoAction, map: "consumption_ibfk_2")
+
+  @@id([id_client, dish_name, id_restaurant])
+  @@index([dish_name, id_restaurant], map: "dish_name")
+}
+
+model discount {
+  dish_name     String  @db.VarChar(100)
+  id_restaurant String  @db.Char(36)
+  description   String  @db.Text
+  percentage    Decimal @db.Decimal(5, 2)
+  status        Int     @default(1) @db.TinyInt
+  dish          dish    @relation(fields: [dish_name, id_restaurant], references: [dish_name, id_restaurant], onDelete: NoAction, onUpdate: NoAction, map: "discount_ibfk_1")
+
+  @@id([dish_name, id_restaurant])
+}
+
+model discount_subscription {
+  dish_name       String       @db.VarChar(100)
+  id_restaurant   String       @db.Char(36)
+  id_subscription String       @db.Char(36)
+  subscription    subscription @relation(fields: [id_subscription], references: [id_subscription], onDelete: NoAction, onUpdate: NoAction, map: "discount_subscription_ibfk_1")
+  dish            dish         @relation(fields: [dish_name, id_restaurant], references: [dish_name, id_restaurant], onDelete: NoAction, onUpdate: NoAction, map: "discount_subscription_ibfk_2")
+
+  @@id([dish_name, id_restaurant, id_subscription])
+  @@index([id_subscription], map: "id_subscription")
+}
+
+model dish {
+  dish_name             String                  @db.VarChar(100)
+  description           String                  @db.Text
+  status                Int                     @default(1) @db.TinyInt
+  current_price         Decimal                 @db.Decimal(10, 2)
+  image                 String?                 @db.VarChar(255)
+  id_restaurant         String                  @db.Char(36)
+  consumption           consumption[]
+  discount              discount?
+  discount_subscription discount_subscription[]
+  restaurant            restaurant              @relation(fields: [id_restaurant], references: [id_restaurant], onDelete: NoAction, onUpdate: NoAction, map: "dish_ibfk_1")
+
+  @@id([dish_name, id_restaurant])
+  @@index([id_restaurant], map: "id_restaurant")
+}
+
+model district {
+  id_district String       @id @default(dbgenerated("(uuid())")) @db.Char(36)
+  name        String       @unique(map: "name") @db.VarChar(50)
+  restaurant  restaurant[]
+}
+
+model has_subscription {
+  id_client       String       @id @db.Char(36)
+  id_subscription String       @db.Char(36)
+  adhesion_date   DateTime     @db.Date
+  useraccount     useraccount  @relation(fields: [id_client], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "has_subscription_ibfk_1")
+  subscription    subscription @relation(fields: [id_subscription], references: [id_subscription], onDelete: NoAction, onUpdate: NoAction, map: "has_subscription_ibfk_2")
+
+  @@index([id_subscription], map: "id_subscription")
+}
+
+model penalty {
+  penalty_number     Int         @default(autoincrement())
+  id_client          String      @db.Char(36)
+  penalty_start_date DateTime    @db.Date
+  penalty_end_date   DateTime    @db.Date
+  client_reason      String?     @db.Text
+  useraccount        useraccount @relation(fields: [id_client], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "penalty_ibfk_1")
+
+  @@id([penalty_number, id_client])
+  @@index([id_client], map: "id_client")
+}
+
+model reservation {
+  id_reservation      String      @id @default(dbgenerated("(uuid())")) @db.Char(36)
+  reservation_date    DateTime    @db.DateTime(0)
+  cancellation_reason String?     @db.Text
+  diners              Int
+  id_client           String      @db.Char(36)
+  id_restaurant       String      @db.Char(36)
+  status              Int         @default(0) @db.TinyInt
+  useraccount         useraccount @relation(fields: [id_client], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "reservation_ibfk_1")
+  restaurant          restaurant  @relation(fields: [id_restaurant], references: [id_restaurant], onDelete: NoAction, onUpdate: NoAction, map: "reservation_ibfk_2")
+  review              review[]
+
+  @@index([id_client], map: "id_client")
+  @@index([id_restaurant], map: "id_restaurant")
+}
+
+model restaurant {
+  id_restaurant       String                @id @default(dbgenerated("(uuid())")) @db.Char(36)
+  name                String                @db.VarChar(100)
+  chair_amount        Int
+  chair_aviable       Int
+  street              String                @db.VarChar(100)
+  height              String                @db.VarChar(10)
+  image               String?               @db.VarChar(255)
+  opening_time        DateTime              @db.Time(0)
+  closing_time        DateTime              @db.Time(0)
+  id_owner            String                @db.Char(36)
+  id_district         String                @db.Char(36)
+  status              Int                   @default(1) @db.TinyInt
+  dish                dish[]
+  reservation         reservation[]
+  useraccount         useraccount           @relation(fields: [id_owner], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "restaurant_ibfk_1")
+  district            district              @relation(fields: [id_district], references: [id_district], onDelete: NoAction, onUpdate: NoAction, map: "restaurant_ibfk_2")
+  restaurant_category restaurant_category[]
+
+  @@index([id_district], map: "id_district")
+  @@index([id_owner], map: "id_owner")
+}
+
+model restaurant_category {
+  id_restaurant String     @db.Char(36)
+  id_category   String     @db.Char(36)
+  restaurant    restaurant @relation(fields: [id_restaurant], references: [id_restaurant], onDelete: NoAction, onUpdate: NoAction, map: "restaurant_category_ibfk_1")
+  category      category   @relation(fields: [id_category], references: [id_category], onDelete: NoAction, onUpdate: NoAction, map: "restaurant_category_ibfk_2")
+
+  @@id([id_restaurant, id_category])
+  @@index([id_category], map: "id_category")
+}
+
+model review {
+  review_number  Int         @default(autoincrement())
+  id_reservation String      @db.Char(36)
+  rating         Int
+  comment        String?     @db.Text
+  reservation    reservation @relation(fields: [id_reservation], references: [id_reservation], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_1")
+
+  @@id([review_number, id_reservation])
+  @@index([id_reservation], map: "id_reservation")
+}
+
+model subscription {
+  id_subscription       String                  @id @default(dbgenerated("(uuid())")) @db.Char(36)
+  plan_name             String                  @db.VarChar(50)
+  price                 Decimal                 @db.Decimal(10, 2)
+  duration              Int
+  discount_subscription discount_subscription[]
+  has_subscription      has_subscription[]
+}
+
+model useraccount {
+  id_user          String            @id @default(dbgenerated("(uuid())")) @db.Char(36)
+  name             String?           @db.VarChar(100)
+  email            String            @unique(map: "email") @db.VarChar(100)
+  phone            String            @db.VarChar(20)
+  type             useraccount_type
+  consumption      consumption[]
+  has_subscription has_subscription?
+  penalty          penalty[]
+  reservation      reservation[]
+  restaurant       restaurant[]
+}
+
+enum useraccount_type {
+  owner
+  client
+}
