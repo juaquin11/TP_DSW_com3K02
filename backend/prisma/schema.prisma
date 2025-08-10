@@ -112,7 +112,7 @@ model restaurant {
   id_restaurant       String                @id @default(dbgenerated("(uuid())")) @db.Char(36)
   name                String                @db.VarChar(100)
   chair_amount        Int
-  chair_aviable       Int
+  chair_available     Int
   street              String                @db.VarChar(100)
   height              String                @db.VarChar(10)
   image               String?               @db.VarChar(255)
@@ -163,6 +163,7 @@ model subscription {
 
 model useraccount {
   id_user          String            @id @default(dbgenerated("(uuid())")) @db.Char(36)
+  password_hash    String            @db.VarChar(255)
   name             String?           @db.VarChar(100)
   email            String            @unique(map: "email") @db.VarChar(100)
   phone            String            @db.VarChar(20)
