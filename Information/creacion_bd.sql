@@ -1,12 +1,25 @@
+-- -----------------------------------------------------
+-- Archivo: app_desarrollo_setup.sql
+-- Descripción: Script completo para la creación de la base de datos
+--              y la inserción de datos de ejemplo.
+-- -----------------------------------------------------
+
+-- Paso 1: Creación de la base de datos y usuario
+
 CREATE DATABASE IF NOT EXISTS app_desarrollo;
 USE app_desarrollo;
 
+-- Crea el usuario y le otorga privilegios
 CREATE USER IF NOT EXISTS 'app_user'@'localhost' IDENTIFIED BY '1234';
 GRANT ALL PRIVILEGES ON app_desarrollo.* TO 'app_user'@'localhost';
 FLUSH PRIVILEGES;
 
 -- Generador de UUID por defecto en MySQL
 -- Nota: MySQL 8 soporta UUID_TO_BIN y BIN_TO_UUID para mejor rendimiento
+
+-- -----------------------------------------------------
+-- Paso 2: Creación de las tablas
+-- -----------------------------------------------------
 
 -- Tabla useraccount
 CREATE TABLE useraccount (
@@ -151,3 +164,4 @@ CREATE TABLE discount_subscription (
     FOREIGN KEY (id_subscription) REFERENCES subscription(id_subscription),
     FOREIGN KEY (dish_name, id_restaurant) REFERENCES dish(dish_name, id_restaurant)
 );
+

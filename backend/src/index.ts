@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
+import restaurantRoutes from './routes/restaurant.routes';
 
 dotenv.config();
 const app = express();
@@ -14,6 +15,9 @@ app.use('/api/auth', authRoutes);
 app.get('/', (req, res) => {
   res.send('Servidor funcionando 🚀');
 });
+
+
+app.use('/api/restaurants', restaurantRoutes);
 
 // health
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
