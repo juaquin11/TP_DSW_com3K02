@@ -1,0 +1,9 @@
+/* styles/variables.css */
+:root {
+  --primary: #107a77;
+  --accent: #00664b;
+  --light: #089672;
+  --neutral-light: #f5f5f5;
+  --text-color: #333333;
+  --background-light: #e6f5f4;
+}

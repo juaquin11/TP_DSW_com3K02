@@ -1,8 +1,3 @@
-:root {
-  --primary: #107a77;
-  --accent: #00664b;
-  --bg-light: #f0f0f0;
-}
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -33,10 +28,10 @@
 .links a {
   color: #fff;
   text-decoration: none;
-  font-size: 1rem;
-  transition: color 0.2s ease-in-out;
+  font-size: 1.3rem;
+  transition: color 0.3s ease-in-out;
 }
 
 .links a:hover {
-  color: #c3f0ca; /* verde más claro para hover */
+  color: var(--accent); /* verde más claro para hover */
 }
