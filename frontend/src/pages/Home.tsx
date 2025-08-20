@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { fetchRestaurants} from '../services/restaurantService';
-import type { RestaurantDTO } from '../types/restaurant';
+// import { fetchRestaurants} from '../services/restaurantService';
+// import type { RestaurantDTO } from '../types/restaurant';
 import RestaurantCard from '../components/RestaurantCard';
 import styles from "./Home.module.css";
 
