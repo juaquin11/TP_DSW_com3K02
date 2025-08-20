@@ -1,33 +1,42 @@
+:root {
+  --primary: #107a77;
+  --accent: #00664b;
+  --bg-light: #f0f0f0;
+}
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: #222;
+  background-color: var(--primary); /* verde esmeralda oscuro */
   color: #fff;
 }
 
-.navbar__logo a {
+.logo {
   font-size: 1.5rem;
   font-weight: bold;
+}
+
+.logo a {
   color: #fff;
   text-decoration: none;
 }
 
-.navbar__links {
+.links {
   list-style: none;
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   margin: 0;
   padding: 0;
 }
 
-.navbar__links a {
+.links a {
   color: #fff;
   text-decoration: none;
   font-size: 1rem;
+  transition: color 0.2s ease-in-out;
 }
 
-.navbar__links a:hover {
-  text-decoration: underline;
+.links a:hover {
+  color: #c3f0ca; /* verde más claro para hover */
 }
