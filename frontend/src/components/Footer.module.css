@@ -5,3 +5,16 @@
   padding: 1rem 0;
   margin-top: 2rem;
 }
+
+.links {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  list-style: none;
+}
+
+.links a {
+  color: #fff;
+  font-size: 1.3rem;
+  transition: color 0.2s ease-in-out;
+}

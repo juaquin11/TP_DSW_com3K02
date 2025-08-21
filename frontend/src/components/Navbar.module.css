@@ -10,11 +10,17 @@
 .logo {
   font-size: 1.5rem;
   font-weight: bold;
+ 
+
 }
 
 .logo a {
   color: #fff;
   text-decoration: none;
+  display: flex;
+  align-items: center; /* Esto alinea los items (el Logo y el texto) verticalmente */
+  gap: 0.5rem;
+
 }
 
 .links {
@@ -28,7 +34,7 @@
 .links a {
   color: #fff;
   text-decoration: none;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   transition: color 0.2s ease-in-out;
 }
 
