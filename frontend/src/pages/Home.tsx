@@ -3,6 +3,7 @@ import { fetchRestaurants } from '../services/restaurantService';
 import type { RestaurantDTO } from '../types/restaurant';
 import RestaurantCard from '../components/RestaurantCard';
 import styles from "./Home.module.css";
+import { useAuth } from '../context/AuthContext'; // Importa el hook de autenticación
 
 const Home: React.FC = () => {
   const [restaurants, setRestaurants] = useState<RestaurantDTO[]>([]);
