@@ -24,7 +24,7 @@ FLUSH PRIVILEGES;
 -- Tabla useraccount
 CREATE TABLE useraccount (
     id_user CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    password_hash VARCHAR(255) NOT NULL;
+    password_hash VARCHAR(255) NOT NULL,
     name VARCHAR(100),  -- null si es 'client', solo sirve para ser mostrado en apartado de perfil.
     email VARCHAR(100) NOT NULL UNIQUE,
     phone VARCHAR(20) NOT NULL,
