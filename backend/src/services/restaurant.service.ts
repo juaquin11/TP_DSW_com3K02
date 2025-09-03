@@ -1,5 +1,5 @@
-// service: interact with Prisma to fetch restaurants and compute avg rating
 import prisma from '../prisma/client';
+import { Prisma } from '../generated/prisma';
 
 export type RestaurantWithRating = {
   id_restaurant: string;
@@ -9,69 +9,48 @@ export type RestaurantWithRating = {
   street: string;
   height: string;
   image?: string | null;
-  opening_time: Date;
-  closing_time: Date;
+  opening_time: string;
+  closing_time: string;
   id_owner: string;
   id_district: string;
   status: number;
-  // extras computed
   avgRating: number | null;
   reviewCount: number;
   districtName?: string | null;
 };
 
+
 export async function getAllRestaurantsOrderedByRating(): Promise<RestaurantWithRating[]> {
-  // fetch restaurants with reservations + reviews and district relation (if present)
-  const restaurants = await prisma.restaurant.findMany({
-    include: {
-      // include reservations so we can access reviews via reservation.review
-      reservation: {
-        include: {
-          review: true,
-        },
-      },
-      // include district relation if exists in schema (we will read possible display name)
-      district: true,
-    },
-  });
+  const result = await prisma.$queryRaw<RestaurantWithRating[]>(Prisma.sql`
+    SELECT               -- Sql clrudo para optimizar esta busqueda concurrente
+      r.id_restaurant,
+      r.name,
+      r.chair_amount,
+      r.chair_available,
+      r.street,
+      r.height,
+      r.image,
+      TIME_FORMAT(r.opening_time, '%H:%i:%s') AS opening_time,
+      TIME_FORMAT(r.closing_time, '%H:%i:%s') AS closing_time,
+      r.id_owner,
+      r.id_district,
+      r.status,
+      d.name AS districtName,
+      CAST(IFNULL(AVG(rev.rating), 0) AS DECIMAL(10, 2)) AS avgRating,
+      COUNT(rev.rating) AS reviewCount
+    FROM restaurant AS r
+    LEFT JOIN district AS d ON r.id_district = d.id_district
+    LEFT JOIN reservation AS res ON r.id_restaurant = res.id_restaurant
+    LEFT JOIN review AS rev ON res.id_reservation = rev.id_reservation
+    GROUP BY r.id_restaurant
+    ORDER BY avgRating DESC;
+  `);
 
-  // compute average rating for each restaurant
-  const computed = restaurants.map((r) => {
-    // collect all reviews under all reservations
-    const reviews = (r.reservation ?? []).flatMap((res) => res.review ?? []);
-    const ratings = reviews.map((rv) => rv.rating).filter((v) => typeof v === 'number');
-    const reviewCount = ratings.length;
-    const avgRating = reviewCount > 0 ? ratings.reduce((a, b) => a + b, 0) / reviewCount : null;
-
-    // try to get a human-friendly district name (fallback to id_district)
-    // using optional chaining: district may have different fields; pick common ones.
-    const district = (r as any).district;
-    let districtName: string | null = null;
-    if (district) {
-      districtName = district.name ?? district.district_name ?? district.description ?? null;
-    }
-
-    return {
-      id_restaurant: r.id_restaurant,
-      name: r.name,
-      chair_amount: r.chair_amount,
-      chair_available: r.chair_available,
-      street: r.street,
-      height: r.height,
-      image: r.image ?? null,
-      opening_time: r.opening_time,
-      closing_time: r.closing_time,
-      id_owner: r.id_owner,
-      id_district: r.id_district,
-      status: r.status,
-      avgRating,
-      reviewCount,
-      districtName,
-    } as RestaurantWithRating;
-  });
-
-  // sort by avgRating desc (nulls treated as 0 to push them to the end)
-  computed.sort((a, b) => (b.avgRating ?? 0) - (a.avgRating ?? 0));
-
-  return computed;
+  return result.map(row => ({
+    ...row,
+    avgRating: Number(row.avgRating),
+    reviewCount: Number(row.reviewCount),
+    opening_time: String(row.opening_time),
+    closing_time: String(row.closing_time),
+  }));
 }
