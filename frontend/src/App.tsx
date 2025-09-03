@@ -10,7 +10,7 @@ import Footer from "./components/Footer";
 
 export default function App() {
   return (
-    <div className={styles.appContainer}>
+    <div style={{ display: "grid", minHeight: "100vh", gridTemplateRows: "auto 1fr auto" }}>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
