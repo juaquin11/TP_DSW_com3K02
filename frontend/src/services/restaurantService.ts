@@ -1,14 +1,12 @@
-import axios from 'axios';
+import apiClient from './apiClient';
 import type { RestaurantDTO } from '../types/restaurant';
-
-const API_BASE = 'http://localhost:3000/api';
 
 export async function fetchRestaurants(token?: string): Promise<RestaurantDTO[]> {
   const headers: Record<string, string> = {};
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
-  const res = await axios.get<RestaurantDTO[]>(`${API_BASE}/restaurants`, {
+  const res = await apiClient.get<RestaurantDTO[]>("/restaurants", {
     headers,
   });
   return res.data;

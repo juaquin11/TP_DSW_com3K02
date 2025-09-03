@@ -1,13 +1,11 @@
-import axios from "axios";
-
-const API_URL = "http://localhost:3000/api/auth"; // URL de tu backend
+import apiClient from "./apiClient";
 
 export const registerUser = async (data: { email: string; password: string }) => {
-  const res = await axios.post(`${API_URL}/register`, data);
+  const res = await apiClient.post("/auth/register", data);
   return res.data;
 };
 
 export const loginUser = async (data: { email: string; password: string }) => {
-  const res = await axios.post(`${API_URL}/login`, data);
+  const res = await apiClient.post("/auth/login", data);
   return res.data;
 };
