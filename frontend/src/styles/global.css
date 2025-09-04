@@ -1,14 +1,23 @@
 /* styles/variables.css */
 :root {
-  --primary: #107a77;
-  --accent: #00664b;
-  --light: #089672;
-  --neutral-light: #f5f5f5;
-  --text-color: #333333;
-  --background-light: #b0d8d8;
+  --restaurant-gold: #d4af37;
+  --restaurant-cream: #f5f3e7;
+  --restaurant-dark: #1a1a1a;
+  --restaurant-card: #2d2d2d;
+  --restaurant-muted: #6c757d;
+  --restaurant-border: #474747;
 }
 * {
   box-sizing: border-box;
   margin: 0px;
   padding: 0px;
+}
+
+@layer base {
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--restaurant-dark);
+    color: var(--restaurant-cream);
+    line-height: 1.6;
+  }
 }

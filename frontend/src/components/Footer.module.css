@@ -1,20 +1,29 @@
 .footer {
-  background-color: var(--primary);
-  color: #fff;
+  background-color: var(--restaurant-dark);
   text-align: center;
   padding: 1rem 0;
-  margin-top: 2rem;
+
+  border-top: 1px solid var(--restaurant-border);
+  color: var(--restaurant-cream);
+  justify-content: center;
+  font:   1rem 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
 }
 
 .links {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
-  list-style: none;
+  justify-content: space-around;
+  list-style: none; 
 }
 
 .links a {
-  color: #fff;
+  color: var(--restaurant-cream);
   font-size: 1.3rem;
-  transition: color 0.2s ease-in-out;
+  text-decoration: none;
+}
+
+.links a:hover {
+  transition-duration: 0.3s;
+  color: var(--restaurant-gold);
+  transform: scale(1.1);
 }

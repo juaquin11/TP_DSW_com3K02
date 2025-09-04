@@ -1,43 +1,91 @@
 .navbar {
+  background-color: var(--restaurant-dark);
+  border-bottom: 1px solid var(--restaurant-border);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.topNav {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background-color: var(--primary);
-  color: #fff;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 0;
 }
 
 .logo {
   font-size: 1.5rem;
   font-weight: bold;
- 
-
+  display: flex;
+  align-items: center; 
+  gap: 0.5rem;
+  font: bold 1rem 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .logo a {
-  color: #fff;
+  color: var(--restaurant-cream);
+  font-size: 1.5rem;
   text-decoration: none;
-  display: flex;
-  align-items: center; /* Esto alinea los items (el Logo y el texto) verticalmente */
-  gap: 0.5rem;
-
-}
-
-.links {
-  list-style: none;
-  display: flex;
-  gap: 1.5rem;
+  font-weight: 700;
   margin: 0;
-  padding: 0;
+  display: flex;
+
 }
 
-.links a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 1.4rem;
-  transition: color 0.2s ease-in-out;
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  
 }
 
-.links a:hover {
-  color: var(--accent);
+.loginButton {
+  background: transparent;
+  border: 1px solid var(--restaurant-gold);
+  color: var(--restaurant-gold);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  display: none;
+  align-items: center;
+  transition: all 0.2s ease;
+  
 }
+
+.loginButton:hover {
+  background-color: var(--restaurante-gold);
+  color: var(--restaurant-dark);
+  
+}
+
+.loginButtonVisible {
+  display: flex;
+}
+
+
+.registerButton {
+  background-color: var(--restaurant-gold);
+  border: 1px solid var(--restaurant-gold);
+  color: var(--restaurant-dark);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.registerButton:hover {
+  background-color: #c19b26;
+  border-color: #c19b26;
+}
+
+@media (min-width: 576px) {
+  .loginButton {
+    display: flex;
+  }
+}
+
