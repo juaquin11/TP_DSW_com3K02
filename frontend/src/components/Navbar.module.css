@@ -58,7 +58,7 @@
 }
 
 .loginButton:hover {
-  background-color: var(--restaurante-gold);
+  background-color: var(--restaurant-gold);
   color: var(--restaurant-dark);
   
 }

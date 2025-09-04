@@ -10,12 +10,10 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLoginClick = () => {
-    // podés hacer cosas antes, ej: limpiar estados, logs, etc.
     navigate("/login");
   };
 
   const handleRegisterClick = () => {
-    // podés hacer cosas antes, ej: limpiar estados, logs, etc.
     navigate("/register");
   };
 
