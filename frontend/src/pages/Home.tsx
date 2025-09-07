@@ -3,16 +3,18 @@ import { fetchRestaurants } from '../services/restaurantService';
 import type { RestaurantDTO } from '../types/restaurant';
 import RestaurantCard from '../components/RestaurantCard';
 import styles from "./Home.module.css";
+import { useAuth } from '../context/AuthContext';
 
 const Home: React.FC = () => {
   const [restaurants, setRestaurants] = useState<RestaurantDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { token } = useAuth(); // Obtiene el token del contexto
 
   useEffect(() => {
     async function getRestaurants() {
       try {
-        const data = await fetchRestaurants();
+        const data = await fetchRestaurants(token ?? undefined);
         setRestaurants(data);
       } catch (err: any) {
         console.error('Failed to fetch restaurants:', err);
@@ -21,8 +23,9 @@ const Home: React.FC = () => {
         setLoading(false);
       }
     }
+    
     getRestaurants();
-  }, []);
+  }, [token]); // El efecto se ejecuta cuando el componente se monta y cuando el token cambia
 
   if (loading) {
     return <main className={styles.container}>Cargando restaurantes...</main>;
