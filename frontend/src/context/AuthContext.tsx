@@ -1,5 +1,7 @@
+// frontend/src/context/AuthContext.tsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { type JwtPayload, jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
+import type { JwtPayload } from '../types/auth'; // Importa tu interfaz personalizada
 
 interface AuthContextType {
     user: JwtPayload | null;
@@ -17,6 +19,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (token) {
             try {
+                // Ahora se usa tu interfaz personalizada, por lo que el error desaparecerá
                 const decoded = jwtDecode<JwtPayload>(token);
                 setUser(decoded);
             } catch (error) {

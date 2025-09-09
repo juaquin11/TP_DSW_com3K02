@@ -1,7 +1,9 @@
+/* frontend/src/components/Navbar.module.css */
 .navbar {
   background-color: var(--restaurant-dark);
   border-bottom: 1px solid var(--restaurant-border);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
 }
 
 .container {
@@ -15,77 +17,134 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 0.5rem 0;
 }
 
 .logo {
-  font-size: 1.5rem;
+  font-size: 5rem;
   font-weight: bold;
   display: flex;
-  align-items: center; 
+  align-items: center;
   gap: 0.5rem;
-  font: bold 1rem 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .logo a {
-  color: var(--restaurant-cream);
+  color: var(--restaurant-gold);
   font-size: 1.5rem;
   text-decoration: none;
   font-weight: 700;
-  margin: 0;
   display: flex;
-
+  align-items: center;
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  
+  gap: 1rem;
+}
+
+.loginButton,
+.registerButton,
+.logoutButton {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .loginButton {
   background: transparent;
   border: 1px solid var(--restaurant-gold);
   color: var(--restaurant-gold);
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.375rem;
-  font-weight: 500;
-  display: none;
-  align-items: center;
-  transition: all 0.2s ease;
-  
 }
 
 .loginButton:hover {
   background-color: var(--restaurant-gold);
   color: var(--restaurant-dark);
-  
 }
-
-.loginButtonVisible {
-  display: flex;
-}
-
 
 .registerButton {
   background-color: var(--restaurant-gold);
   border: 1px solid var(--restaurant-gold);
   color: var(--restaurant-dark);
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.375rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
 }
 
 .registerButton:hover {
-  background-color: #c19b26;
-  border-color: #c19b26;
+  background-color: transparent;
+  color: var(--restaurant-gold);
 }
 
-@media (min-width: 576px) {
-  .loginButton {
-    display: flex;
+.logoutButton {
+  background-color: #dc3545;
+  color: white;
+  border: 1px solid #dc3545;
+}
+
+.logoutButton:hover {
+  background-color: transparent;
+  color: #dc3545;
+}
+
+.profileContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.profileIcon {
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 2px solid transparent; /* Por defecto, sin borde */
+  transition: border-color 0.3s ease;
+  overflow: hidden;
+}
+
+.profileIcon.subscribed {
+  border-color: var(--restaurant-gold);
+}
+
+.profileImage {
+  width: 7rem;
+  height: 7rem;
+  object-fit: cover;
+  border-radius: 50%;
+  background-color: var(--restaurant-cream);
+}
+
+.notificationBadge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  color: var(--restaurant-dark);
+  font-weight: bold;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(25%, -25%);
+  z-index: 10;
+}
+
+.notificationBadgeYellow {
+  background-color: #ffc107;
+}
+
+.notificationBadgeRed {
+  background-color: #dc3545;
+  color: white;
+}
+
+@media (max-width: 576px) {
+  .actions {
+    gap: 0.5rem;
   }
 }
-

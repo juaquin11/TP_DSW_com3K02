@@ -20,3 +20,10 @@ export type AuthResponseDTO = {
   };
   token: string;
 };
+
+export interface JwtPayload {
+  id_user: string;
+  type: 'client' | 'owner';
+  iat?: number;
+  exp?: number;
+}
