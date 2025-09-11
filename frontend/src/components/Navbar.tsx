@@ -15,10 +15,10 @@ const Navbar: React.FC = () => {
   const hasPenalty = user?.type === 'owner' && user.id_user === 'be0fb518-8869-11f0-888b-3822e2f3ab83'; //Mi cuenta para probar si funciona
   const notificationCount = hasPenalty ? 2 : 5; // Simulación: 5 reseñas pendientes o 2 por penalidad
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  // const handleLogout = () => { 
+  //   logout();
+  //   navigate('/');
+  // };
 
   return (
     <nav className={styles.navbar}>

@@ -24,7 +24,7 @@ function Login() {
       alert('¡Bienvenido! Has iniciado sesión correctamente.');
 
       if (result.user.type === 'owner') {
-        navigate('/owner-dashboard'); // Redirige a una ruta para dueños
+        navigate('/ownerDashboard'); // Redirige a una ruta para dueños
       } else {
         navigate('/'); // Redirige al home para clientes
       }
