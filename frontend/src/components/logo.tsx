@@ -1,11 +1,11 @@
 import React from 'react';
 
-const Logo = ({ width = '32px', height = '32px' }) => {
+const Logo = ({ width = '32px', height = '32px' }) => { //32px por defecto*
   return (
     <img 
       src="/logo.svg" 
       alt="FoodApp Logo"
-      style={{ width: width, height: height }} 
+      style={{ width: width, height: height, backgroundColor: 'white', borderRadius: '50%'}} 
     />
   );
 };

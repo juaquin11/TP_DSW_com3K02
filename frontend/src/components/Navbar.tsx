@@ -11,8 +11,8 @@ const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   
   // Lógica simulada para las notificaciones y suscripción
-  const hasSubscription = user?.type === 'client' && user.id_user === 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14';
-  const hasPenalty = user?.type === 'client' && user.id_user === 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a16';
+  const hasSubscription = user?.type === 'owner' && user.id_user === 'be0fb518-8869-11f0-888b-3822e2f3ab83'; //Mi cuenta para probar si funciona
+  const hasPenalty = user?.type === 'owner' && user.id_user === 'be0fb518-8869-11f0-888b-3822e2f3ab83'; //Mi cuenta para probar si funciona
   const notificationCount = hasPenalty ? 2 : 5; // Simulación: 5 reseñas pendientes o 2 por penalidad
 
   const handleLogout = () => {
@@ -35,9 +35,9 @@ const Navbar: React.FC = () => {
           <div className={styles.actions}>
             {user ? (
               <>
-                <button onClick={handleLogout} className={styles.logoutButton}>
+                {/* <button onClick={handleLogout} className={styles.logoutButton}>
                   Logout
-                </button>
+                </button> */}
                 <ProfileIcon 
                   userType={user.type}
                   hasSubscription={hasSubscription}

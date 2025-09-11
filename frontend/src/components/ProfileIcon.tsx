@@ -16,8 +16,18 @@ const ProfileIcon: React.FC<ProfileIconProps> = ({ userType, hasSubscription, no
   return (
     <div className={styles.profileContainer}>
       <Link to="/profile" className={`${styles.profileIcon} ${hasSubscription ? styles.subscribed : ''}`}>
-        <img src={profileImage} alt={`${userType} profile`} className={styles.profileImage} />
-        {notificationCount > 0 && (
+        <img 
+          src={profileImage} 
+          alt={`${userType} profile`} 
+          className={styles.profileImage} 
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+          }}
+          />
+            {notificationCount > 0 && (
           <span className={`${styles.notificationBadge} ${notificationBadgeColor}`}>
             {notificationCount}
           </span>
