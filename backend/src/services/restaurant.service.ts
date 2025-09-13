@@ -1,39 +1,6 @@
 import prisma from '../prisma/client';
 import { Prisma } from '../generated/prisma';
-
-export type RestaurantWithRating = {
-  id_restaurant: string;
-  name: string;
-  chair_amount: number;
-  chair_available: number;
-  street: string;
-  height: string;
-  image?: string | null;
-  opening_time: string;
-  closing_time: string;
-  id_owner: string;
-  id_district: string;
-  status: number;
-  avgRating: number | null;
-  reviewCount: number;
-  districtName?: string | null;
-};
-
-export type OwnerRestaurant = {
-  id_restaurant: string;
-  name: string;
-  chair_amount: number;
-  chair_available: number;
-  street: string;
-  height: string;
-  image?: string | null;
-  opening_time: string;
-  closing_time: string;
-  id_owner: string;
-  id_district: string;
-  status: number;
-  districtName?: string | null;
-};
+import { RestaurantWithRating , OwnerRestaurant} from '../models/types';
 
 
 export async function getAllRestaurantsOrderedByRating(): Promise<RestaurantWithRating[]> {
