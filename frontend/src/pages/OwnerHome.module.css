@@ -67,3 +67,27 @@
   background-color: #c19b26;
   color: var(--restaurant-cream);
 }
+
+.actionsContainer {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.addButton {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--restaurant-gold);
+  color: var(--restaurant-dark);
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.addButton:hover {
+  background-color: #c19b26;
+  color: var(--restaurant-cream);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}

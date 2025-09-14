@@ -9,6 +9,7 @@ const OwnerHome: React.FC = () => {
   const [restaurants, setRestaurants] = useState<OwnerRestaurantDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState<boolean>(false); 
   const { token, user } = useAuth();
   const navigate = useNavigate();
 
@@ -35,6 +36,11 @@ const OwnerHome: React.FC = () => {
 
   const handleAdminClick = (id: string) => {
     navigate(`/ownerDashboard/restaurant/${id}`);
+  };
+  
+  const handleAddNewRestaurant = (newRestaurant: OwnerRestaurantDTO) => {
+    setRestaurants(prev => [...prev, newRestaurant]);
+    setShowCreateForm(false); // Ocultar formulario tras el éxito
   };
 
   if (loading) {
@@ -96,6 +102,12 @@ const OwnerHome: React.FC = () => {
           </tbody>
         </table>
       </div>
+      <div className={styles.actionsContainer}>
+        {/* Este botón ahora navega a la nueva página */}
+        <button onClick={() => navigate('/ownerDashboard/new-restaurant')} className={styles.addButton}>
+          ＋ Agregar Restaurante
+        </button>
+      </div>      
     </main>
   );
 };

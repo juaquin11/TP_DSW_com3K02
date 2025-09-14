@@ -1,0 +1,43 @@
+.container {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 2rem auto;
+  color: var(--restaurant-cream);
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--restaurant-gold);
+}
+
+.info {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 3rem;
+  background-color: var(--restaurant-card);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.comingSoon {
+  text-align: center;
+}
+
+.comingSoon h2 {
+  margin-bottom: 1rem;
+  color: var(--restaurant-gold);
+}
+
+.comingSoon ul {
+  list-style: none;
+  padding: 0;
+}
+
+.comingSoon li {
+  background-color: var(--restaurant-card);
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border-left: 4px solid var(--restaurant-gold);
+}

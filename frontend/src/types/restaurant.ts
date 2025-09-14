@@ -6,7 +6,7 @@ export type RestaurantDTO = {
   street: string;
   height: string;
   image?: string | null;
-  opening_time: string; // will be ISO string from backend JSON -- "conversion"
+  opening_time: string;
   closing_time: string;
   id_district: string;
   status: number;
@@ -29,4 +29,16 @@ export type OwnerRestaurantDTO = {
   id_district: string;
   status: number;
   districtName?: string | null;
+};
+
+export type CreateRestaurantDTO = {
+  name: string;
+  chair_amount: number;
+  street: string;
+  height: string;
+  opening_time: string;
+  closing_time: string;
+  id_district: string;
+  categoryIds: string[];
+  image?: string;
 };
