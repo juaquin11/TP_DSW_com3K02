@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import restaurantRoutes from './routes/restaurant.routes';
 import dishRoutes from './routes/dishCRUD.routes';
+import categoryRoutes from './routes/category.routes'; 
 
 
 dotenv.config();
@@ -12,8 +13,11 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
-
+app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/dishes', dishRoutes);
+app.use('/api/categories', categoryRoutes);
+
+
 
 // Rutas de prueba
 app.get('/', (req, res) => {
@@ -21,7 +25,6 @@ app.get('/', (req, res) => {
 });
 
 
-app.use('/api/restaurants', restaurantRoutes);
 
 // health
 app.get('/api/health', (_req, res) => res.json({ ok: true }));

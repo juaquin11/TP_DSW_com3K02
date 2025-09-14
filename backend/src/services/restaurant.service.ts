@@ -1,6 +1,6 @@
 import prisma from '../prisma/client';
 import { Prisma } from '../generated/prisma';
-import { RestaurantWithRating , OwnerRestaurant} from '../models/types';
+import { RestaurantWithRating , OwnerRestaurant, CreateRestaurantPayload } from '../models/types';
 
 
 export async function getAllRestaurantsOrderedByRating(): Promise<RestaurantWithRating[]> {
@@ -79,5 +79,35 @@ export async function getOwnerRestaurants(ownerId: string): Promise<OwnerRestaur
       status: r.status,
       districtName: r.district?.name,
     };
+  });
+}
+
+export async function createRestaurant(data: CreateRestaurantPayload, ownerId: string) {
+  const { id_category, ...restaurantData } = data;
+
+  // Prisma se encargará de la transacción para crear el restaurante y sus relaciones
+  return prisma.restaurant.create({
+    data: {
+      ...restaurantData,
+      chair_amount: Number(data.chair_amount), // Aseguramos que sea un número
+      id_owner: ownerId,
+      chair_available: Number(data.chair_amount), // Por defecto, todas las sillas están disponibles
+      status: 1, // Activo por defecto
+      restaurant_category: {
+        create: id_category.map(id_category => ({
+          category: {
+            connect: { id_category },
+          },
+        })),
+      },
+    },
+    include: {
+        restaurant_category: {
+            include: {
+                category: true
+            }
+        },
+        district: true
+    }
   });
 }

@@ -46,7 +46,7 @@ export interface CreateRestaurantPayload {
   height: string;
   opening_time: string;
   closing_time: string;
-  id_owner: string;
   id_district: string;
-  categories: string[];
+  id_category: string[]; // Cambiado de 'categories' para mayor claridad
+  image?: string;
 }
