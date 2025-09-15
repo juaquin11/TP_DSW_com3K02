@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import * as restaurantService from '../services/restaurant.service';
 import { JwtPayload, CreateRestaurantPayload} from '../models/types';
-
+import path from 'path';
+import fs from 'fs'; // Importamos el módulo File System
+  
 
 export async function listRestaurants(req: Request, res: Response) {
   try {
@@ -27,6 +29,18 @@ export async function listOwnerRestaurants(req: Request, res: Response) {
     console.error('Error listing owner restaurants', err);
     return res.status(500).json({ error: 'Failed to fetch restaurants for owner' });
   }
+}
+
+
+function slugify(text: string): string { // proceso de convertir un nombre (texto) en un "slug", que es una versión simplificada y legible de ese nombre, diseñada para usarse en URLs de sitios web
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, '-')           // Reemplaza espacios con -
+    .replace(/[^\w\-]+/g, '')       // Quita caracteres no válidos
+    .replace(/\-\-+/g, '-')         // Reemplaza múltiples - con uno solo
+    .replace(/^-+/, '')             // Quita - del inicio
+    .replace(/-+$/, '');            // Quita - del final
 }
 
 export async function createRestaurant(req: Request, res: Response) {
@@ -57,7 +71,17 @@ export async function createRestaurant(req: Request, res: Response) {
         return res.status(400).json({ error: 'Debes seleccionar al menos una categoría.' });
     }
 
-    const imageUrl = `/uploads/${req.file.filename}`;
+      const tempPath = req.file.path;
+    const extension = path.extname(req.file.filename); // Usamos la extensión del archivo temporal
+    const uniqueSuffix = Date.now();
+    
+    // Crea el nuevo nombre de archivo legible y único
+    const newFileName = `${slugify(name)}-${uniqueSuffix}${extension}`;
+    const newPath = path.join(path.dirname(tempPath), newFileName);
+
+    // Renombra el archivo en el sistema de archivos
+    fs.renameSync(tempPath, newPath);
+    // --- Fin de la lógica ---
 
     const restaurantData = {
       name,
@@ -68,7 +92,8 @@ export async function createRestaurant(req: Request, res: Response) {
       closing_time,
       id_district,
       id_category: parsedCategoryIds,
-      image: imageUrl,
+      // Guarda la ruta relativa que usará el frontend
+      image: `/uploads/${newFileName}`,
     };
 
     const newRestaurant = await restaurantService.createRestaurant(restaurantData, user.id_user);
