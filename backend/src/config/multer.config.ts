@@ -4,13 +4,13 @@ import path from 'path';
 // Define dónde se guardarán las imágenes
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Los archivos se guardarán en la carpeta 'public/uploads' en la raíz del backend
-    cb(null, 'public/uploads/');
+    // Los archivos se guardarán en la carpeta 'frontend/public/public' en la raíz del backend
+    cb(null, '../frontend/public/');
   },
   filename: (req, file, cb) => {
     // Genera un nombre de archivo único para evitar colisiones
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    const uploadPath = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uploadPath);
   }
 });
 
