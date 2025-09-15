@@ -48,5 +48,5 @@ export interface CreateRestaurantPayload {
   closing_time: string;
   id_district: string;
   id_category: string[]; // Cambiado de 'categories' para mayor claridad
-  image?: string;
+  image: string;
 }

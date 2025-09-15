@@ -33,27 +33,51 @@ export async function createRestaurant(req: Request, res: Response) {
   try {
     const user = (req as any).user as JwtPayload;
     if (user.type !== 'owner') {
-      return res.status(403).json({ error: 'Acceso denegado. Solo los dueños pueden crear restaurantes.' });
+      return res.status(403).json({ error: 'Acceso denegado.' });
     }
 
-    const restaurantData: CreateRestaurantPayload = req.body;
+    const { name, chair_amount, street, height, opening_time, closing_time, id_district, id_category } = req.body;
 
-    // Validación de campos no vacíos
-    const requiredFields: (keyof CreateRestaurantPayload)[] = ['name', 'chair_amount', 'street', 'height', 'opening_time', 'closing_time', 'id_district', 'id_category'];
-    for (const field of requiredFields) {
-      if (!restaurantData[field] || (Array.isArray(restaurantData[field]) && restaurantData[field].length === 0)) {
-        return res.status(400).json({ error: `El campo '${field}' es requerido y no puede estar vacío.` });
-      }
+    // Validación de campos obligatorios
+    if (!name || !chair_amount || !street || !height || !opening_time || !closing_time || !id_district || !id_category) {
+      return res.status(400).json({ error: 'Todos los campos de texto son requeridos.' });
     }
+    
+    if (!req.file) {
+      return res.status(400).json({ error: 'La imagen del restaurante es obligatoria.' });
+    }
+
+    const chairAmountNumber = parseInt(chair_amount, 10);
+    if (isNaN(chairAmountNumber) || chairAmountNumber <= 0) {
+      return res.status(400).json({ error: 'La cantidad de sillas debe ser un número mayor a 0.' });
+    }
+    
+    const parsedCategoryIds = JSON.parse(id_category);
+    if (!Array.isArray(parsedCategoryIds) || parsedCategoryIds.length === 0) {
+        return res.status(400).json({ error: 'Debes seleccionar al menos una categoría.' });
+    }
+
+    const imageUrl = `/uploads/${req.file.filename}`;
+
+    const restaurantData = {
+      name,
+      chair_amount: chairAmountNumber,
+      street,
+      height,
+      opening_time,
+      closing_time,
+      id_district,
+      id_category: parsedCategoryIds,
+      image: imageUrl,
+    };
 
     const newRestaurant = await restaurantService.createRestaurant(restaurantData, user.id_user);
     res.status(201).json(newRestaurant);
   } catch (error: any) {
     console.error('Error al crear el restaurante:', error);
-    // Error de Prisma para violación de llave única
     if (error.code === 'P2002') {
         return res.status(409).json({ error: 'Ya existe un restaurante con ese nombre.' });
     }
-    res.status(500).json({ error: 'Error interno del servidor al crear el restaurante.' });
+    res.status(500).json({ error: 'Error interno al crear el restaurante.' });
   }
 }

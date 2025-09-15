@@ -21,10 +21,11 @@ export async function fetchOwnerRestaurants(token: string): Promise<OwnerRestaur
   return res.data;
 }
 
-export async function createRestaurant(data: CreateRestaurantDTO, token: string): Promise<RestaurantDTO> {
+export const createRestaurant = async (data: FormData, token: string): Promise<OwnerRestaurantDTO> => {
   const res = await apiClient.post("/restaurants", data, {
     headers: {
       "Authorization": `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data', //Para subir imágenes en un formulario con el middleware Multer, hay que usar FormData (y el tipo de contenido multipart/form-data
     },
   });
   return res.data;

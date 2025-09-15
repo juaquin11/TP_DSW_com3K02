@@ -84,19 +84,23 @@ export async function getOwnerRestaurants(ownerId: string): Promise<OwnerRestaur
 
 export async function createRestaurant(data: CreateRestaurantPayload, ownerId: string) {
   const { id_category, ...restaurantData } = data;
+  const openingTime = new Date(`1970-01-01T${data.opening_time}:00.000Z`);
+  const closingTime = new Date(`1970-01-01T${data.closing_time}:00.000Z`);
 
   // Prisma se encargará de la transacción para crear el restaurante y sus relaciones
   return prisma.restaurant.create({
     data: {
       ...restaurantData,
+      opening_time: openingTime,
+      closing_time: closingTime,
       chair_amount: Number(data.chair_amount), // Aseguramos que sea un número
       id_owner: ownerId,
       chair_available: Number(data.chair_amount), // Por defecto, todas las sillas están disponibles
       status: 1, // Activo por defecto
       restaurant_category: {
-        create: id_category.map(id_category => ({
+        create: id_category.map(catId => ({
           category: {
-            connect: { id_category },
+            connect: { id_category: catId },
           },
         })),
       },

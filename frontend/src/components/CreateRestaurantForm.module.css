@@ -1,0 +1,37 @@
+.container {
+  background-color: var(--restaurant-card);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 2.5rem;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.previewTitle {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--restaurant-gold);
+}
+.previewWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background: var(--restaurant-dark);
+  border-radius: 8px;
+  min-height: 300px;
+}
+.fullWidth {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+/* ... (y más estilos para inputs, botones, etc.) */

@@ -39,6 +39,6 @@ export type CreateRestaurantDTO = {
   opening_time: string;
   closing_time: string;
   id_district: string;
-  categoryIds: string[];
+  id_category: string[];
   image?: string;
 };
