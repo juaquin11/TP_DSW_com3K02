@@ -7,9 +7,14 @@ import type { Category } from '../types/category';
 import type { District } from '../types/district';
 import styles from './CreateRestaurantForm.module.css';
 import CategoryModal from './CategoryModal';
-import RestaurantCard from './RestaurantCard'; // Para la vista previa
+import Stepper from './Stepper';
+import ImageDropzone from './ImageDropzone';
+import CustomSelect from './CustomSelect';
+
+const formSteps = ["Datos del Local", "Detalles y Multimedia"];
 
 const CreateRestaurantForm: React.FC = () => {
+  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
     chair_amount: '',
@@ -19,6 +24,7 @@ const CreateRestaurantForm: React.FC = () => {
     closing_time: '00:00',
     id_district: '',
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
@@ -27,7 +33,6 @@ const CreateRestaurantForm: React.FC = () => {
   const [districts, setDistricts] = useState<District[]>([]);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const { token } = useAuth();
@@ -37,31 +42,57 @@ const CreateRestaurantForm: React.FC = () => {
     if (!token) return;
     const loadData = async () => {
       try {
+        setIsLoading(true);
         const [cats, dists] = await Promise.all([
           fetchCategories(token),
           fetchDistricts(token),
         ]);
         setCategories(cats);
         setDistricts(dists);
-        if (dists.length > 0) {
+        if (dists.length > 0 && !formData.id_district) {
           setFormData(prev => ({ ...prev, id_district: dists[0].id_district }));
         }
       } catch (err) {
-        setError('Error al cargar datos necesarios para el formulario.');
+        setErrors({ form: 'Error al cargar datos necesarios para el formulario.' });
+      } finally {
+        setIsLoading(false);
       }
     };
     loadData();
   }, [token]);
   
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
+  const handleDistrictChange = (value: string) => {
+    setFormData(prev => ({ ...prev, id_district: value }));
+    if (errors.id_district) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.id_district;
+        return newErrors;
+      });
+    }
+  };
+
+  const handleImageSelect = (file: File) => {
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+    if (errors.image) {
+        setErrors(prev => {
+            const newErrors = { ...prev };
+            delete newErrors.image;
+            return newErrors;
+        });
     }
   };
   
@@ -75,27 +106,54 @@ const CreateRestaurantForm: React.FC = () => {
       }
       return newSet;
     });
+    if (errors.categories) {
+        setErrors(prev => {
+            const newErrors = { ...prev };
+            delete newErrors.categories;
+            return newErrors;
+        });
+    }
   };
+
+  const validateStep1 = () => {
+    const newErrors: Record<string, string> = {};
+    if (!formData.name.trim()) newErrors.name = "El nombre es obligatorio.";
+    if (!formData.street.trim()) newErrors.street = "La calle es obligatoria.";
+    if (!formData.height.trim()) newErrors.height = "La altura es obligatoria.";
+    if (!formData.id_district) newErrors.id_district = "Debe seleccionar un distrito.";
+    const chairs = parseInt(formData.chair_amount);
+    if (isNaN(chairs) || chairs <= 0) newErrors.chair_amount = "Debe ser un número mayor a 0.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  
+  const validateStep2 = () => {
+      const newErrors: Record<string, string> = {};
+      if (selectedCategories.size === 0) newErrors.categories = "Seleccione al menos una categoría.";
+      if (!imageFile) newErrors.image = "La imagen es obligatoria.";
+      setErrors(prev => ({...prev, ...newErrors}));
+      return selectedCategories.size > 0 && imageFile !== null;
+  }
+
+  const handleNext = () => {
+    if (validateStep1()) {
+      setCurrentStep(2);
+    }
+  };
+
+  const handleBack = () => setCurrentStep(1);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) return;
-    // Validaciones
-    if (Object.values(formData).some(val => val === '') || !imageFile || selectedCategories.size === 0) {
-      setError('Todos los campos son obligatorios.');
-      return;
+    if (!validateStep1() || !validateStep2()) {
+        return;
     }
-    if (parseInt(formData.chair_amount) <= 0) {
-      setError('La cantidad de sillas debe ser mayor a 0.');
-      return;
-    }
-    setError(null);
+    if (!token || !imageFile) return;
+    
     setIsLoading(true);
 
     const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      data.append(key, value);
-    });
+    Object.entries(formData).forEach(([key, value]) => data.append(key, value));
     data.append('id_category', JSON.stringify(Array.from(selectedCategories)));
     data.append('image', imageFile);
 
@@ -104,83 +162,105 @@ const CreateRestaurantForm: React.FC = () => {
       alert('¡Restaurante creado exitosamente!');
       navigate(`/ownerDashboard/restaurant/${newRestaurant.id_restaurant}`);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'No se pudo crear el restaurante.');
+      setErrors({ form: err.response?.data?.error || 'No se pudo crear el restaurante.' });
     } finally {
       setIsLoading(false);
     }
   };
 
+  const districtOptions = districts.map(d => ({ value: d.id_district, label: d.name }));
+  const stepSubtitles = ['', formData.name.trim() || null];
+
   return (
-    <div className={styles.container}>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        {/* Columna Izquierda: Datos */}
-        <div className={styles.column}>
-          {error && <p className={styles.error}>{error}</p>}
-          <div className={styles.inputGroup}>
-            <label htmlFor="name">Nombre del Restaurante</label>
-            <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} />
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="chair_amount">Cantidad de Sillas</label>
-            <input type="number" id="chair_amount" name="chair_amount" value={formData.chair_amount} onChange={handleChange} />
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="street">Calle</label>
-            <input type="text" id="street" name="street" value={formData.street} onChange={handleChange} />
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="height">Altura</label>
-            <input type="text" id="height" name="height" value={formData.height} onChange={handleChange} />
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="id_district">Distrito</label>
-            <select id="id_district" name="id_district" value={formData.id_district} onChange={handleChange}>
-              {districts.map(d => <option key={d.id_district} value={d.id_district}>{d.name}</option>)}
-            </select>
-          </div>
-          <div className={styles.timeInputs}>
-            <div className={styles.inputGroup}>
-              <label htmlFor="opening_time">Apertura</label>
-              <input type="time" id="opening_time" name="opening_time" value={formData.opening_time} onChange={handleChange} />
+    <div className={styles.card}>
+      <Stepper steps={formSteps} subtitles={stepSubtitles} currentStep={currentStep} />
+      <form onSubmit={handleSubmit} noValidate>
+        {currentStep === 1 && (
+          <div className={styles.stepContent}>
+            <fieldset className={styles.fieldset}>
+                <legend>Información General y Ubicación</legend>
+                <div className={styles.formGrid}>
+                    <div className={styles.inputGroup}>
+                        <input id="name" name="name" type="text" className={styles.input} value={formData.name} onChange={handleChange} placeholder=" " />
+                        <label htmlFor="name" className={styles.label}>Nombre del Restaurante</label>
+                        {errors.name && <span className={styles.errorMessage}>{errors.name}</span>}
+                    </div>
+                    <div className={styles.inputGroup}>
+                        <input id="chair_amount" name="chair_amount" type="number" className={styles.input} value={formData.chair_amount} onChange={handleChange} placeholder=" " />
+                        <label htmlFor="chair_amount" className={styles.label}>Cantidad de Sillas</label>
+                        {errors.chair_amount && <span className={styles.errorMessage}>{errors.chair_amount}</span>}
+                    </div>
+                    <div className={styles.inputGroup}>
+                        <input id="street" name="street" type="text" className={styles.input} value={formData.street} onChange={handleChange} placeholder=" " />
+                        <label htmlFor="street" className={styles.label}>Calle</label>
+                        {errors.street && <span className={styles.errorMessage}>{errors.street}</span>}
+                    </div>
+                     <div className={styles.inputGroup}>
+                        <input id="height" name="height" type="text" className={styles.input} value={formData.height} onChange={handleChange} placeholder=" " />
+                        <label htmlFor="height" className={styles.label}>Altura</label>
+                        {errors.height && <span className={styles.errorMessage}>{errors.height}</span>}
+                    </div>
+                    <div className={styles.inputGroup}>
+                        <CustomSelect
+                            options={districtOptions}
+                            value={formData.id_district}
+                            onChange={handleDistrictChange}
+                            placeholder="Seleccione un distrito"
+                        />
+                        {errors.id_district && <span className={styles.errorMessage}>{errors.id_district}</span>}
+                    </div>
+                </div>
+            </fieldset>
+             <div className={styles.navigationButtons}>
+                <div></div> {/* Espaciador */}
+                <button type="button" onClick={handleNext} className={styles.navButton}>
+                    Siguiente
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </button>
             </div>
-            <div className={styles.inputGroup}>
-              <label htmlFor="closing_time">Cierre</label>
-              <input type="time" id="closing_time" name="closing_time" value={formData.closing_time} onChange={handleChange} />
+          </div>
+        )}
+
+        {currentStep === 2 && (
+            <div className={styles.stepContent}>
+                 <fieldset className={styles.fieldset}>
+                    <legend>Detalles y Multimedia</legend>
+                    <div className={styles.formGrid}>
+                        <div className={styles.inputGroup}>
+                            <label>Horarios</label>
+                            <div className={styles.timeInputs}>
+                                <input type="time" name="opening_time" value={formData.opening_time} onChange={handleChange} className={styles.input} />
+                                <input type="time" name="closing_time" value={formData.closing_time} onChange={handleChange} className={styles.input} />
+                            </div>
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <label>Categorías</label>
+                            <button type="button" onClick={() => setIsModalOpen(true)} className={styles.modalButton}>
+                                Seleccionar ({selectedCategories.size})
+                            </button>
+                            {errors.categories && <span className={styles.errorMessage}>{errors.categories}</span>}
+                        </div>
+                        <div className={`${styles.inputGroup} ${styles.fullWidth}`}>
+                             <label>Imagen del Restaurante</label>
+                             <ImageDropzone onFileSelect={handleImageSelect} imagePreview={imagePreview} />
+                             {errors.image && <span className={styles.errorMessage}>{errors.image}</span>}
+                        </div>
+                    </div>
+                </fieldset>
+                {errors.form && <p className={styles.errorMessage}>{errors.form}</p>}
+                <div className={styles.navigationButtons}>
+                    <button type="button" onClick={handleBack} className={styles.navButton}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+                        Atrás
+                    </button>
+                    <button type="submit" className={styles.submitButton} disabled={isLoading}>
+                        {isLoading ? 'Creando...' : 'Finalizar y Crear'}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                    </button>
+                </div>
             </div>
-          </div>
-          <div className={styles.inputGroup}>
-             <label>Categorías</label>
-             <button type="button" onClick={() => setIsModalOpen(true)} className={styles.modalButton}>
-               Seleccionar ({selectedCategories.size})
-             </button>
-          </div>
-           <div className={styles.inputGroup}>
-            <label htmlFor="image">Imagen Principal</label>
-            <input type="file" id="image" accept="image/*" onChange={handleImageChange} className={styles.fileInput} />
-          </div>
-        </div>
-
-        {/* Columna Derecha: Vista Previa */}
-        <div className={styles.column}>
-          <h3 className={styles.previewTitle}>Vista Previa</h3>
-          <div className={styles.previewWrapper}>
-            <RestaurantCard
-              name={formData.name || "Nombre de tu Restaurante"}
-              image={imagePreview || '/path/to/default/image.webp'}
-              street={formData.street || "Calle"}
-              height={formData.height || "Altura"}
-              rating={0}
-            />
-          </div>
-        </div>
-
-        <div className={styles.fullWidth}>
-          <button type="submit" className={styles.submitButton} disabled={isLoading}>
-            {isLoading ? 'Creando...' : 'Crear Restaurante'}
-          </button>
-        </div>
+        )}
       </form>
-      
       {isModalOpen && (
         <CategoryModal
           categories={categories}
@@ -194,3 +274,4 @@ const CreateRestaurantForm: React.FC = () => {
 };
 
 export default CreateRestaurantForm;
+
