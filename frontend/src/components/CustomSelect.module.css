@@ -1,0 +1,62 @@
+.selectContainer {
+  position: relative;
+  width: 100%;
+  color: var(--restaurant-cream);
+}
+
+.selectHeader {
+  padding: 0.75rem;
+  background-color: var(--restaurant-dark);
+  border: 1px solid var(--restaurant-border);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.2s ease;
+}
+
+.selectHeader:hover, .selectHeader.open {
+  border-color: var(--restaurant-gold);
+}
+
+.arrow {
+  transition: transform 0.2s ease;
+}
+
+.selectHeader.open .arrow {
+  transform: rotate(180deg);
+}
+
+.optionsList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--restaurant-card);
+  border: 1px solid var(--restaurant-border);
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  list-style: none;
+  padding: 0;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.optionItem {
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.optionItem:hover {
+  background-color: var(--restaurant-dark);
+}
+
+.optionItem.selected {
+  background-color: var(--restaurant-gold);
+  color: var(--restaurant-dark);
+  font-weight: bold;
+}
