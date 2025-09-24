@@ -14,19 +14,21 @@ const CategoryModal: React.FC<Props> = ({ categories, selectedCategories, onTogg
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <h3>Selecciona las Categorías</h3>
-        <div className={styles.list}>
+        <div className={styles.categoryGrid}>
           {categories.map((cat) => (
-            <label key={cat.id_category} className={styles.checkboxLabel}>
-              <input
-                type="checkbox"
-                checked={selectedCategories.has(cat.id_category)}
-                onChange={() => onToggle(cat.id_category)}
-              />
+            <button
+              key={cat.id_category}
+              type="button"
+              className={`${styles.categoryChip} ${selectedCategories.has(cat.id_category) ? styles.selected : ''}`}
+              onClick={() => onToggle(cat.id_category)}
+            >
               {cat.name}
-            </label>
+            </button>
           ))}
         </div>
-        <button onClick={onClose} className={styles.closeButton}>Cerrar</button>
+        <div className={styles.buttonContainer}>
+          <button onClick={onClose} className={styles.closeButton}>Confirmar</button>
+        </div>
       </div>
     </div>
   );
