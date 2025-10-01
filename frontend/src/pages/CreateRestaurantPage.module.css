@@ -1,18 +1,20 @@
 .container {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 2rem auto;
-  padding: 0 2rem;
+  padding: 0 2rem 4rem 2rem;
 }
 
 .title {
   color: var(--restaurant-gold);
   text-align: center;
   margin-bottom: 0.5rem;
+  font-size: 2.5rem;
+  font-weight: 700;
 }
 
 .subtitle {
-  color: var(--restaurant-cream);
+  color: var(--restaurant-muted);
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
   font-size: 1.1rem;
 }

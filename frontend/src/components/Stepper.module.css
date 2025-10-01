@@ -1,0 +1,62 @@
+.stepperContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 2.5rem;
+}
+
+.stepItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--restaurant-muted);
+  transition: color 0.3s ease;
+}
+
+.stepCircle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--restaurant-card);
+  border: 2px solid var(--restaurant-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.stepLabel {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.stepItem.active .stepCircle {
+  border-color: var(--restaurant-gold);
+  background-color: var(--restaurant-gold);
+  color: var(--restaurant-dark);
+}
+
+.stepItem.active {
+  color: var(--restaurant-cream);
+}
+
+.stepItem.completed .stepCircle {
+  border-color: var(--restaurant-gold);
+  background-color: transparent;
+  color: var(--restaurant-gold);
+}
+
+.stepItem.completed {
+    color: var(--restaurant-cream);
+}
+
+.stepConnector {
+  flex-grow: 1;
+  height: 2px;
+  background-color: var(--restaurant-muted);
+  margin: 0 1rem;
+  transform: translateY(-15px); /* Alinea con el centro de los círculos */
+}

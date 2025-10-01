@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Logo = ({ width = '32px', height = '32px' }) => { //32px por defecto*
   return (
     <img 
