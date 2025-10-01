@@ -27,3 +27,11 @@ export interface JwtPayload {
   iat?: number;
   exp?: number;
 }
+
+export interface UserStatus {
+  hasActiveSubscription: boolean;
+  hasActivePenalty: boolean;
+  notificationCount: number;
+}
+
+export type AuthenticatedUser = JwtPayload & UserStatus;

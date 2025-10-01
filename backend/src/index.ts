@@ -7,6 +7,7 @@ import restaurantRoutes from './routes/restaurant.routes';
 import dishRoutes from './routes/dishCRUD.routes';
 import categoryRoutes from './routes/category.routes'; 
 import districtRoutes from './routes/district.routes'; 
+import userRoutes from './routes/user.routes'; 
 
 
 
@@ -25,7 +26,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/dishes', dishRoutes);
 app.use('/api/categories', categoryRoutes);
-app.use('/api/districts', districtRoutes); 
+app.use('/api/districts', districtRoutes);
+app.use('/api/user', userRoutes); 
 
 
 

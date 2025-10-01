@@ -99,10 +99,10 @@ model reservation {
   diners              Int
   id_client           String      @db.Char(36)
   id_restaurant       String      @db.Char(36)
-  status              Int         @default(0) @db.TinyInt
+  status              Int         @default(0) @db.TinyInt // 0 'pendiente' | 1 'aceptada' | 2 'rechazada' | 3 'asistencia' | 4 'ausencia'
   useraccount         useraccount @relation(fields: [id_client], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "reservation_ibfk_1")
   restaurant          restaurant  @relation(fields: [id_restaurant], references: [id_restaurant], onDelete: NoAction, onUpdate: NoAction, map: "reservation_ibfk_2")
-  review              review[]
+  review              review?
 
   @@index([id_client], map: "id_client")
   @@index([id_restaurant], map: "id_restaurant")
@@ -143,13 +143,12 @@ model restaurant_category {
 
 model review {
   review_number  Int         @default(autoincrement())
-  id_reservation String      @db.Char(36)
+  id_reservation String      @db.Char(36) @unique
   rating         Int
   comment        String?     @db.Text
   reservation    reservation @relation(fields: [id_reservation], references: [id_reservation], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_1")
 
   @@id([review_number, id_reservation])
-  @@index([id_reservation], map: "id_reservation")
 }
 
 model subscription {
