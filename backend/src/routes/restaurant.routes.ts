@@ -7,10 +7,12 @@ import { upload } from '../config/multer.config';
 const router = Router();
 
 router.get('/', restaurantController.listRestaurants);
-router.get('/:id', restaurantController.getRestaurantById);
 
 // Ruta protegida para que solo el dueño vea sus restaurantes
 router.get('/owner', requireAuth, restaurantController.listOwnerRestaurants);
+
+router.get('/:id', restaurantController.getRestaurantById);
+
 router.post('/', requireAuth, upload.single('image'), restaurantController.createRestaurant);
 
 export default router;
