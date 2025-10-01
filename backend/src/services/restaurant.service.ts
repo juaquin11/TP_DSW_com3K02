@@ -115,3 +115,50 @@ export async function createRestaurant(data: CreateRestaurantPayload, ownerId: s
     }
   });
 }
+export async function getRestaurantById(id: string): Promise<RestaurantWithRating | null> {
+  const result = await prisma.$queryRaw<any[]>(Prisma.sql`
+    SELECT 
+      r.id_restaurant,
+      r.name,
+      r.chair_amount,
+      r.chair_available,
+      r.street,
+      r.height,
+      r.image,
+      TIME_FORMAT(r.opening_time, '%H:%i:%s') AS opening_time,
+      TIME_FORMAT(r.closing_time, '%H:%i:%s') AS closing_time,
+      r.id_owner,
+      r.id_district,
+      r.status,
+      d.name AS districtName,
+      CAST(IFNULL(AVG(rev.rating), 0) AS DECIMAL(10, 2)) AS avgRating,
+      COUNT(rev.rating) AS reviewCount
+    FROM restaurant AS r
+    LEFT JOIN district AS d ON r.id_district = d.id_district
+    LEFT JOIN reservation AS res ON r.id_restaurant = res.id_restaurant
+    LEFT JOIN review AS rev ON res.id_reservation = rev.id_reservation
+    WHERE r.id_restaurant = ${id}
+    GROUP BY r.id_restaurant;
+  `);
+
+  if (result.length === 0) return null;
+
+  const row = result[0];
+  return {
+    id_restaurant: row.id_restaurant as string,
+    name: row.name as string,
+    chair_amount: row.chair_amount as number,
+    chair_available: row.chair_available as number,
+    street: row.street as string,
+    height: row.height as string,
+    image: row.image as string | null,
+    opening_time: String(row.opening_time),
+    closing_time: String(row.closing_time),
+    id_owner: row.id_owner as string,
+    id_district: row.id_district as string,
+    status: row.status as number,
+    avgRating: Number(row.avgRating),
+    reviewCount: Number(row.reviewCount),
+    districtName: row.districtName as string | null,
+  } as RestaurantWithRating;
+}

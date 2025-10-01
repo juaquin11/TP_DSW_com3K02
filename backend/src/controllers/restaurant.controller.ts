@@ -106,3 +106,23 @@ export async function createRestaurant(req: Request, res: Response) {
     res.status(500).json({ error: 'Error interno al crear el restaurante.' });
   }
 }
+export async function getRestaurantById(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    
+    if (!id) {
+      return res.status(400).json({ error: 'Restaurant ID is required' });
+    }
+    
+    const restaurant = await restaurantService.getRestaurantById(id);
+    
+    if (!restaurant) {
+      return res.status(404).json({ error: 'Restaurant not found' });
+    }
+    
+    return res.json(restaurant);
+  } catch (err: any) {
+    console.error('Error fetching restaurant by ID', err);
+    return res.status(500).json({ error: 'Failed to fetch restaurant' });
+  }
+}

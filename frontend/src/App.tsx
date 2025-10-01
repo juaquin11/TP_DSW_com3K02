@@ -8,7 +8,7 @@ import Register from "./pages/Register";
 import OwnerHome from "./pages/OwnerHome";
 import OwnerRestaurantPanel from "./pages/OwnerRestaurantPanel";
 import CreateRestaurantPage from "./pages/CreateRestaurantPage";
-
+import RestaurantDetail from "./pages/RestaurantDetail";
 
 const Profile = () => {
   return (
@@ -32,6 +32,7 @@ export default function App() {
         <Route path="/ownerDashboard" element={<OwnerHome />} />
         <Route path="/ownerDashboard/restaurant/:id" element={<OwnerRestaurantPanel />} />
         <Route path="/ownerDashboard/new-restaurant" element={<CreateRestaurantPage />} /> {/* <-- NUEVA RUTA */}
+        <Route path="/restaurant/:id" element={<RestaurantDetail />} />
       </Routes>
       <Footer />
     </div>

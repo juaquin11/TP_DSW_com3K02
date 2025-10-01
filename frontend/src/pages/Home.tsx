@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchRestaurants } from '../services/restaurantService';
 import type { RestaurantDTO } from '../types/restaurant';
 import RestaurantCard from '../components/RestaurantCard';
@@ -10,6 +11,14 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { token } = useAuth(); // Obtiene el token del contexto
+  const navigate = useNavigate(); // Hook para navegación
+
+  // Función para manejar el click en una tarjeta de restaurante
+  const handleRestaurantClick = (restaurantId: string) => {
+    if (restaurantId) {
+      navigate(`/restaurant/${restaurantId}`);
+    }
+  };
 
   useEffect(() => {
     async function getRestaurants() {
@@ -40,13 +49,15 @@ const Home: React.FC = () => {
       <h1 className={styles.title}>Featured Restaurants</h1>
       <div className={styles.grid}>
         {restaurants.map((restaurant, index) => (
-          <RestaurantCard 
-            key={restaurant.id_restaurant || index} 
+          <RestaurantCard
+            key={restaurant.id_restaurant || index}
+            id={restaurant.id_restaurant || ''}
             name={restaurant.name}
             image={restaurant.image || 'path/to/default/image.webp'}
             street={restaurant.street}
             height={restaurant.height}
             rating={restaurant.avgRating || 0}
+            onClick={handleRestaurantClick}
           />
         ))}
       </div>

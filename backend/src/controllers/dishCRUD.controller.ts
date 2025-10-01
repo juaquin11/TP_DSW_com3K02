@@ -40,6 +40,27 @@ export const getAllDishes = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error interno del servidor', details: error.message });
   }
 };
+// Obtener todos los platos de un restaurante
+export const getDishesByRestaurant = async (req: Request, res: Response) => {
+  try {
+    const { id_restaurant } = req.params;
+    
+    if (!id_restaurant) {
+      return res.status(400).json({ error: 'Se requiere id_restaurant' });
+    }
+
+    const dishes = await dishService.getDishesByRestaurant(id_restaurant);
+    
+    return res.status(200).json({
+      message: 'Platos del restaurante obtenidos exitosamente',
+      data: dishes,
+      count: dishes.length
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Error interno del servidor', details: error.message });
+  }
+};
+
 
 // Obtener un plato específico
 export const getDish = async (req: Request, res: Response) => {

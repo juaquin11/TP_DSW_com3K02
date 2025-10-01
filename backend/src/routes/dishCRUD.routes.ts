@@ -18,6 +18,9 @@ router.post('/', validateCreateDish, dishController.createDish);
 // GET /api/dishes - Obtener todos los platos
 router.get('/', dishController.getAllDishes);
 
+// GET /api/dishes/restaurant/:id_restaurant - Obtener todos los platos de un restaurante
+router.get('/restaurant/:id_restaurant', dishController.getDishesByRestaurant);
+
 // GET /api/dishes/:dish_name/:id_restaurant - Obtener un plato específico
 router.get('/:dish_name/:id_restaurant', validateDishParams, dishController.getDish);
 

@@ -18,6 +18,14 @@ export const dishService = {
   async getAllDishes(): Promise<dish[]> {
     return prisma.dish.findMany();
   },
+  // Obtener todos los platos de un restaurante específico
+  async getDishesByRestaurant(id_restaurant: string): Promise<dish[]> {
+    return await prisma.dish.findMany({
+      where: {
+        id_restaurant
+      }
+    });
+  },
 
   // Obtener plato por nombre y id de restaurante
   async getDish(dish_name: string, id_restaurant: string): Promise<dish | null> {

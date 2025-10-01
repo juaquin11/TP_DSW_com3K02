@@ -30,3 +30,13 @@ export const createRestaurant = async (data: FormData, token: string): Promise<O
   });
   return res.data;
 }
+export async function fetchRestaurantById(id: string, token?: string): Promise<RestaurantDTO> {
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  const res = await apiClient.get<RestaurantDTO>(`/restaurants/${id}`, {
+    headers,
+  });
+  return res.data;
+}
