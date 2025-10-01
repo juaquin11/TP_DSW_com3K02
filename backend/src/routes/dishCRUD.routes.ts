@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 
-router.use(requireAuth);
+//router.use(requireAuth);
 
 // POST /api/dishes - Crear un nuevo plato
 router.post('/', validateCreateDish, dishController.createDish);
