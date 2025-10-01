@@ -56,6 +56,11 @@ const OwnerHome: React.FC = () => {
       <main className={styles.container}>
         <h1 className={styles.title}>Mis Restaurantes</h1>
         <p>No tienes restaurantes registrados.</p>
+        <div className={styles.actionsContainer}>
+        <button onClick={() => navigate('/ownerDashboard/new-restaurant')} className={styles.addButton}>
+          ＋ Agregar Restaurante
+        </button>
+      </div>  
       </main>
     );
   }
