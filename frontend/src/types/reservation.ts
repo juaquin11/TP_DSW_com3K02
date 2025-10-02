@@ -4,7 +4,8 @@ export type ReservationStatus =
   | 'rechazada' 
   | 'superada' 
   | 'asistencia'
-  | 'ausencia';
+  | 'ausencia'
+  | 'cancelada';
 
 export interface Reservation {
   id: string; // O id_reservation si viene así del backend

@@ -69,6 +69,7 @@ const ReservationsToday: React.FC<Props> = ({ restaurantId }) => {
         <button onClick={() => setFilter('aceptada')} className={filter === 'aceptada' ? styles.active : ''}>Aceptadas</button>
         <button onClick={() => setFilter('rechazada')} className={filter === 'rechazada' ? styles.active : ''}>Rechazadas</button>
         <button onClick={() => setFilter('superada')} className={filter === 'superada' ? styles.active : ''}>Superadas</button>
+        <button onClick={() => setFilter('cancelada')} className={filter === 'cancelada' ? styles.active : ''}>Canceladas</button> 
       </div>
 
       <div className={styles.tableContainer}>

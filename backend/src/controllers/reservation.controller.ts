@@ -9,6 +9,7 @@ const statusToDbMap: { [key: string]: number } = {
   'rechazada': 2,
   'asistencia': 3,
   'ausencia': 4,
+  'cancelada': 5,
 };
 
 

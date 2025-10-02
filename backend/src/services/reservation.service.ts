@@ -9,6 +9,7 @@ const statusMap: { [key: number]: string } = {
   2: 'rechazada',
   3: 'asistencia',
   4: 'ausencia',
+  5: 'cancelada',
 };
 
 export async function getReservationsForToday(restaurantId: string) {

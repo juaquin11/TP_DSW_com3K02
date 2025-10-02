@@ -75,8 +75,9 @@
 .status.aceptada { background-color: #5cb85c; color: #fff; }
 .status.rechazada { background-color: #d9534f; color: #fff; }
 .status.superada { background-color: #5bc0de; color: #fff; }
-.status.ausente { background-color: #777; color: #fff; }
+.status.ausente { background-color: red; color: #fff; }
 .status.asistencia { background-color: #337ab7; color: #fff; }
+.status.cancelada { background-color: darkred; color: #fff; } 
 
 
 .actions {
