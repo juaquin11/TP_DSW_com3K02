@@ -1,43 +1,72 @@
+/* frontend/src/pages/OwnerRestaurantPanel.module.css */
 .container {
   padding: 2rem;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 2rem auto;
   color: var(--restaurant-cream);
 }
 
-.title {
+.mainTitle {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
   color: var(--restaurant-gold);
+  font-size: 2.5rem;
+  font-weight: 700;
 }
 
-.info {
+.mainSubtitle {
   text-align: center;
-  font-size: 1.1rem;
   margin-bottom: 3rem;
+  font-size: 1.1rem;
+  color: var(--restaurant-muted);
+}
+
+.adminNav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
   background-color: var(--restaurant-card);
-  padding: 1rem;
+  padding: 0.5rem;
+  border-radius: 12px;
+}
+
+.navButton {
+  padding: 0.75rem 1.5rem;
+  background-color: transparent;
+  border: none;
   border-radius: 8px;
+  color: var(--restaurant-muted);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.navButton:hover {
+  color: var(--restaurant-cream);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.navButton.active {
+  color: var(--restaurant-dark);
+  background-color: var(--restaurant-gold);
+  box-shadow: 0 4px 10px rgba(212, 175, 55, 0.2);
+}
+
+.contentArea {
+  background-color: var(--restaurant-card);
+  padding: 2rem;
+  border-radius: 12px;
+  min-height: 500px;
 }
 
 .comingSoon {
   text-align: center;
+  padding: 4rem;
 }
 
 .comingSoon h2 {
   margin-bottom: 1rem;
   color: var(--restaurant-gold);
-}
-
-.comingSoon ul {
-  list-style: none;
-  padding: 0;
-}
-
-.comingSoon li {
-  background-color: var(--restaurant-card);
-  margin: 0.5rem 0;
-  padding: 0.75rem;
-  border-radius: 4px;
-  border-left: 4px solid var(--restaurant-gold);
 }
