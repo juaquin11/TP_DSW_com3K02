@@ -20,9 +20,13 @@ export async function getTodayReservations(req: Request, res: Response) {
       return res.status(400).json({ error: 'Restaurant ID is required.' });
     }
 
-    const user = (req as any).user as JwtPayload;
+    const user = (req as any).user as JwtPayload | undefined;
 
-    const reservations = await reservationService.getReservationsForToday(id);
+    if (!user || user.type !== 'owner' || !user.id_user) {
+      return res.status(403).json({ error: 'Forbidden: only restaurant owners can access reservations.' });
+    }
+
+    const reservations = await reservationService.getReservationsForToday(id, user.id_user);
     res.json(reservations);
   } catch (error: any) {
     console.error('Error fetching today\'s reservations:', error);

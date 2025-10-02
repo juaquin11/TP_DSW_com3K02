@@ -11,7 +11,7 @@ const statusMap: { [key: number]: string } = {
   4: 'ausencia',
 };
 
-export async function getReservationsForToday(restaurantId: string) {
+export async function getReservationsForToday(restaurantId: string, ownerId: string) {
   const today = new Date();
   const startOfDay = new Date(today.setHours(0, 0, 0, 0));
   const endOfDay = new Date(today.setHours(23, 59, 59, 999));
@@ -19,6 +19,9 @@ export async function getReservationsForToday(restaurantId: string) {
   const reservations = await prisma.reservation.findMany({
     where: {
       id_restaurant: restaurantId,
+      restaurant: {
+        id_owner: ownerId,
+      },
       reservation_date: {
         gte: startOfDay,
         lte: endOfDay,
