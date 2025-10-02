@@ -2,12 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+
 import authRoutes from './routes/auth.routes';
 import restaurantRoutes from './routes/restaurant.routes';
 import dishRoutes from './routes/dishCRUD.routes';
 import categoryRoutes from './routes/category.routes'; 
 import districtRoutes from './routes/district.routes'; 
 import userRoutes from './routes/user.routes'; 
+import reservationRoutes from './routes/reservation.routes'; 
 
 
 
@@ -27,16 +29,14 @@ app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/dishes', dishRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/districts', districtRoutes);
-app.use('/api/user', userRoutes); 
-
-
+app.use('/api/user', userRoutes);
+app.use('/api/reservations', reservationRoutes); 
 
 
 // Rutas de prueba
 app.get('/', (req, res) => {
   res.send('Servidor funcionando 🚀');
 });
-
 
 
 // health

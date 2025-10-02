@@ -101,7 +101,7 @@ CREATE TABLE reservation (
     diners INT NOT NULL,
     id_client CHAR(36) NOT NULL,
     id_restaurant CHAR(36) NOT NULL,
-    status TINYINT NOT NULL DEFAULT 0, -- 0 'pendiente' | 1 'aceptada' | | 2 'rechazada' | 3 'asistencia' | 4 'ausencia'
+    status TINYINT NOT NULL DEFAULT 0, -- 0 'pendiente' | 1 'aceptada' | | 2 'rechazada' | 3 'asistencia' | 4 'ausencia' | 5 'cancelada'
     FOREIGN KEY (id_client) REFERENCES useraccount(id_user),
     FOREIGN KEY (id_restaurant) REFERENCES restaurant(id_restaurant)
 );
