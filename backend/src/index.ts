@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 
 import authRoutes from './routes/auth.routes';
 import restaurantRoutes from './routes/restaurant.routes';
@@ -21,7 +22,9 @@ app.use(express.json());
 
 // Servir archivos estáticos desde la carpeta 'public'
 // Ahora, las imágenes en 'public/uploads' serán accesibles desde http://localhost:3000/uploads/nombre-archivo.ext
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads'))); 
+const uploadsDir = path.join(__dirname, '../public/uploads');
+fs.mkdirSync(uploadsDir, { recursive: true });
+app.use('/uploads', express.static(uploadsDir));
                                         //              '../..frontend/public/uploads'  si se puede
 
 app.use('/api/auth', authRoutes);
