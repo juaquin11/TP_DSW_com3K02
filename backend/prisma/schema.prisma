@@ -26,21 +26,13 @@ model consumption {
   @@index([dish_name, id_restaurant], map: "dish_name")
 }
 
-model discount {
-  dish_name     String  @db.VarChar(100)
-  id_restaurant String  @db.Char(36)
-  description   String  @db.Text
-  percentage    Decimal @db.Decimal(5, 2)
-  status        Int     @default(1) @db.TinyInt
-  dish          dish    @relation(fields: [dish_name, id_restaurant], references: [dish_name, id_restaurant], onDelete: NoAction, onUpdate: NoAction, map: "discount_ibfk_1")
 
-  @@id([dish_name, id_restaurant])
-}
 
-model discount_subscription {
+model dish_subscription {
   dish_name       String       @db.VarChar(100)
   id_restaurant   String       @db.Char(36)
   id_subscription String       @db.Char(36)
+  discount        Int
   subscription    subscription @relation(fields: [id_subscription], references: [id_subscription], onDelete: NoAction, onUpdate: NoAction, map: "discount_subscription_ibfk_1")
   dish            dish         @relation(fields: [dish_name, id_restaurant], references: [dish_name, id_restaurant], onDelete: NoAction, onUpdate: NoAction, map: "discount_subscription_ibfk_2")
 
@@ -56,8 +48,7 @@ model dish {
   image                 String?                 @db.VarChar(255)
   id_restaurant         String                  @db.Char(36)
   consumption           consumption[]
-  discount              discount?
-  discount_subscription discount_subscription[]
+  dish_subscription     dish_subscription[]
   restaurant            restaurant              @relation(fields: [id_restaurant], references: [id_restaurant], onDelete: NoAction, onUpdate: NoAction, map: "dish_ibfk_1")
 
   @@id([dish_name, id_restaurant])
@@ -156,7 +147,7 @@ model subscription {
   plan_name             String                  @db.VarChar(50)
   price                 Decimal                 @db.Decimal(10, 2)
   duration              Int
-  discount_subscription discount_subscription[]
+  dish_subscription     dish_subscription[]
   has_subscription      has_subscription[]
 }
 
