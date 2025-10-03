@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./RestaurantCard.module.css";
+import { API_BASE_URL } from "../services/apiClient"; 
 
 interface RestaurantCardProps {
   id: string;
@@ -20,6 +21,10 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({
   rating,
   onClick
 }) => {
+
+    const imageUrl = `${API_BASE_URL}${image}`;
+
+
   const handleClick = () => {
     if (onClick && id) {
       onClick(id);
@@ -32,7 +37,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({
       onClick={handleClick}
       style={{ cursor: onClick ? 'pointer' : 'default' }}
     >
-      <img src={image} alt={name} className={styles.image} />
+      <img src={imageUrl} alt={name} className={styles.image} />
       <div className={styles.info}>
         <h2 className={styles.name}>{name}</h2>
         <p className={styles.address}>{street} {height}</p>

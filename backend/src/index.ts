@@ -25,7 +25,6 @@ app.use(express.json());
 const uploadsDir = path.join(__dirname, '../public/uploads');
 fs.mkdirSync(uploadsDir, { recursive: true });
 app.use('/uploads', express.static(uploadsDir));
-                                        //              '../..frontend/public/uploads'  si se puede
 
 app.use('/api/auth', authRoutes);
 app.use('/api/restaurants', restaurantRoutes);
