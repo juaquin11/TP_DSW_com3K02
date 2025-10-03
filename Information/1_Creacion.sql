@@ -25,7 +25,7 @@ FLUSH PRIVILEGES;
 CREATE TABLE useraccount (
     id_user CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     password_hash VARCHAR(255) NOT NULL,
-    name VARCHAR(100),  -- null si es 'client', solo sirve para ser mostrado en apartado de perfil.
+    name VARCHAR(100),  
     email VARCHAR(100) NOT NULL UNIQUE,
     phone VARCHAR(20) NOT NULL,
     type ENUM('owner', 'client') NOT NULL
@@ -82,16 +82,16 @@ CREATE TABLE dish (
     FOREIGN KEY (id_restaurant) REFERENCES restaurant(id_restaurant)
 );
 
--- Tabla discount
-CREATE TABLE discount (
-    dish_name VARCHAR(100) NOT NULL,
-    id_restaurant CHAR(36) NOT NULL,
-    description TEXT NOT NULL,
-    percentage DECIMAL(5,2) NOT NULL,
-    status TINYINT NOT NULL DEFAULT 1,    -- 0 'inactive'  |  1 'active'
-    PRIMARY KEY (dish_name, id_restaurant),
-    FOREIGN KEY (dish_name, id_restaurant) REFERENCES dish(dish_name, id_restaurant)
-);
+-- -- Tabla discount
+-- CREATE TABLE discount (
+--     dish_name VARCHAR(100) NOT NULL,
+--     id_restaurant CHAR(36) NOT NULL,
+--     description TEXT NOT NULL,
+--     percentage DECIMAL(5,2) NOT NULL,
+--     status TINYINT NOT NULL DEFAULT 1,    -- 0 'inactive'  |  1 'active'
+--     PRIMARY KEY (dish_name, id_restaurant),
+--     FOREIGN KEY (dish_name, id_restaurant) REFERENCES dish(dish_name, id_restaurant)
+-- );
 
 -- Tabla reservation
 CREATE TABLE reservation (
@@ -113,6 +113,7 @@ CREATE TABLE review (
     rating INT NOT NULL,
     comment TEXT,
     PRIMARY KEY (review_number, id_reservation),
+    UNIQUE (id_reservation), 
     FOREIGN KEY (id_reservation) REFERENCES reservation(id_reservation)
 );
 
@@ -160,6 +161,7 @@ CREATE TABLE discount_subscription (
     dish_name VARCHAR(100) NOT NULL,
     id_restaurant CHAR(36) NOT NULL,
     id_subscription CHAR(36) NOT NULL,
+    discount INT NOT NULL, 
     PRIMARY KEY (dish_name, id_restaurant, id_subscription),
     FOREIGN KEY (id_subscription) REFERENCES subscription(id_subscription),
     FOREIGN KEY (dish_name, id_restaurant) REFERENCES dish(dish_name, id_restaurant)
