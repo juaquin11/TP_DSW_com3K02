@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { fetchOwnerRestaurants } from '../services/restaurantService';
 import type { OwnerRestaurantDTO } from '../types/restaurant';
 import styles from './OwnerHome.module.css';
+import { API_BASE_URL } from '../services/apiClient';
+
 
 const OwnerHome: React.FC = () => {
   const [restaurants, setRestaurants] = useState<OwnerRestaurantDTO[]>([]);
@@ -56,6 +58,11 @@ const OwnerHome: React.FC = () => {
       <main className={styles.container}>
         <h1 className={styles.title}>Mis Restaurantes</h1>
         <p>No tienes restaurantes registrados.</p>
+        <div className={styles.actionsContainer}>
+        <button onClick={() => navigate('/ownerDashboard/new-restaurant')} className={styles.addButton}>
+          ＋ Agregar Restaurante
+        </button>
+      </div>  
       </main>
     );
   }
@@ -76,10 +83,12 @@ const OwnerHome: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {restaurants.map((restaurant) => (
+            {restaurants.map((restaurant) => {
+              const imageUrl = restaurant.image ? `${API_BASE_URL}${restaurant.image}` : '/path/to/default/image.webp';
+              return (
               <tr key={restaurant.id_restaurant}>
                 <td>
-                  <img src={restaurant.image || '/path/to/default/image.webp'} alt={restaurant.name} className={styles.restaurantImage} />
+                  <img src={imageUrl} alt={restaurant.name} className={styles.restaurantImage} />
                 </td>
                 <td>{restaurant.name}</td>
                 <td>
@@ -98,7 +107,8 @@ const OwnerHome: React.FC = () => {
                   </button>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

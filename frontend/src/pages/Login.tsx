@@ -1,3 +1,5 @@
+// frontend/src/pages/Login.tsx
+
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -19,14 +21,20 @@ function Login() {
     const loginData: LoginDTO = { email, password };
 
     try {
+      // 1. Llamar al servicio de la API
       const result = await loginUser(loginData);
-      login(result.token);
+      
+      // 2. Llamar a la función login del contexto y ESPERAR a que termine.
+      //    Esta función ahora actualiza todo el estado del usuario.
+      const loggedInUser = await login(result.token);
+      
       alert('¡Bienvenido! Has iniciado sesión correctamente.');
 
-      if (result.user.type === 'owner') {
-        navigate('/ownerDashboard'); // Redirige a una ruta para dueños
+      // 3. Redirigir basándose en los datos del usuario ya actualizados en el contexto.
+      if (loggedInUser.type === 'owner') {
+        navigate('/ownerDashboard');
       } else {
-        navigate('/'); // Redirige al home para clientes
+        navigate('/');
       }
     } catch (err: any) {
       console.error('❌ Error al iniciar sesión:', err.response?.data || err.message);

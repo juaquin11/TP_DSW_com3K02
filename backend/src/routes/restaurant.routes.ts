@@ -1,16 +1,20 @@
 import { Router } from 'express';
 import * as restaurantController from '../controllers/restaurant.controller';
-import { requireAuth } from '../middlewares/auth.middleware'; 
-import { upload } from '../config/multer.config'; 
-
+import { requireAuth } from '../middlewares/auth.middleware';
+import { upload } from '../config/multer.config';
 
 const router = Router();
 
+// Rutas públicas
 router.get('/', restaurantController.listRestaurants);
+
+// Rutas protegidas y específicas (deben ir antes que las dinámicas)
+router.get('/owner', requireAuth, restaurantController.listOwnerRestaurants);
+
+// Ruta dinámica (debe ir después de las específicas)
 router.get('/:id', restaurantController.getRestaurantById);
 
-// Ruta protegida para que solo el dueño vea sus restaurantes
-router.get('/owner', requireAuth, restaurantController.listOwnerRestaurants);
+// Rutas de creación/modificación
 router.post('/', requireAuth, upload.single('image'), restaurantController.createRestaurant);
 
 export default router;
