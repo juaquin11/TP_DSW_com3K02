@@ -11,7 +11,7 @@ interface Props {
 
 const ReservationsToday: React.FC<Props> = ({ restaurantId }) => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [filter, setFilter] = useState('todas');
+  const [filter, setFilter] = useState('pendiente');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { token } = useAuth();
@@ -64,7 +64,7 @@ const ReservationsToday: React.FC<Props> = ({ restaurantId }) => {
       <h2 className={styles.title}>Reservas para Hoy</h2>
       <div className={styles.filterContainer}>
         {/* ... (los botones de filtro no cambian) ... */}
-         <button onClick={() => setFilter('todas')} className={filter === 'todas' ? styles.active : ''}>Todas</button>
+        <button onClick={() => setFilter('todas')} className={filter === 'todas' ? styles.active : ''}>Todas</button>
         <button onClick={() => setFilter('pendiente')} className={filter === 'pendiente' ? styles.active : ''}>Pendientes</button>
         <button onClick={() => setFilter('aceptada')} className={filter === 'aceptada' ? styles.active : ''}>Aceptadas</button>
         <button onClick={() => setFilter('rechazada')} className={filter === 'rechazada' ? styles.active : ''}>Rechazadas</button>
@@ -75,7 +75,6 @@ const ReservationsToday: React.FC<Props> = ({ restaurantId }) => {
       <div className={styles.tableContainer}>
         {filteredReservations.length > 0 ? (
           <table className={styles.table}>
-            {/* ... (la cabecera de la tabla no cambia) ... */}
             <thead>
             <tr>
               <th>Hora</th>
@@ -99,11 +98,11 @@ const ReservationsToday: React.FC<Props> = ({ restaurantId }) => {
                         <button onClick={() => handleUpdateStatus(res.id, 'rechazada')} className={`${styles.btn} ${styles.btnReject}`}>Rechazar</button>
                       </>
                     )}
-                    {res.status === 'superada' && (
-                       <button onClick={() => handleUpdateStatus(res.id, 'ausencia')} className={`${styles.btn} ${styles.btnAbsent}`}>Marcar Ausencia</button>
-                    )}
-                     {res.status === 'aceptada' && (
-                       <button onClick={() => handleUpdateStatus(res.id, 'asistencia')} className={`${styles.btn} ${styles.btnAssist}`}>Marcar Asistencia</button>
+                    {(res.status === 'aceptada' || res.status === 'superada') && (
+                       <>
+                         <button onClick={() => handleUpdateStatus(res.id, 'asistencia')} className={`${styles.btn} ${styles.btnAssist}`}>Marcar Asistencia</button>
+                         <button onClick={() => handleUpdateStatus(res.id, 'ausencia')} className={`${styles.btn} ${styles.btnAbsent}`}>Marcar Ausencia</button>
+                       </>
                     )}
                   </td>
                 </tr>

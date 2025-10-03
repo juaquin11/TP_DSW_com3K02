@@ -22,7 +22,7 @@ SET SQL_SAFE_UPDATES = 1;
 
 -- Reserva 1: Estado 'pendiente' (0) para hoy a las 21:00
 INSERT INTO reservation (reservation_date, diners, id_client, id_restaurant, status)
-VALUES (CONCAT(CURDATE(), ' 21:00:00'), 1, '6bd41e76-a0a1-11f0-a8f3-3822e2f3ab83', '0765782e-a0a4-11f0-a8f3-3822e2f3ab83', 0);
+VALUES (CONCAT(CURDATE(), ' 23:00:00'), 1, '6bd41e76-a0a1-11f0-a8f3-3822e2f3ab83', '0765782e-a0a4-11f0-a8f3-3822e2f3ab83', 0);
 
 -- Reserva 2: Estado 'aceptada' (1) para hoy a las 20:30
 INSERT INTO reservation (reservation_date, diners, id_client, id_restaurant, status)
@@ -34,15 +34,15 @@ VALUES (CONCAT(CURDATE(), ' 22:00:00'), 3, '6bd41e76-a0a1-11f0-a8f3-3822e2f3ab83
 
 -- Reserva 4: Estado 'asistencia' (3) para una hora pasada de hoy (ej. 13:00)
 INSERT INTO reservation (reservation_date, diners, id_client, id_restaurant, status)
-VALUES (CONCAT(CURDATE(), ' 13:00:00'), 4, '6bd41e76-a0a1-11f0-a8f3-3822e2f3ab83', '0765782e-a0a4-11f0-a8f3-3822e2f3ab83', 3);
+VALUES (CONCAT(CURDATE(), ' 22:00:00'), 4, '6bd41e76-a0a1-11f0-a8f3-3822e2f3ab83', '0765782e-a0a4-11f0-a8f3-3822e2f3ab83', 3);
 
 -- Reserva 5: Estado 'ausencia' (4) para una hora pasada de hoy (ej. 14:00)
 INSERT INTO reservation (reservation_date, diners, id_client, id_restaurant, status)
-VALUES (CONCAT(CURDATE(), ' 14:00:00'), 5, '6bd41e76-a0a1-11f0-a8f3-3822e2f3ab83', '0765782e-a0a4-11f0-a8f3-3822e2f3ab83', 4);
+VALUES (CONCAT(CURDATE(), ' 23:00:00'), 5, '6bd41e76-a0a1-11f0-a8f3-3822e2f3ab83', '0765782e-a0a4-11f0-a8f3-3822e2f3ab83', 4);
 
 -- Reserva 5: Estado 'ausencia' (4) para una hora pasada de hoy (ej. 14:00)
 INSERT INTO reservation (reservation_date, diners, id_client, id_restaurant, status)
-VALUES (CONCAT(CURDATE(), ' 14:00:00'), 5, '6bd41e76-a0a1-11f0-a8f3-3822e2f3ab83', '0765782e-a0a4-11f0-a8f3-3822e2f3ab83', 5);
+VALUES (CONCAT(CURDATE(), ' 23:00:00'), 5, '6bd41e76-a0a1-11f0-a8f3-3822e2f3ab83', '0765782e-a0a4-11f0-a8f3-3822e2f3ab83', 5);
 
 
 
