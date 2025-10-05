@@ -1,5 +1,6 @@
 // backend/src/services/reservation.service.ts
 import prisma from '../prisma/client';
+import { CreateReservationData } from '../models/types';
 // import { reservation_status } from '../generated/prisma';
 
 // Mapeo de estado numérico a texto para consistencia con el frontend
@@ -11,6 +12,7 @@ const statusMap: { [key: number]: string } = {
   4: 'ausencia',
   5: 'cancelada',
 };
+
 
 export async function getReservationsForToday(restaurantId: string, ownerId: string) {
   const today = new Date();
@@ -79,4 +81,53 @@ export async function updateReservationStatus(reservationId: string, newStatus: 
             status: newStatus
         }
     });
+}
+
+export async function createReservation(
+  restaurantId: string,
+  clientId: string,
+  reservationDate: Date,
+  diners: number
+) {
+  const restaurant = await prisma.restaurant.findUnique({
+    where: { id_restaurant: restaurantId },
+    select: {
+      id_restaurant: true,
+      chair_amount: true,
+    },
+  });
+
+  if (!restaurant) {
+    const error: any = new Error('Restaurant not found');
+    error.code = 'RESTAURANT_NOT_FOUND';
+    throw error;
+  }
+
+  const occupied = await prisma.reservation.aggregate({
+    where: {
+      id_restaurant: restaurantId,
+      status: { in: [0, 1] },
+    },
+    _sum: {
+      diners: true,
+    },
+  });
+
+  const occupiedSeats = occupied._sum?.diners ?? 0;
+  const availableSeats = restaurant.chair_amount - occupiedSeats;
+
+  if (diners > availableSeats) {
+    const error: any = new Error('Not enough availability');
+    error.code = 'INSUFFICIENT_CAPACITY';
+    throw error;
+  }
+
+  return prisma.reservation.create({
+    data: {
+      id_restaurant: restaurantId,
+      id_client: clientId,
+      reservation_date: reservationDate,
+      diners,
+    },
+  });
 }

@@ -1,7 +1,7 @@
 // backend/src/controllers/reservation.controller.ts
 import { Request, Response } from 'express';
 import * as reservationService from '../services/reservation.service';
-import { JwtPayload } from '../models/types';
+import { CreateReservationPayload, JwtPayload } from '../models/types';
 
 // Mapeo de texto a estado numérico para guardar en la BD
 const statusToDbMap: { [key: string]: number } = {
@@ -11,7 +11,6 @@ const statusToDbMap: { [key: string]: number } = {
   'ausencia': 4,
   'cancelada': 5,
 };
-
 
 export async function getTodayReservations(req: Request, res: Response) {
   try {
@@ -60,4 +59,60 @@ export async function updateStatus(req: Request, res: Response) {
         }
         res.status(500).json({ error: 'Failed to update reservation status.' });
     }
+}
+
+export async function createReservation(req: Request, res: Response) {
+  try {
+    const { restaurantId, reservationDate, diners } = req.body;
+
+    if (!restaurantId) {
+      return res.status(400).json({ error: 'Restaurant ID is required.' });
+    }
+
+    if (!reservationDate) {
+      return res.status(400).json({ error: 'Reservation date is required.' });
+    }
+
+    if (diners === undefined) {
+      return res.status(400).json({ error: 'Diners amount is required.' });
+    }
+
+    const user = (req as any).user as JwtPayload | undefined;
+
+    if (!user || !user.id_user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
+    }
+
+    if (user.type !== 'client') {
+      return res.status(403).json({ error: 'Only clients can create reservations.' });
+    }
+
+    const parsedDate = new Date(reservationDate);
+    if (Number.isNaN(parsedDate.getTime())) {
+      return res.status(400).json({ error: 'Invalid reservation date.' });
+    }
+
+    const dinersNumber = Number(diners);
+    if (!Number.isInteger(dinersNumber) || dinersNumber <= 0) {
+      return res.status(400).json({ error: 'Invalid diners amount.' });
+    }
+
+    const reservation = await reservationService.createReservation(
+      restaurantId,
+      user.id_user,
+      parsedDate,
+      dinersNumber
+    );
+
+    res.status(201).json(reservation);
+  } catch (error: any) {
+    console.error('Error creating reservation:', error);
+    if (error.code === 'RESTAURANT_NOT_FOUND') {
+      return res.status(404).json({ error: 'Restaurant not found.' });
+    }
+    if (error.code === 'INSUFFICIENT_CAPACITY') {
+      return res.status(409).json({ error: 'The restaurant does not have enough availability for the requested diners.' });
+    }
+    res.status(500).json({ error: 'Failed to create reservation.' });
+  }
 }

@@ -1,5 +1,5 @@
 import apiClient from './apiClient';
-import type { RestaurantDTO, OwnerRestaurantDTO, CreateRestaurantDTO} from '../types/restaurant';
+import type { RestaurantDTO, OwnerRestaurantDTO } from '../types/restaurant';
 
 export async function fetchRestaurants(token?: string): Promise<RestaurantDTO[]> {
   const headers: Record<string, string> = {};
