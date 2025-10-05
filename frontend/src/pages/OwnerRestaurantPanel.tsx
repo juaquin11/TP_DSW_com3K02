@@ -1,8 +1,8 @@
+// frontend/src/pages/OwnerRestaurantPanel.tsx
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styles from './OwnerRestaurantPanel.module.css';
-import ReservationsToday from '../components/ReservationsToday'; 
-import DishManagement from '../components/DishManagement';
+import ReservationsToday from '../components/ReservationsToday'; // <-- Componente nuevo
 
 // Opciones del panel de administración
 const adminOptions = [
@@ -21,8 +21,7 @@ const OwnerRestaurantPanel: React.FC = () => {
     switch (activeTab) {
       case 'reservations':
         return <ReservationsToday restaurantId={id!} />;
-      case 'dishes': 
-        return <DishManagement restaurantId={id!} />;
+      // ... aquí irán los otros componentes en el futuro
       default:
         return (
           <div className={styles.comingSoon}>
@@ -41,7 +40,7 @@ const OwnerRestaurantPanel: React.FC = () => {
       </p>
 
       <div className={styles.adminNav}>
-        {adminOptions.map(opt => (  
+        {adminOptions.map(opt => (
           <button
             key={opt.id}
             className={`${styles.navButton} ${activeTab === opt.id ? styles.active : ''}`}
