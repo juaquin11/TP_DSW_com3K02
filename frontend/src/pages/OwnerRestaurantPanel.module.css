@@ -1,7 +1,7 @@
-/* frontend/src/pages/OwnerRestaurantPanel.module.css */
 .container {
+  width: 95%; /* Opcional: define un ancho base */
+  max-width: none; /* Quitamos el max-width fijo */
   padding: 2rem;
-  max-width: 1200px;
   margin: 2rem auto;
   color: var(--restaurant-cream);
 }
@@ -10,7 +10,7 @@
   text-align: center;
   margin-bottom: 0.5rem;
   color: var(--restaurant-gold);
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   font-weight: 700;
 }
 
@@ -23,7 +23,7 @@
 
 .adminNav {
   display: flex;
-  justify-content: center;
+  justify-content:space-between;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 2.5rem;
@@ -44,7 +44,7 @@
 }
 
 .navButton:hover {
-  color: var(--restaurant-cream);
+  color: var(--restaurant-gold);
   background-color: rgba(255, 255, 255, 0.05);
 }
 

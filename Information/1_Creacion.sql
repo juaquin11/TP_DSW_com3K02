@@ -157,7 +157,7 @@ CREATE TABLE restaurant_category (
 );
 
 -- Tabla discount_subscription
-CREATE TABLE discount_subscription (
+CREATE TABLE dish_subscription (
     dish_name VARCHAR(100) NOT NULL,
     id_restaurant CHAR(36) NOT NULL,
     id_subscription CHAR(36) NOT NULL,
