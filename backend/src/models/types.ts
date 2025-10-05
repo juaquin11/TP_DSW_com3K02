@@ -5,6 +5,19 @@ export interface JwtPayload {
   exp?: number;
 }
 
+export interface CreateReservationPayload {
+  id_restaurant: string;
+  reservation_date: string;
+  diners: number;
+}
+
+export interface CreateReservationData {
+  id_restaurant: string;
+  reservation_date: Date;
+  diners: number;
+  id_client: string;
+}
+
 export type RestaurantWithRating = {
   id_restaurant: string;
   name: string;

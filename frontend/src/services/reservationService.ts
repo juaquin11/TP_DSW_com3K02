@@ -2,6 +2,13 @@
 import apiClient from './apiClient';
 import type { Reservation } from '../types/reservation';
 
+export interface CreateReservationPayload {
+  restaurantId: string;
+  reservationDate: string;
+  chairs: number;
+}
+
+
 /**
  * Obtiene las reservas del día para un restaurante específico.
  * @param restaurantId El ID del restaurante.
@@ -28,4 +35,21 @@ export const updateReservationStatus = async (reservationId: string, status: str
       Authorization: `Bearer ${token}`,
     },
   });
+};
+
+export const createReservation = async (
+  restaurantId: string,
+  reservationDate: string,
+  diners: number,
+  token: string
+): Promise<void> => {
+  await apiClient.post(
+    '/reservations',
+    { restaurantId, reservationDate, diners },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 };

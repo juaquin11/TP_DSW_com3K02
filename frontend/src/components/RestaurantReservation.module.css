@@ -1,0 +1,94 @@
+.container {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background-color: var(--restaurant-card);
+  border: 1px solid var(--restaurant-border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--restaurant-cream);
+}
+
+.closeButton {
+  background: none;
+  color: var(--restaurant-muted);
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.closeButton:hover {
+  color: var(--restaurant-cream);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: var(--restaurant-muted);
+}
+
+.input {
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--restaurant-border);
+  background-color: rgba(0, 0, 0, 0.25);
+  color: var(--restaurant-cream);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.submitButton {
+  background-color: var(--restaurant-gold);
+  color: var(--restaurant-dark);
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.7rem 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.submitButton:hover:not(:disabled) {
+  background-color: #c19b26;
+  transform: translateY(-1px);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.feedback {
+  font-size: 0.9rem;
+}
+
+.success {
+  color: #3ac17b;
+}
+
+.error {
+  color: #ff7675;
+}

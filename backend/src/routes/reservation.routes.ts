@@ -7,6 +7,9 @@ const router = Router();
 // Todas las rutas de reservas requieren que el usuario esté logueado
 router.use(requireAuth);
 
+// Crear una nueva reserva (disponible para clientes autenticados)
+router.post('/', reservationController.createReservation);
+
 // Obtener las reservas de hoy para un restaurante específico
 router.get('/restaurant/:id/today', reservationController.getTodayReservations);
 

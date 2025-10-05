@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import styles from "./RestaurantDetail.module.css";
 import type { RestaurantDTO } from "../types/restaurant";
@@ -7,6 +7,7 @@ import type { Dish } from "../types/dish";
 import { fetchRestaurantById } from '../services/restaurantService';
 import { fetchDishesByRestaurant } from '../services/dishService';
 import { API_BASE_URL } from '../services/apiClient';
+import RestaurantReservation from '../components/RestaurantReservation';
 
 // --- Icon Components ---
 const LocationIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>;
@@ -18,11 +19,13 @@ type TabType = 'menu' | 'info';
 const RestaurantDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [restaurant, setRestaurant] = useState<RestaurantDTO | null>(null);
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('menu');
+  const [showReservationForm, setShowReservationForm] = useState(false);
 
   useEffect(() => {
     const loadRestaurantData = async () => {
@@ -49,6 +52,19 @@ const RestaurantDetail: React.FC = () => {
 
     loadRestaurantData();
   }, [id, token]);
+
+ const handleReservationClick = () => {
+    if (!id) {
+      return;
+    }
+
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    navigate(`/restaurant/${id}/reservar`);
+  };
 
   if (loading) {
     return <main className={styles.container}><div className={styles.loading}>Cargando...</div></main>;
@@ -135,7 +151,19 @@ const RestaurantDetail: React.FC = () => {
                 <li><ClockIcon /> {restaurant.opening_time.slice(0, 5)} - {restaurant.closing_time.slice(0, 5)}</li>
                 <li><CapacityIcon /> {restaurant.chair_available} de {restaurant.chair_amount} sillas disponibles</li>
               </ul>
-              <button className={styles.bookingButton}>Reservar una Mesa</button>
+              <button
+                type="button"
+                className={styles.bookingButton}
+                onClick={() => setShowReservationForm(prev => !prev)}
+              >
+                {showReservationForm ? 'Cerrar formulario' : 'Reservar una Mesa'}
+              </button>
+              {showReservationForm && (
+                <RestaurantReservation
+                  restaurantId={restaurant.id_restaurant}
+                  onClose={() => setShowReservationForm(false)}
+                />
+              )}
             </div>
           </div>
 

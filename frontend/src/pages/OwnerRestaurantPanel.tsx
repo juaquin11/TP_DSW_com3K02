@@ -1,4 +1,4 @@
-// frontend/src/pages/OwnerRestaurantPanel.tsx
+ // frontend/src/pages/OwnerRestaurantPanel.tsx
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styles from './OwnerRestaurantPanel.module.css';
