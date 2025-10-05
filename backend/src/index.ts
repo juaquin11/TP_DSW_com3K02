@@ -11,7 +11,7 @@ import categoryRoutes from './routes/category.routes';
 import districtRoutes from './routes/district.routes'; 
 import userRoutes from './routes/user.routes'; 
 import reservationRoutes from './routes/reservation.routes'; 
-
+import subscriptionRoutes from './routes/subscription.routes';
 
 
 dotenv.config();
@@ -33,7 +33,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/districts', districtRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/reservations', reservationRoutes); 
-
+app.use('/api/subscriptions', subscriptionRoutes); 
 
 // Rutas de prueba
 app.get('/', (req, res) => {

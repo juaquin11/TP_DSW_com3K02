@@ -1,0 +1,116 @@
+.container {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  color: var(--restaurant-gold);
+  font-size: 1.8rem;
+}
+
+.addButton {
+  padding: 0.6rem 1.2rem;
+  background-color: var(--restaurant-gold);
+  color: var(--restaurant-dark);
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.addButton:hover {
+  background-color: #c19b26;
+  transform: translateY(-2px);
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--restaurant-border);
+}
+
+.table th {
+  color: var(--restaurant-muted);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.dishImage {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.descriptionCell {
+  max-width: 300px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.status {
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+
+.active { background-color: #5cb85c; color: #fff; }
+.inactive { background-color: #777; color: #fff; }
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editButton, .deleteButton {
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.editButton {
+  background-color: #337ab7;
+  color: white;
+}
+
+.editButton:hover {
+  background-color: #286090;
+}
+
+.deleteButton {
+  background-color: transparent;
+  color: #d9534f;
+  border-color: #d9534f;
+}
+
+.deleteButton:hover {
+  background-color: #d9534f;
+  color: white;
+}
+
+.error {
+  color: #e57373;
+  text-align: center;
+  padding: 1rem;
+}
