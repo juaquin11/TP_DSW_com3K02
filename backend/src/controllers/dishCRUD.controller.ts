@@ -86,6 +86,32 @@ export const getDishesByRestaurant = async (req: Request, res: Response) => {
   }
 };
 
+// Obtener platos de un restaurante con descuentos de suscripción 
+export const getDishesByRestaurantWithDiscounts = async (req: Request, res: Response) => {
+  try {
+    const id_restaurant  = req.params.id_restaurant;
+    const id_subscription = req.params.id_subscription;
+    
+    if (!id_restaurant) {
+      return res.status(400).json({ error: 'Se requiere id_restaurant' });
+    }
+    if (!id_subscription) {
+      return res.status(400).json({ error: 'Se requiere id_restaurant' });
+    }
+
+    const dishes = await dishService.getDishesByRestaurantWithDiscounts(
+      id_restaurant, 
+      id_subscription
+      
+    );
+    return res.status(200).json({
+      data: dishes
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Error interno del servidor', details: error.message });
+  }
+};
+
 
 // Obtener un plato específico
 export const getDish = async (req: Request, res: Response) => {
