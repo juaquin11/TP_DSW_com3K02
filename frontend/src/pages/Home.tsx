@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchRestaurants } from '../services/restaurantService';
-import type { RestaurantDTO } from '../types/restaurant';
+import { fetchRestaurantsWithDiscounts } from '../services/restaurantService';
+import type { RestaurantWithDiscounts } from '../types/restaurant';
 import RestaurantCard from '../components/RestaurantCard';
 import styles from "./Home.module.css";
 import { useAuth } from '../context/AuthContext';
 
 const Home: React.FC = () => {
-  const [restaurants, setRestaurants] = useState<RestaurantDTO[]>([]);
+  const [restaurants, setRestaurants] = useState<RestaurantWithDiscounts[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { token } = useAuth(); // Obtiene el token del contexto
-  const navigate = useNavigate(); // Hook para navegación
+  const { token } = useAuth();
+  const navigate = useNavigate();
 
-  // Función para manejar el click en una tarjeta de restaurante
   const handleRestaurantClick = (restaurantId: string) => {
     if (restaurantId) {
       navigate(`/restaurant/${restaurantId}`);
@@ -23,7 +22,8 @@ const Home: React.FC = () => {
   useEffect(() => {
     async function getRestaurants() {
       try {
-        const data = await fetchRestaurants(token ?? undefined);
+        const data = await fetchRestaurantsWithDiscounts();
+        console.log ('Fetched restaurants with discounts:', data);
         setRestaurants(data);
       } catch (err: any) {
         console.error('Failed to fetch restaurants:', err);
@@ -34,7 +34,7 @@ const Home: React.FC = () => {
     }
     
     getRestaurants();
-  }, [token]); // El efecto se ejecuta cuando el componente se monta y cuando el token cambia
+  }, [token]);
 
   if (loading) {
     return <main className={styles.container}>Cargando restaurantes...</main>;
@@ -57,6 +57,7 @@ const Home: React.FC = () => {
             street={restaurant.street}
             height={restaurant.height}
             rating={restaurant.avgRating || 0}
+            subscriptionNames={restaurant.subscriptionNames}
             onClick={handleRestaurantClick}
           />
         ))}

@@ -126,3 +126,13 @@ export async function getRestaurantById(req: Request, res: Response) {
     return res.status(500).json({ error: 'Failed to fetch restaurant' });
   }
 }
+
+export async function listRestaurantsWithDiscounts(req: Request, res: Response) {
+  try {
+    const restaurants = await restaurantService.getRestaurantsWithSubscriptionDiscounts();
+    return res.json(restaurants);
+  } catch (err: any) {
+    console.error('Error listing restaurants with discounts', err);
+    return res.status(500).json({ error: 'Failed to fetch restaurants with discounts' });
+  }
+}

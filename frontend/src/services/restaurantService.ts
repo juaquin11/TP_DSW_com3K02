@@ -1,5 +1,5 @@
 import apiClient from './apiClient';
-import type { RestaurantDTO, OwnerRestaurantDTO } from '../types/restaurant';
+import type { RestaurantDTO, OwnerRestaurantDTO, RestaurantWithDiscounts } from '../types/restaurant';
 
 export async function fetchRestaurants(token?: string): Promise<RestaurantDTO[]> {
   const headers: Record<string, string> = {};
@@ -40,3 +40,9 @@ export async function fetchRestaurantById(id: string, token?: string): Promise<R
   });
   return res.data;
 }
+
+export async function fetchRestaurantsWithDiscounts(): Promise<RestaurantWithDiscounts[]> {
+  const response = await apiClient.get<RestaurantWithDiscounts[]>('/restaurants/with-discounts');
+  return response.data;
+}
+

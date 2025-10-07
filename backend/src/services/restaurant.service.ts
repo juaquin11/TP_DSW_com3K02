@@ -1,6 +1,6 @@
 import prisma from '../prisma/client';
 import { Prisma } from '../generated/prisma';
-import { RestaurantWithRating , OwnerRestaurant, CreateRestaurantPayload } from '../models/types';
+import { RestaurantWithRating , OwnerRestaurant, CreateRestaurantPayload, RestaurantWithDiscounts } from '../models/types';
 
 
 export async function getAllRestaurantsOrderedByRating(): Promise<RestaurantWithRating[]> {
@@ -161,4 +161,46 @@ export async function getRestaurantById(id: string): Promise<RestaurantWithRatin
     reviewCount: Number(row.reviewCount),
     districtName: row.districtName as string | null,
   } as RestaurantWithRating;
+}
+
+export async function getRestaurantsWithSubscriptionDiscounts(): Promise<RestaurantWithDiscounts[]> {
+  const result = await prisma.$queryRaw<RestaurantWithDiscounts[]>(Prisma.sql`
+    SELECT 
+      r.id_restaurant,
+      r.name,
+      r.chair_amount,
+      r.chair_available,
+      r.street,
+      r.height,
+      r.image,
+      TIME_FORMAT(r.opening_time, '%H:%i:%s') AS opening_time,
+      TIME_FORMAT(r.closing_time, '%H:%i:%s') AS closing_time,
+      r.id_owner,
+      r.id_district,
+      r.status,
+      d.name AS districtName,
+      CAST(IFNULL(AVG(rev.rating), 0) AS DECIMAL(10, 2)) AS avgRating,
+      COUNT(DISTINCT rev.review_number) AS reviewCount,
+      (
+        SELECT GROUP_CONCAT(DISTINCT s.plan_name ORDER BY s.plan_name SEPARATOR ', ')
+        FROM dish_subscription AS ds
+        INNER JOIN subscription AS s ON ds.id_subscription = s.id_subscription
+        WHERE ds.id_restaurant = r.id_restaurant AND ds.discount > 0
+      ) AS subscriptionNames
+    FROM restaurant AS r
+    LEFT JOIN district AS d ON r.id_district = d.id_district
+    LEFT JOIN reservation AS res ON r.id_restaurant = res.id_restaurant
+    LEFT JOIN review AS rev ON res.id_reservation = rev.id_reservation
+    GROUP BY r.id_restaurant, r.name, r.chair_amount, r.chair_available, 
+             r.street, r.height, r.image, r.opening_time, r.closing_time,
+             r.id_owner, r.id_district, r.status, d.name
+    ORDER BY avgRating DESC;
+  `);
+  return result.map(row => ({
+    ...row,
+    avgRating: Number(row.avgRating),
+    reviewCount: Number(row.reviewCount),
+    opening_time: String(row.opening_time),
+    closing_time: String(row.closing_time),
+  }));
 }

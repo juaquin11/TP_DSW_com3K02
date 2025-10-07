@@ -63,3 +63,7 @@ export interface CreateRestaurantPayload {
   id_category: string[]; // Cambiado de 'categories' para mayor claridad
   image: string;
 }
+
+export type RestaurantWithDiscounts = RestaurantWithRating & {
+  subscriptionNames: string | null;
+};

@@ -4,13 +4,12 @@
   overflow: hidden;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  font:  1rem 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-
+  font: 1rem 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .card:hover {
   transform: scale(1.02);
-  transition: transform 0.3s ease-in-out;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -22,6 +21,24 @@
 
 .info {
   padding: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  min-height: 140px;
+}
+
+.infoMain {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.infoDiscounts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: flex-start;
+  align-items: flex-end;
 }
 
 .name {
@@ -39,4 +56,44 @@
 .rating {
   font-weight: normal;
   color: var(--restaurant-muted);
+  margin-bottom: 0;
+}
+
+.discountBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  width: auto;
+}
+
+.discountIcon {
+  font-size: 1.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.discountContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.discountTitle {
+  color: var(--restaurant-gold);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+  letter-spacing: 0.3px;
+}
+
+.subscriptionsList {
+  color: var(--restaurant-cream);
+  font-size: 0.8rem;
+  margin: 0;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
