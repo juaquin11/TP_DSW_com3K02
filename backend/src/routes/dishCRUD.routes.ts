@@ -14,9 +14,13 @@ const router = Router();
 // Descomentar si se requiere autenticación para todas las rutas de platos
 // router.use(requireAuth);   EN REVISION
 
+// GET /api/dishes/restaurant/:id_restaurant/:id_subscription/discounts - Obtener platos con descuentos
+router.get('/restaurant/discounts/:id_restaurant/:id_subscription', dishController.getDishesByRestaurantWithDiscounts);
+
 router.post('/', requireAuth, upload.single('image'), validateCreateDish, dishController.createDish);
 
 // router.post('/:dish_name/:id_restaurant/subscriptions', requireAuth, dishController.addDiscountSubscription);
+
 
 router.get('/', dishController.getAllDishes);
 router.get('/restaurant/:id_restaurant', dishController.getDishesByRestaurant);
