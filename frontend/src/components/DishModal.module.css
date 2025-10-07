@@ -1,0 +1,143 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal {
+  background: var(--restaurant-card);
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border: 1px solid var(--restaurant-border);
+}
+
+.modal h3 {
+  text-align: center;
+  color: var(--restaurant-gold);
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.inputGroup label {
+  color: var(--restaurant-muted);
+  font-weight: 600;
+}
+
+.inputGroup input,
+.inputGroup textarea {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--restaurant-dark);
+  border: 1px solid var(--restaurant-border);
+  border-radius: 6px;
+  color: var(--restaurant-cream);
+  font-size: 1rem;
+}
+
+.inputGroup input:disabled {
+  background-color: #333;
+  cursor: not-allowed;
+}
+
+.subscriptionSection {
+  margin-top: 2rem;
+  border-top: 1px solid var(--restaurant-border);
+  padding-top: 1.5rem;
+}
+
+.subscriptionSection h4 {
+  color: var(--restaurant-gold);
+  margin-bottom: 1rem;
+}
+
+.subscriptionRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.subscriptionRow label {
+  font-weight: 500;
+}
+
+.subscriptionRow input {
+  width: 80px;
+  text-align: right;
+}
+
+.errorMessage {
+  color: #e57373;
+  background-color: rgba(229, 115, 115, 0.1);
+  border: 1px solid #e57373;
+  padding: 0.75rem;
+  border-radius: 6px;
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.cancelButton, .saveButton {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelButton {
+  background-color: transparent;
+  color: var(--restaurant-muted);
+}
+
+.cancelButton:hover {
+  color: var(--restaurant-cream);
+}
+
+.saveButton {
+  background-color: var(--restaurant-gold);
+  color: var(--restaurant-dark);
+}
+
+.saveButton:hover:not(:disabled) {
+  background-color: #c19b26;
+}
+
+.saveButton:disabled {
+  background-color: var(--restaurant-muted);
+  cursor: not-allowed;
+}

@@ -1,5 +1,5 @@
 import apiClient from './apiClient';
-import type { subscription } from '../types/subscription2';
+import type { subscription } from '../types/subscription';
 
 
 export async function fetchSubscriptionByClient(id_User: string,token: string): Promise<subscription> {
@@ -12,3 +12,10 @@ export async function fetchSubscriptionByClient(id_User: string,token: string): 
   });
   return res.data.data;
 }
+
+export const fetchSubscriptions = async (token: string): Promise<subscription[]> => {
+  const { data } = await apiClient.get('/subscriptions', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+};

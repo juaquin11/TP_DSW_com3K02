@@ -36,3 +36,21 @@ export async function fetchDishesWithDiscounts(
   return res.data.data;  
 }
 
+export const createDish = async (data: FormData, token: string): Promise<Dish> => {
+  const res = await apiClient.post("/dishes", data, {
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return res.data.data;
+};
+
+export const updateDish = async (dishName: string, restaurantId: string, data: Partial<Dish>, token: string): Promise<Dish> => {
+  const res = await apiClient.put(`/dishes/${dishName}/${restaurantId}`, data, {
+     headers: {
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  return res.data.data;
+};
