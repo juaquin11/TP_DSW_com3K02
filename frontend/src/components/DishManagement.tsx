@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { fetchDishesByRestaurant } from '../services/dishService';
+import { fetchDishesByRestaurant, updateDish } from '../services/dishService';
 import type { Dish } from '../types/dish';
 import styles from './DishManagement.module.css';
 import { API_BASE_URL } from '../services/apiClient';
+import DishModal from './DishModal'; // <-- Descomentar/Añadir
 
 interface Props {
   restaurantId: string;
@@ -14,6 +15,9 @@ const DishManagement: React.FC<Props> = ({ restaurantId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { token } = useAuth();
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingDish, setEditingDish] = useState<Dish | null>(null);
 
   const loadDishes = useCallback(async () => {
     if (!token) return;
@@ -34,6 +38,34 @@ const DishManagement: React.FC<Props> = ({ restaurantId }) => {
     loadDishes();
   }, [loadDishes]);
 
+  const handleOpenModalForCreate = () => {
+    setEditingDish(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenModalForEdit = (dish: Dish) => {
+    setEditingDish(dish);
+    setIsModalOpen(true);
+  };
+  
+  const handleToggleStatus = async (dish: Dish) => {
+    if (!token) return;
+    const newStatus = dish.status === 1 ? 0 : 1;
+    const confirmation = window.confirm(`¿Estás seguro de que quieres ${newStatus === 1 ? 'activar' : 'desactivar'} el plato "${dish.dish_name}"?`);
+
+    if (confirmation) {
+      try {
+        await updateDish(dish.dish_name, restaurantId, { status: newStatus }, token);
+        setDishes(prevDishes => prevDishes.map(d => 
+          d.dish_name === dish.dish_name ? { ...d, status: newStatus } : d
+        ));
+      } catch (err) {
+        alert('Error al cambiar el estado del plato.');
+        console.error(err);
+      }
+    }
+  };
+
   if (loading) return <p>Cargando platos...</p>;
   if (error) return <p className={styles.error}>{error}</p>;
 
@@ -41,7 +73,7 @@ const DishManagement: React.FC<Props> = ({ restaurantId }) => {
     <div className={styles.container}>
       <div className={styles.header}>
         <h2 className={styles.title}>Gestión de Platos</h2>
-        <button className={styles.addButton}>+ Añadir Plato</button>
+        <button onClick={handleOpenModalForCreate} className={styles.addButton}>+ Añadir Plato</button>
       </div>
       <div className={styles.tableContainer}>
         <table className={styles.table}>
@@ -56,8 +88,8 @@ const DishManagement: React.FC<Props> = ({ restaurantId }) => {
             </tr>
           </thead>
           <tbody>
-            {dishes.map(dish => {
-              const imageUrl = dish.image ? `${API_BASE_URL}${dish.image}` : `${API_BASE_URL}/uploads/default_Dish.jpg`;
+            {dishes.length > 0 ? dishes.map(dish => {
+              const imageUrl = dish.image && !dish.image.includes('default') ? `${API_BASE_URL}${dish.image}` : `${API_BASE_URL}/uploads/default_Dish.jpg`;
               return (
                 <tr key={dish.dish_name}>
                   <td><img src={imageUrl} alt={dish.dish_name} className={styles.dishImage} /></td>
@@ -70,15 +102,31 @@ const DishManagement: React.FC<Props> = ({ restaurantId }) => {
                     </span>
                   </td>
                   <td className={styles.actions}>
-                    <button className={styles.editButton}>Editar</button>
-                    <button className={styles.deleteButton}>Eliminar</button>
+                    <button onClick={() => handleOpenModalForEdit(dish)} className={styles.editButton}>Editar</button>
+                    <button onClick={() => handleToggleStatus(dish)} className={dish.status === 1 ? styles.deleteButton : styles.activateButton}>
+                      {dish.status === 1 ? 'Dar de Baja' : 'Activar'}
+                    </button>
                   </td>
                 </tr>
               );
-            })}
+            }) : (
+              <tr>
+                <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>Aún no has añadido ningún plato.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
+      
+      {isModalOpen && (
+        <DishModal 
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSave={loadDishes}
+          dishToEdit={editingDish}
+          restaurantId={restaurantId}
+        />
+      )}
     </div>
   );
 };
