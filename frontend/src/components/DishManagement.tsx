@@ -63,7 +63,7 @@ const DishManagement: React.FC<Props> = ({ restaurantId }) => {
                   <td><img src={imageUrl} alt={dish.dish_name} className={styles.dishImage} /></td>
                   <td>{dish.dish_name}</td>
                   <td className={styles.descriptionCell}>{dish.description}</td>
-                  <td>${dish.current_price.toFixed(2)}</td>
+                  <td>${Number(dish.current_price).toFixed(2)}</td>
                   <td>
                     <span className={`${styles.status} ${dish.status === 1 ? styles.active : styles.inactive}`}>
                       {dish.status === 1 ? 'Activo' : 'Inactivo'}
