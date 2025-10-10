@@ -12,7 +12,7 @@ import districtRoutes from './routes/district.routes';
 import userRoutes from './routes/user.routes'; 
 import reservationRoutes from './routes/reservation.routes'; 
 import subscriptionRoutes from './routes/subscription.routes';
-
+import reviewRoutes from './routes/review.routes';
 
 dotenv.config();
 const app = express();
@@ -34,6 +34,7 @@ app.use('/api/districts', districtRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/reservations', reservationRoutes); 
 app.use('/api/subscriptions', subscriptionRoutes); 
+app.use('/api/reviews', reviewRoutes);
 
 // Rutas de prueba
 app.get('/', (req, res) => {

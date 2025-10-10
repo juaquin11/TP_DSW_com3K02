@@ -1,0 +1,239 @@
+.container {
+  background-color: var(--restaurant-card);
+  border-radius: 12px;
+  border: 1px solid var(--restaurant-border);
+  padding: 2rem;
+}
+
+.title {
+  color: var(--restaurant-gold);
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--restaurant-border);
+}
+
+.loading,
+.error,
+.noReviews {
+  text-align: center;
+  color: var(--restaurant-muted);
+  padding: 2rem 0;
+  line-height: 1.6;
+}
+
+.error {
+  color: #e74c3c;
+}
+
+.reviewCard {
+  background-color: var(--restaurant-dark);
+  border-radius: 8px;
+  border: 1px solid var(--restaurant-border);
+  padding: 1.5rem;
+  position: relative;
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.clientInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--restaurant-gold) 0%, #9d7e2a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--restaurant-dark);
+  font-weight: bold;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+}
+
+.clientDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.clientName {
+  color: var(--restaurant-cream);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+}
+
+.reservationInfo {
+  color: var(--restaurant-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.dateContainer {
+  flex-shrink: 0;
+}
+
+.date {
+  color: var(--restaurant-muted);
+  font-size: 0.85rem;
+  margin: 0;
+  text-align: right;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.rating .starFilled {
+  color: var(--restaurant-gold);
+  font-size: 1.5rem;
+}
+
+.rating .starEmpty {
+  color: #555;
+  font-size: 1.5rem;
+}
+
+.ratingNumber {
+  color: var(--restaurant-gold);
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-left: 0.25rem;
+}
+
+.commentContainer {
+  margin-bottom: 1.5rem;
+  min-height: 80px;
+}
+
+.comment {
+  color: var(--restaurant-cream);
+  font-size: 1rem;
+  line-height: 1.7;
+  font-style: italic;
+  margin: 0;
+  position: relative;
+  padding: 0 0.5rem;
+}
+
+.noComment {
+  color: var(--restaurant-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+  font-style: italic;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--restaurant-border);
+}
+
+.navButton {
+  background-color: transparent;
+  border: 1px solid var(--restaurant-border);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--restaurant-gold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navButton:hover {
+  background-color: var(--restaurant-gold);
+  color: var(--restaurant-dark);
+  border-color: var(--restaurant-gold);
+  transform: scale(1.1);
+}
+
+.navButton svg {
+  width: 20px;
+  height: 20px;
+}
+
+.counter {
+  color: var(--restaurant-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem;
+  }
+
+  .reviewHeader {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .dateContainer {
+    align-self: flex-start;
+  }
+
+  .date {
+    text-align: left;
+  }
+
+  .avatar {
+    width: 45px;
+    height: 45px;
+    font-size: 1rem;
+  }
+
+  .clientName {
+    font-size: 1rem;
+  }
+
+  .navigation {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .reviewCard {
+    padding: 1rem;
+  }
+
+  .rating .starFilled,
+  .rating .starEmpty {
+    font-size: 1.2rem;
+  }
+
+  .ratingNumber {
+    font-size: 1rem;
+  }
+
+  .comment {
+    font-size: 0.95rem;
+  }
+}
