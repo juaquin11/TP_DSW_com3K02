@@ -239,7 +239,7 @@ const RestaurantDetail: React.FC = () => {
           {filteredDishes.length > 0 ? (
             <div className={styles.dishesGallery}>
               {filteredDishes.map((dish, index) => {
-                const dishImageUrl = dish.image ? `${API_BASE_URL}/uploads/${dish.image}` : '/default-dish.webp';                
+                const dishImageUrl = dish.image ? `${API_BASE_URL}${dish.image}` : '/default-dish.webp';                
                 const basePrice = Number(dish.current_price);
                 const displayPrice = getDisplayPrice(dish);
                 const hasDiscount = dish.subscription_discount && dish.subscription_discount > 0;

@@ -42,3 +42,7 @@ export type CreateRestaurantDTO = {
   id_category: string[];
   image?: string;
 };
+
+export type RestaurantWithDiscounts = RestaurantDTO & {
+  subscriptionNames: string;
+};

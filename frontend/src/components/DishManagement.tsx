@@ -102,10 +102,12 @@ const DishManagement: React.FC<Props> = ({ restaurantId }) => {
                     </span>
                   </td>
                   <td className={styles.actions}>
-                    <button onClick={() => handleOpenModalForEdit(dish)} className={styles.editButton}>Editar</button>
-                    <button onClick={() => handleToggleStatus(dish)} className={dish.status === 1 ? styles.deleteButton : styles.activateButton}>
-                      {dish.status === 1 ? 'Dar de Baja' : 'Activar'}
-                    </button>
+                    <div className={styles.actionsWrapper}>
+                      <button onClick={() => handleOpenModalForEdit(dish)} className={styles.editButton}>Editar</button>
+                      <button onClick={() => handleToggleStatus(dish)} className={dish.status === 1 ? styles.deleteButton : styles.activateButton}>
+                        {dish.status === 1 ? 'Dar de Baja' : 'Activar'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );
