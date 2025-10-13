@@ -15,3 +15,20 @@ export async function getUserStatus(req: Request, res: Response) {
     return res.status(500).json({ error: 'Error interno del servidor.' });
   }
 }
+
+export async function getProfile(req: Request, res: Response) {
+  try {
+    const userPayload = (req as any).user as JwtPayload;
+    const userProfile = await userService.getUserProfile(userPayload.id_user);
+
+    if (!userProfile) {
+      return res.status(404).json({ error: 'Usuario no encontrado.' });
+    }
+
+    return res.status(200).json(userProfile);
+  } catch (error: any) {
+    console.error('Error al obtener el perfil del usuario:', error);
+    return res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+}
+

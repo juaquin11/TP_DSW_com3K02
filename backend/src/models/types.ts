@@ -77,3 +77,35 @@ export interface ReviewWithDetails  {
   client_name: string;
   client_email: string;
 }
+
+export interface UserProfileReservation {
+  id_reservation: string;
+  reservation_date: Date;
+  diners: number;
+  status: number;
+  restaurant: {
+    id_restaurant: string;
+    name: string;
+  };
+  review: {
+    rating: number;
+  } | null;
+}
+
+export interface UserProfile {
+  id_user: string;
+  name: string | null;
+  email: string;
+  phone: string;
+  type: string;
+  subscription?: {
+    plan_name: string;
+    adhesion_date: Date;
+  } | null;
+  penalties: {
+    penalty_start_date: Date;
+    penalty_end_date: Date;
+    client_reason: string | null;
+  }[];
+  reservations: UserProfileReservation[];
+}

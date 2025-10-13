@@ -4,7 +4,9 @@ import { requireAuth } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// Endpoint protegido para el estado actual del usuario logueado.
 router.get('/status', requireAuth, userController.getUserStatus);
+
+router.get('/profile', requireAuth, userController.getProfile);
+
 
 export default router;

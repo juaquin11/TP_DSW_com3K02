@@ -1,5 +1,5 @@
 import prisma from '../prisma/client';
-import { JwtPayload } from '../models/types';
+import { JwtPayload, UserProfile} from '../models/types';
 
 /**
  * Obtiene el estado dinámico de un usuario (suscripciones, penalizaciones, notificaciones).
@@ -50,4 +50,80 @@ export async function getUserStatus(user: JwtPayload) {
     hasActivePenalty,
     notificationCount,
   };
+}
+
+export async function getUserProfile(userId: string): Promise<UserProfile | null> {
+  const user = await prisma.useraccount.findUnique({
+    where: { id_user: userId },
+    select: {
+      id_user: true,
+      name: true,
+      email: true,
+      phone: true,
+      type: true,
+      // Incluimos datos solo si es un cliente
+      has_subscription: {
+        select: {
+          adhesion_date: true,
+          subscription: {
+            select: {
+              plan_name: true,
+            },
+          },
+        },
+      },
+      penalty: {
+        select: {
+          penalty_start_date: true,
+          penalty_end_date: true,
+          client_reason: true,
+        },
+        orderBy: {
+          penalty_start_date: 'desc',
+        },
+      },
+      reservation: {
+        select: {
+          id_reservation: true,
+          reservation_date: true,
+          diners: true,
+          status: true,
+          restaurant: {
+            select: {
+              id_restaurant: true,
+              name: true,
+            },
+          },
+          review: {
+            select: {
+              rating: true,
+            },
+          },
+        },
+        orderBy: {
+          reservation_date: 'desc',
+        },
+      },
+    },
+  });
+
+  if (!user) {
+    return null;
+  }
+
+  // Aplanamos la estructura de la suscripción para que sea más fácil de usar en el frontend
+  const { has_subscription, penalty, reservation, ...userData } = user;
+  const profile: UserProfile = {
+    ...userData,
+    subscription: has_subscription
+      ? {
+          plan_name: has_subscription.subscription.plan_name,
+          adhesion_date: has_subscription.adhesion_date,
+        }
+      : null,
+    penalties: penalty,
+    reservations: reservation,
+  };
+
+  return profile;
 }

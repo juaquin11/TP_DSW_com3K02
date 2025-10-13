@@ -12,15 +12,8 @@ import CreateRestaurantPage from "./pages/CreateRestaurantPage";
 import RestaurantDetail from "./pages/RestaurantDetail";
 import RestaurantReservation from "./components/RestaurantReservation";
 import { useAuth } from "./context/AuthContext";
+import ProfilePage from "./pages/ProfilePage"; 
 
-const Profile = () => {
-  return (
-    <main style={{ padding: "2rem", color: "var(--restaurant-cream)" }}>
-      <h1>Página de Perfil</h1>
-      <p>Esta es la página de tu perfil de usuario. Aquí podrás ver tus datos personales, reservas, suscripción y notificaciones.</p>
-    </main>
-  );
-};
 
 const ProtectedRoute = ({ children }: { children: ReactElement }) => {
   const { token } = useAuth();
@@ -40,7 +33,11 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        } />
         <Route path="/ownerDashboard" element={<OwnerHome />} />
         <Route path="/ownerDashboard/restaurant/:id" element={<OwnerRestaurantPanel />} />
         <Route path="/ownerDashboard/new-restaurant" element={<CreateRestaurantPage />} /> {/* <-- NUEVA RUTA */}
