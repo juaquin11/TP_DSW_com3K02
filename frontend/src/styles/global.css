@@ -6,6 +6,10 @@
   --restaurant-card: #2d2d2d;
   --restaurant-muted: #6c757d;
   --restaurant-border: #474747;
+  --restaurant-plum: #6c5ce7;
+  --restaurant-emerald: #2ecc71;
+  --restaurant-rose: #ff7675;
+  --restaurant-ink: #0f0f0f;
 }
 * {
   box-sizing: border-box;

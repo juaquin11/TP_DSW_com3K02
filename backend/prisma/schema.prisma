@@ -26,8 +26,6 @@ model consumption {
   @@index([dish_name, id_restaurant], map: "dish_name")
 }
 
-
-
 model dish_subscription {
   dish_name       String       @db.VarChar(100)
   id_restaurant   String       @db.Char(36)
@@ -41,15 +39,15 @@ model dish_subscription {
 }
 
 model dish {
-  dish_name             String                  @db.VarChar(100)
-  description           String                  @db.Text
-  status                Int                     @default(1) @db.TinyInt
-  current_price         Decimal                 @db.Decimal(10, 2)
-  image                 String?                 @db.VarChar(255)
-  id_restaurant         String                  @db.Char(36)
-  consumption           consumption[]
-  dish_subscription     dish_subscription[]
-  restaurant            restaurant              @relation(fields: [id_restaurant], references: [id_restaurant], onDelete: NoAction, onUpdate: NoAction, map: "dish_ibfk_1")
+  dish_name         String              @db.VarChar(100)
+  description       String              @db.Text
+  status            Int                 @default(1) @db.TinyInt
+  current_price     Decimal             @db.Decimal(10, 2)
+  image             String?             @db.VarChar(255)
+  id_restaurant     String              @db.Char(36)
+  consumption       consumption[]
+  dish_subscription dish_subscription[]
+  restaurant        restaurant          @relation(fields: [id_restaurant], references: [id_restaurant], onDelete: NoAction, onUpdate: NoAction, map: "dish_ibfk_1")
 
   @@id([dish_name, id_restaurant])
   @@index([id_restaurant], map: "id_restaurant")
@@ -134,7 +132,7 @@ model restaurant_category {
 
 model review {
   review_number  Int         @default(autoincrement())
-  id_reservation String      @db.Char(36) @unique
+  id_reservation String      @unique @db.Char(36)
   rating         Int
   comment        String?     @db.Text
   reservation    reservation @relation(fields: [id_reservation], references: [id_reservation], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_1")
@@ -143,12 +141,12 @@ model review {
 }
 
 model subscription {
-  id_subscription       String                  @id @default(dbgenerated("(uuid())")) @db.Char(36)
-  plan_name             String                  @db.VarChar(50)
-  price                 Decimal                 @db.Decimal(10, 2)
-  duration              Int
-  dish_subscription     dish_subscription[]
-  has_subscription      has_subscription[]
+  id_subscription   String              @id @default(dbgenerated("(uuid())")) @db.Char(36)
+  plan_name         String              @db.VarChar(50)
+  price             Decimal             @db.Decimal(10, 2)
+  duration          Int
+  dish_subscription dish_subscription[]
+  has_subscription  has_subscription[]
 }
 
 model useraccount {

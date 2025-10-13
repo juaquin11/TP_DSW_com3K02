@@ -1,0 +1,115 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2.5rem 0;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 2rem;
+  color: var(--restaurant-cream);
+  letter-spacing: 0.02em;
+  margin: 0 0 0.5rem;
+}
+
+.description {
+  font-size: 1rem;
+  color: var(--restaurant-muted);
+  max-width: 520px;
+  margin: 0;
+}
+
+.controls {
+  display: inline-flex;
+  gap: 0.75rem;
+}
+
+.controlButton {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--restaurant-cream);
+  font-size: 1.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.controlButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: rgba(212, 175, 55, 0.2);
+  color: var(--restaurant-gold);
+}
+
+.controlButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.carouselWrapper {
+  position: relative;
+}
+
+.carousel {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(280px, 320px);
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+
+.carousel::-webkit-scrollbar {
+  height: 8px;
+}
+
+.carousel::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+}
+
+.carousel::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.4);
+  border-radius: 999px;
+}
+
+.carousel > * {
+  scroll-snap-align: start;
+}
+
+.emptyState {
+  padding: 2rem;
+  border-radius: 1rem;
+  background: linear-gradient(120deg, rgba(45, 45, 45, 0.85), rgba(26, 26, 26, 0.85));
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  color: var(--restaurant-muted);
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 2rem 0;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .carousel {
+    grid-auto-columns: minmax(240px, 75vw);
+  }
+}

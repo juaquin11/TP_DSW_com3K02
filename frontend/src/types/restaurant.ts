@@ -44,5 +44,5 @@ export type CreateRestaurantDTO = {
 };
 
 export type RestaurantWithDiscounts = RestaurantDTO & {
-  subscriptionNames: string;
+  subscriptionNames: string | null;
 };
