@@ -136,3 +136,36 @@ export async function listRestaurantsWithDiscounts(req: Request, res: Response) 
     return res.status(500).json({ error: 'Failed to fetch restaurants with discounts' });
   }
 }
+
+export async function searchRestaurants(req: Request, res: Response) {
+  try {
+    const queryParam = typeof req.query.query === 'string'
+      ? req.query.query
+      : typeof req.query.q === 'string'
+        ? req.query.q
+        : '';
+
+    const query = queryParam.trim();
+
+    if (!query) {
+      return res.status(400).json({ error: 'La consulta de búsqueda es obligatoria.' });
+    }
+
+    const limitValue = Number.parseInt(String(req.query.limit ?? ''), 10);
+    const suggestionsLimitValue = Number.parseInt(String(req.query.suggestionsLimit ?? ''), 10);
+    const mode = typeof req.query.mode === 'string' ? req.query.mode : 'results';
+    const includeResults = mode !== 'suggestions';
+
+    const data = await restaurantService.searchRestaurants({
+      query,
+      limit: Number.isNaN(limitValue) ? 12 : limitValue,
+      suggestionsLimit: Number.isNaN(suggestionsLimitValue) ? 6 : suggestionsLimitValue,
+      includeResults,
+    });
+
+    return res.json(data);
+  } catch (err: any) {
+    console.error('Error searching restaurants', err);
+    return res.status(500).json({ error: 'No pudimos realizar la búsqueda.' });
+  }
+}

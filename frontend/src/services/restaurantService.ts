@@ -1,5 +1,5 @@
 import apiClient from './apiClient';
-import type { RestaurantDTO, OwnerRestaurantDTO, RestaurantWithDiscounts } from '../types/restaurant';
+import type { RestaurantDTO, OwnerRestaurantDTO, RestaurantWithDiscounts, RestaurantSearchResponse } from '../types/restaurant';
 
 export async function fetchRestaurants(token?: string): Promise<RestaurantDTO[]> {
   const headers: Record<string, string> = {};
@@ -46,3 +46,39 @@ export async function fetchRestaurantsWithDiscounts(): Promise<RestaurantWithDis
   return response.data;
 }
 
+type SearchMode = 'results' | 'suggestions';
+
+interface SearchOptions {
+  limit?: number;
+  suggestionsLimit?: number;
+  mode?: SearchMode;
+}
+
+export async function searchRestaurants(
+  query: string,
+  options: SearchOptions = {},
+): Promise<RestaurantSearchResponse> {
+  const params: Record<string, string | number> = { query };
+
+  if (typeof options.limit === 'number') {
+    params.limit = options.limit;
+  }
+
+  if (typeof options.suggestionsLimit === 'number') {
+    params.suggestionsLimit = options.suggestionsLimit;
+  }
+
+  if (options.mode) {
+    params.mode = options.mode;
+  }
+
+  const response = await apiClient.get<RestaurantSearchResponse>('/restaurants/search', { params });
+  return response.data;
+}
+
+export async function fetchSearchSuggestions(
+  query: string,
+  suggestionsLimit = 6,
+): Promise<RestaurantSearchResponse> {
+  return searchRestaurants(query, { suggestionsLimit, mode: 'suggestions' });
+}

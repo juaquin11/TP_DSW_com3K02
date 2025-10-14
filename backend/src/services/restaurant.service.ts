@@ -1,6 +1,15 @@
 import prisma from '../prisma/client';
 import { Prisma } from '../generated/prisma';
-import { RestaurantWithRating , OwnerRestaurant, CreateRestaurantPayload, RestaurantWithDiscounts } from '../models/types';
+import {
+  RestaurantWithRating,
+  OwnerRestaurant,
+  CreateRestaurantPayload,
+  RestaurantWithDiscounts,
+  RestaurantSearchMatch,
+  RestaurantSearchParams,
+  RestaurantSearchResult,
+  RestaurantSearchSuggestions,
+} from '../models/types';
 
 
 export async function getAllRestaurantsOrderedByRating(): Promise<RestaurantWithRating[]> {
@@ -165,7 +174,7 @@ export async function getRestaurantById(id: string): Promise<RestaurantWithRatin
 
 export async function getRestaurantsWithSubscriptionDiscounts(): Promise<RestaurantWithDiscounts[]> {
   const result = await prisma.$queryRaw<RestaurantWithDiscounts[]>(Prisma.sql`
-    SELECT 
+    SELECT
       r.id_restaurant,
       r.name,
       r.chair_amount,
@@ -203,4 +212,199 @@ export async function getRestaurantsWithSubscriptionDiscounts(): Promise<Restaur
     opening_time: String(row.opening_time),
     closing_time: String(row.closing_time),
   }));
+}
+
+type RawSearchRow = {
+  id_restaurant: string;
+  name: string;
+  chair_amount: number;
+  chair_available: number;
+  street: string;
+  height: string;
+  image: string | null;
+  opening_time: string;
+  closing_time: string;
+  id_owner: string;
+  id_district: string;
+  status: number;
+  districtName: string | null;
+  avgRating: any;
+  reviewCount: any;
+  isRestaurantMatch: any;
+  matchedCategoryNames: string | null;
+  matchedDishNames: string | null;
+  matchPriority: any;
+};
+
+const parseGroupedList = (value: string | null): string[] => {
+  if (!value) {
+    return [];
+  }
+
+  return value
+    .split(',')
+    .map(item => item.trim())
+    .filter((item, index, array) => item.length > 0 && array.indexOf(item) === index);
+};
+
+const buildSuggestions = (
+  restaurants: { name: string }[],
+  categories: { name: string }[],
+  dishes: { dish_name: string }[],
+): RestaurantSearchSuggestions => ({
+  restaurants: restaurants.map(item => item.name).filter(Boolean),
+  categories: categories.map(item => item.name).filter(Boolean),
+  dishes: dishes.map(item => item.dish_name).filter(Boolean),
+});
+
+export async function searchRestaurants({
+  query,
+  limit,
+  suggestionsLimit,
+  includeResults,
+}: RestaurantSearchParams): Promise<RestaurantSearchResult> {
+  const normalizedQuery = query.trim().toLowerCase();
+
+  if (!normalizedQuery) {
+    return {
+      query,
+      results: [],
+      suggestions: { restaurants: [], categories: [], dishes: [] },
+    };
+  }
+
+  const likeQuery = `%${normalizedQuery}%`;
+  const safeLimit = Number.isFinite(limit) ? Math.max(1, Math.min(50, Math.floor(limit))) : 12;
+  const safeSuggestionsLimit = Number.isFinite(suggestionsLimit)
+    ? Math.max(1, Math.min(12, Math.floor(suggestionsLimit)))
+    : 6;
+
+  let rawRows: RawSearchRow[] = [];
+
+  if (includeResults) {
+    rawRows = await prisma.$queryRaw<RawSearchRow[]>(Prisma.sql`
+      SELECT
+        r.id_restaurant,
+        r.name,
+        r.chair_amount,
+        r.chair_available,
+        r.street,
+        r.height,
+        r.image,
+        TIME_FORMAT(r.opening_time, '%H:%i:%s') AS opening_time,
+        TIME_FORMAT(r.closing_time, '%H:%i:%s') AS closing_time,
+        r.id_owner,
+        r.id_district,
+        r.status,
+        d.name AS districtName,
+        CAST(IFNULL(AVG(rev.rating), 0) AS DECIMAL(10, 2)) AS avgRating,
+        COUNT(rev.rating) AS reviewCount,
+        MAX(CASE WHEN LOWER(r.name) LIKE ${likeQuery} THEN 1 ELSE 0 END) AS isRestaurantMatch,
+        GROUP_CONCAT(DISTINCT CASE WHEN LOWER(cat.name) LIKE ${likeQuery} THEN cat.name END) AS matchedCategoryNames,
+        GROUP_CONCAT(DISTINCT CASE WHEN LOWER(dish.dish_name) LIKE ${likeQuery} THEN dish.dish_name END) AS matchedDishNames,
+        MAX(
+          CASE
+            WHEN LOWER(r.name) LIKE ${likeQuery} THEN 3
+            WHEN LOWER(cat.name) LIKE ${likeQuery} THEN 2
+            WHEN LOWER(dish.dish_name) LIKE ${likeQuery} THEN 1
+            ELSE 0
+          END
+        ) AS matchPriority
+      FROM restaurant AS r
+      LEFT JOIN district AS d ON r.id_district = d.id_district
+      LEFT JOIN restaurant_category AS rc ON r.id_restaurant = rc.id_restaurant
+      LEFT JOIN category AS cat ON rc.id_category = cat.id_category
+      LEFT JOIN dish AS dish ON r.id_restaurant = dish.id_restaurant
+      LEFT JOIN reservation AS res ON r.id_restaurant = res.id_restaurant
+      LEFT JOIN review AS rev ON res.id_reservation = rev.id_reservation
+      WHERE r.status = 1
+        AND (
+          LOWER(r.name) LIKE ${likeQuery}
+          OR LOWER(cat.name) LIKE ${likeQuery}
+          OR LOWER(dish.dish_name) LIKE ${likeQuery}
+        )
+      GROUP BY r.id_restaurant
+      ORDER BY matchPriority DESC, avgRating DESC
+      LIMIT ${safeLimit}
+    `);
+  }
+
+  const [restaurantNames, categoryNames, dishNames] = await Promise.all([
+    prisma.$queryRaw<{ name: string }[]>(Prisma.sql`
+      SELECT DISTINCT r.name AS name
+      FROM restaurant AS r
+      WHERE r.status = 1 AND LOWER(r.name) LIKE ${likeQuery}
+      ORDER BY LOCATE(${normalizedQuery}, LOWER(r.name)), r.name
+      LIMIT ${safeSuggestionsLimit}
+    `),
+    prisma.$queryRaw<{ name: string }[]>(Prisma.sql`
+      SELECT DISTINCT c.name AS name
+      FROM category AS c
+      INNER JOIN restaurant_category AS rc ON rc.id_category = c.id_category
+      INNER JOIN restaurant AS r ON r.id_restaurant = rc.id_restaurant
+      WHERE r.status = 1 AND LOWER(c.name) LIKE ${likeQuery}
+      ORDER BY LOCATE(${normalizedQuery}, LOWER(c.name)), c.name
+      LIMIT ${safeSuggestionsLimit}
+    `),
+    prisma.$queryRaw<{ dish_name: string }[]>(Prisma.sql`
+      SELECT DISTINCT d.dish_name
+      FROM dish AS d
+      INNER JOIN restaurant AS r ON r.id_restaurant = d.id_restaurant
+      WHERE r.status = 1 AND LOWER(d.dish_name) LIKE ${likeQuery}
+      ORDER BY LOCATE(${normalizedQuery}, LOWER(d.dish_name)), d.dish_name
+      LIMIT ${safeSuggestionsLimit}
+    `),
+  ]);
+
+  const suggestions = buildSuggestions(restaurantNames, categoryNames, dishNames);
+
+  const results: RestaurantSearchMatch[] = includeResults
+    ? rawRows.map(row => {
+        const matchedCategories = parseGroupedList(row.matchedCategoryNames);
+        const matchedDishes = parseGroupedList(row.matchedDishNames);
+
+        const reasons: string[] = [];
+        if (Number(row.isRestaurantMatch)) {
+          reasons.push('Coincide con el nombre');
+        }
+        if (matchedCategories.length > 0) {
+          reasons.push(`Categoría: ${matchedCategories[0]}`);
+        }
+        if (matchedDishes.length > 0) {
+          reasons.push(`Plato: ${matchedDishes[0]}`);
+        }
+
+        const matchSummary = reasons.length > 0 ? reasons.join(' • ') : 'Coincidencia encontrada';
+
+        const mapped: RestaurantSearchMatch = {
+          id_restaurant: row.id_restaurant,
+          name: row.name,
+          chair_amount: row.chair_amount,
+          chair_available: row.chair_available,
+          street: row.street,
+          height: row.height,
+          image: row.image,
+          opening_time: String(row.opening_time),
+          closing_time: String(row.closing_time),
+          id_owner: row.id_owner,
+          id_district: row.id_district,
+          status: row.status,
+          districtName: row.districtName,
+          avgRating: row.avgRating !== null ? Number(row.avgRating) : null,
+          reviewCount: Number(row.reviewCount),
+          matchPriority: Number(row.matchPriority ?? 0),
+          matchedCategories,
+          matchedDishes,
+          matchSummary,
+        };
+
+        return mapped;
+      })
+    : [];
+
+  return {
+    query,
+    results,
+    suggestions,
+  };
 }

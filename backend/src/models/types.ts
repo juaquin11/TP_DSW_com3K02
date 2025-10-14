@@ -68,6 +68,32 @@ export type RestaurantWithDiscounts = RestaurantWithRating & {
   subscriptionNames: string | null;
 };
 
+export interface RestaurantSearchMatch extends RestaurantWithRating {
+  matchPriority: number;
+  matchedCategories: string[];
+  matchedDishes: string[];
+  matchSummary: string;
+}
+
+export interface RestaurantSearchSuggestions {
+  restaurants: string[];
+  dishes: string[];
+  categories: string[];
+}
+
+export interface RestaurantSearchResult {
+  query: string;
+  results: RestaurantSearchMatch[];
+  suggestions: RestaurantSearchSuggestions;
+}
+
+export interface RestaurantSearchParams {
+  query: string;
+  limit: number;
+  suggestionsLimit: number;
+  includeResults: boolean;
+}
+
 export interface ReviewWithDetails  {
   review_number: number;
   rating: number;

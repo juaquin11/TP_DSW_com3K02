@@ -8,6 +8,8 @@ const router = Router();
 // Rutas públicas
 router.get('/', restaurantController.listRestaurants);
 
+router.get('/search', restaurantController.searchRestaurants);
+
 router.get('/with-discounts', restaurantController.listRestaurantsWithDiscounts);
 
 // Rutas protegidas y específicas (deben ir antes que las dinámicas)

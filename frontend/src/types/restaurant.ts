@@ -46,3 +46,22 @@ export type CreateRestaurantDTO = {
 export type RestaurantWithDiscounts = RestaurantDTO & {
   subscriptionNames: string | null;
 };
+
+export type RestaurantSearchSuggestions = {
+  restaurants: string[];
+  dishes: string[];
+  categories: string[];
+};
+
+export type RestaurantSearchResultItem = RestaurantDTO & {
+  matchPriority: number;
+  matchedCategories: string[];
+  matchedDishes: string[];
+  matchSummary: string;
+};
+
+export type RestaurantSearchResponse = {
+  query: string;
+  results: RestaurantSearchResultItem[];
+  suggestions: RestaurantSearchSuggestions;
+};

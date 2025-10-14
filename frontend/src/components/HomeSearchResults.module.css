@@ -1,0 +1,151 @@
+.resultsSection {
+  margin: 3.5rem 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.resultsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.resultsTitle {
+  font-size: 1.8rem;
+  color: var(--restaurant-cream);
+  margin: 0;
+}
+
+.resultsSubtitle {
+  font-size: 1rem;
+  color: rgba(245, 243, 231, 0.7);
+  margin: 0.35rem 0 0;
+}
+
+.feedbackCard {
+  padding: 1.4rem 1.6rem;
+  border-radius: 1.2rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(245, 243, 231, 0.85);
+  font-size: 0.98rem;
+}
+
+.feedbackError {
+  border-color: rgba(255, 118, 117, 0.35);
+  background: rgba(255, 118, 117, 0.15);
+  color: #ffdede;
+}
+
+.resultsGrid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.resultCard {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  background: linear-gradient(140deg, rgba(40, 40, 40, 0.95), rgba(25, 25, 25, 0.92));
+  border-radius: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  padding: 0;
+  gap: 0;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border 0.25s ease;
+}
+
+.resultCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 45px rgba(0, 0, 0, 0.35);
+  border-color: rgba(212, 175, 55, 0.55);
+}
+
+.resultImage {
+  height: 160px;
+  background: radial-gradient(circle at center, rgba(212, 175, 55, 0.18), rgba(40, 40, 40, 0.9));
+  background-size: cover;
+  background-position: center;
+}
+
+.resultBody {
+  padding: 1.2rem 1.3rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.resultHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.resultName {
+  font-size: 1.1rem;
+  color: var(--restaurant-cream);
+  margin: 0;
+}
+
+.ratingBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.85rem;
+  color: var(--restaurant-cream);
+}
+
+.ratingStar {
+  color: var(--restaurant-gold);
+}
+
+.resultLocation {
+  font-size: 0.9rem;
+  color: rgba(245, 243, 231, 0.65);
+  margin: 0;
+}
+
+.matchSummary {
+  font-size: 0.95rem;
+  color: rgba(255, 215, 128, 0.8);
+  margin: 0;
+}
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tag {
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 0.75rem;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.8rem;
+  color: rgba(245, 243, 231, 0.8);
+}
+
+.dishTag {
+  background: rgba(108, 92, 231, 0.25);
+  color: rgba(237, 233, 255, 0.95);
+}
+
+@media (max-width: 768px) {
+  .resultsSection {
+    margin-top: 3rem;
+  }
+
+  .resultsTitle {
+    font-size: 1.5rem;
+  }
+}

@@ -1,17 +1,36 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchRestaurantsWithDiscounts } from '../services/restaurantService';
-import type { RestaurantWithDiscounts } from '../types/restaurant';
+import {
+  fetchRestaurantsWithDiscounts,
+  fetchSearchSuggestions,
+  searchRestaurants as searchRestaurantsRequest,
+} from '../services/restaurantService';
+import type {
+  RestaurantWithDiscounts,
+  RestaurantSearchResultItem,
+  RestaurantSearchSuggestions,
+} from '../types/restaurant';
 import styles from "./Home.module.css";
 import { useAuth } from '../context/AuthContext';
 import RestaurantCarousel from '../components/RestaurantCarousel';
+import HomeSearchBar from '../components/HomeSearchBar';
+import HomeSearchResults from '../components/HomeSearchResults';
 
 const CAROUSEL_LIMIT = 8;
+const EMPTY_SUGGESTIONS: RestaurantSearchSuggestions = { restaurants: [], dishes: [], categories: [] };
 
 const Home: React.FC = () => {
   const [restaurants, setRestaurants] = useState<RestaurantWithDiscounts[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<RestaurantSearchResultItem[]>([]);
+  const [searchSuggestions, setSearchSuggestions] = useState<RestaurantSearchSuggestions>(EMPTY_SUGGESTIONS);
+  const [isFetchingSuggestions, setIsFetchingSuggestions] = useState<boolean>(false);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [hasSearched, setHasSearched] = useState<boolean>(false);
+  const [activeSearchTerm, setActiveSearchTerm] = useState<string>('');
   const { token } = useAuth();
   const navigate = useNavigate();
 
@@ -36,6 +55,72 @@ const Home: React.FC = () => {
     
     getRestaurants();
   }, [token]);
+
+  useEffect(() => {
+    const trimmedQuery = searchQuery.trim();
+
+    if (trimmedQuery.length < 2) {
+      setSearchSuggestions({ ...EMPTY_SUGGESTIONS });
+      setIsFetchingSuggestions(false);
+      return;
+    }
+
+    let cancelled = false;
+    setIsFetchingSuggestions(true);
+
+    const debounceHandle = window.setTimeout(async () => {
+      try {
+        const response = await fetchSearchSuggestions(trimmedQuery, 6);
+        if (!cancelled) {
+          setSearchSuggestions(response.suggestions);
+        }
+      } catch (suggestionError) {
+        if (!cancelled) {
+          console.error('No se pudieron obtener sugerencias de búsqueda', suggestionError);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsFetchingSuggestions(false);
+        }
+      }
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(debounceHandle);
+    };
+  }, [searchQuery]);
+
+  const executeSearch = useCallback(async (rawQuery: string) => {
+    const trimmed = rawQuery.trim();
+
+    if (!trimmed) {
+      setSearchQuery('');
+      setSearchResults([]);
+      setSearchError(null);
+      setHasSearched(false);
+      setActiveSearchTerm('');
+      return;
+    }
+
+    setSearchQuery(trimmed);
+    setIsSearching(true);
+    setSearchError(null);
+
+    try {
+      const response = await searchRestaurantsRequest(trimmed, { limit: 18, suggestionsLimit: 6 });
+      setSearchResults(response.results);
+      setSearchSuggestions(response.suggestions);
+      setActiveSearchTerm(trimmed);
+      setHasSearched(true);
+    } catch (searchErr: unknown) {
+      console.error('Error al buscar restaurantes', searchErr);
+      setSearchError('No pudimos realizar la búsqueda. Intentá nuevamente.');
+      setHasSearched(true);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
 
   const numberFormatter = useMemo(() => new Intl.NumberFormat('es-AR'), []);
 
@@ -100,6 +185,15 @@ const Home: React.FC = () => {
           <p className={styles.heroSubtitle}>
             Descubrí lugares únicos, aprovechá beneficios exclusivos y asegurá tu mesa en cuestión de segundos.
           </p>
+          <HomeSearchBar
+            query={searchQuery}
+            suggestions={searchSuggestions}
+            isSearching={isSearching}
+            isFetchingSuggestions={isFetchingSuggestions}
+            onQueryChange={setSearchQuery}
+            onSubmit={executeSearch}
+            onSuggestionSelect={setSearchQuery}
+            />
           <div className={styles.heroActions}>
             <a href="#mejores-valorados" className={styles.heroPrimaryAction}>Ver destacados</a>
             <a href="#nuevos" className={styles.heroSecondaryAction}>Explorar novedades</a>
@@ -120,6 +214,15 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      <HomeSearchResults
+        query={activeSearchTerm}
+        results={searchResults}
+        isSearching={isSearching}
+        hasSearched={hasSearched}
+        error={searchError}
+        onRestaurantClick={handleRestaurantClick}
+      />
 
       {loading && (
         <section className={styles.feedbackSection}>
