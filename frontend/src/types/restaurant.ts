@@ -65,3 +65,10 @@ export type RestaurantSearchResponse = {
   results: RestaurantSearchResultItem[];
   suggestions: RestaurantSearchSuggestions;
 };
+
+export type RestaurantDetailsDTO = OwnerRestaurantDTO & {
+  categories: Array<{
+    id_category: string;
+    name: string;
+  }>;
+};

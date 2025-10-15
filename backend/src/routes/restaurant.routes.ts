@@ -17,6 +17,10 @@ router.get('/owner', requireAuth, restaurantController.listOwnerRestaurants);
 
 // Ruta dinámica (debe ir después de las específicas)
 router.get('/:id', restaurantController.getRestaurantById);
+router.get('/:id/details', requireAuth, restaurantController.getRestaurantDetailsForOwner);
+router.put('/:id', requireAuth, upload.single('image'), restaurantController.updateRestaurant);
+router.delete('/:id', requireAuth, restaurantController.deleteRestaurant);
+
 
 // Rutas de creación/modificación
 router.post('/', requireAuth, upload.single('image'), restaurantController.createRestaurant);

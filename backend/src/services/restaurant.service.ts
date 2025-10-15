@@ -408,3 +408,131 @@ export async function searchRestaurants({
     suggestions,
   };
 }
+
+export async function updateRestaurant(
+  id: string, 
+  data: Partial<CreateRestaurantPayload>, 
+  ownerId: string
+) {
+  // Verificar que el restaurante pertenece al owner
+  const restaurant = await prisma.restaurant.findFirst({
+    where: {
+      id_restaurant: id,
+      id_owner: ownerId,
+    },
+  });
+
+  if (!restaurant) {
+    throw new Error('Restaurant not found or you do not have permission to modify it.');
+  }
+
+  const { id_category, ...restaurantData } = data;
+  
+  // Preparar datos de actualización
+  const updateData: any = { ...restaurantData };
+  
+  if (data.opening_time) {
+    updateData.opening_time = new Date(`1970-01-01T${data.opening_time}:00.000Z`);
+  }
+  
+  if (data.closing_time) {
+    updateData.closing_time = new Date(`1970-01-01T${data.closing_time}:00.000Z`);
+  }
+  
+  if (data.chair_amount) {
+    updateData.chair_amount = Number(data.chair_amount);
+  }
+
+  // Actualizar restaurante y categorías en una transacción
+  return prisma.$transaction(async (tx) => {
+    // Si hay nuevas categorías, primero eliminar las existentes
+    if (id_category && id_category.length > 0) {
+      await tx.restaurant_category.deleteMany({
+        where: { id_restaurant: id },
+      });
+
+      // Crear las nuevas relaciones
+      await tx.restaurant_category.createMany({
+        data: id_category.map(catId => ({
+          id_restaurant: id,
+          id_category: catId,
+        })),
+      });
+    }
+
+    // Actualizar el restaurante
+    return tx.restaurant.update({
+      where: { id_restaurant: id },
+      data: updateData,
+      include: {
+        restaurant_category: {
+          include: {
+            category: true,
+          },
+        },
+        district: true,
+      },
+    });
+  });
+}
+
+export async function deleteRestaurant(id: string, ownerId: string) {
+  // Verificar que el restaurante pertenece al owner
+  const restaurant = await prisma.restaurant.findFirst({
+    where: {
+      id_restaurant: id,
+      id_owner: ownerId,
+    },
+  });
+
+  if (!restaurant) {
+    throw new Error('Restaurant not found or you do not have permission to delete it.');
+  }
+
+  // Eliminación lógica: cambiar status a 0
+  return prisma.restaurant.update({
+    where: { id_restaurant: id },
+    data: { status: 0 },
+  });
+}
+
+export async function getRestaurantDetailsForOwner(id: string, ownerId: string) {
+  const restaurant = await prisma.restaurant.findFirst({
+    where: {
+      id_restaurant: id,
+      id_owner: ownerId,
+    },
+    include: {
+      restaurant_category: {
+        include: {
+          category: true,
+        },
+      },
+      district: true,
+    },
+  });
+
+  if (!restaurant) {
+    return null;
+  }
+
+  return {
+    id_restaurant: restaurant.id_restaurant,
+    name: restaurant.name,
+    chair_amount: restaurant.chair_amount,
+    chair_available: restaurant.chair_available,
+    street: restaurant.street,
+    height: restaurant.height,
+    image: restaurant.image,
+    opening_time: restaurant.opening_time.toISOString().slice(11, 19),
+    closing_time: restaurant.closing_time.toISOString().slice(11, 19),
+    id_owner: restaurant.id_owner,
+    id_district: restaurant.id_district,
+    status: restaurant.status,
+    districtName: restaurant.district?.name,
+    categories: restaurant.restaurant_category.map(rc => ({
+      id_category: rc.category.id_category,
+      name: rc.category.name,
+    })),
+  };
+}
