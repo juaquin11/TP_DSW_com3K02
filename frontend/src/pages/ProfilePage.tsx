@@ -3,20 +3,22 @@ import { useAuth } from '../context/AuthContext';
 import { fetchUserProfile } from '../services/userService';
 import type { UserProfile } from '../types/user';
 import styles from './ProfilePage.module.css';
+import UserData from '../components/profile/UserData';
+
 
 // componentes placeholder por ahora
-const UserData = ({ profile }: { profile: UserProfile }) => <div>Datos del Usuario: {profile.name}</div>;
+// const UserData = ({ profile }: { profile: UserProfile }) => <div>Datos del Usuario: {profile.name}</div>;
 const UserReservations = ({ profile }: { profile: UserProfile }) => <div>{profile.reservations.length} Reservas</div>;
 const UserSubscription = ({ profile }: { profile: UserProfile }) => <div>Suscripción: {profile.subscription?.plan_name || 'Ninguna'}</div>;
 const UserPenalties = ({ profile }: { profile: UserProfile }) => <div>{profile.penalties.length} Penalizaciones</div>;
 
 
 const ProfilePage: React.FC = () => {
-  const { user, token, logout } = useAuth();
+  const { user, token, logout, refreshUserStatus } = useAuth();
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('data');
+  const [activeTab, setActiveTab] = useState('reservations');
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -42,12 +44,18 @@ const ProfilePage: React.FC = () => {
     loadProfile();
   }, [token, logout]);
 
+  const handleProfileUpdate = (updatedProfileData: Partial<UserProfile>) => {
+    setProfileData(prev => prev ? { ...prev, ...updatedProfileData } : null);
+    // Refrescamos el estado global para que el Navbar, por ejemplo, se actualice.
+    refreshUserStatus();
+  };
+
   const renderContent = () => {
     if (!profileData) return null;
 
     switch (activeTab) {
       case 'data':
-        return <UserData profile={profileData} />;
+        return <UserData profile={profileData} onProfileUpdate={handleProfileUpdate} />;
       case 'reservations':
         return <UserReservations profile={profileData} />;
       case 'subscription':
@@ -61,10 +69,10 @@ const ProfilePage: React.FC = () => {
   
   const adminOptions = [
     { id: 'data', label: 'Mis Datos' },
-    { id: 'reservations', label: 'Mis Reservas' },
   ];
   
   if (user?.type === 'client') {
+    adminOptions.push({ id: 'reservations', label: 'Mis Reservas' });
     adminOptions.push({ id: 'subscription', label: 'Suscripción' });
     adminOptions.push({ id: 'penalties', label: 'Penalizaciones' });
   }

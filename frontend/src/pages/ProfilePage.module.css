@@ -1,5 +1,6 @@
 .container {
-  max-width: 1200px;
+  width: 75%; 
+  max-width: none; 
   padding: 2rem;
   margin: 2rem auto;
   color: var(--restaurant-cream);
@@ -22,14 +23,13 @@
 
 .adminNav {
   display: flex;
-  justify-content: center;
+  justify-content:space-around;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 2.5rem;
   background-color: var(--restaurant-card);
   padding: 0.5rem;
   border-radius: 12px;
-  border: 1px solid var(--restaurant-border);
 }
 
 .navButton {

@@ -21,3 +21,13 @@ export const fetchUserProfile = async (token: string): Promise<UserProfile> => {
   });
   return response.data;
 };
+
+export const updateUserProfile = async (data: { name?: string; phone?: string }, token: string): Promise<UserProfile> => {
+  const response = await apiClient.patch('/user/profile', data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  // El backend devuelve { message, user }, nosotros solo necesitamos el 'user'.
+  return response.data.user;
+};

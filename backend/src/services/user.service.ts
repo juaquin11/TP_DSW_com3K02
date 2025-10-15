@@ -127,3 +127,30 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 
   return profile;
 }
+
+export async function updateUserProfile(userId: string, data: { name?: string; phone?: string }) {
+  // Objeto para almacenar los datos que realmente se van a actualizar
+  const updateData: { name?: string; phone?: string } = {};
+
+  // Añadimos las propiedades al objeto solo si no son undefined
+  if (data.name !== undefined) {
+    updateData.name = data.name;
+  }
+  if (data.phone !== undefined) {
+    updateData.phone = data.phone;
+  }
+
+  // Usamos 'update' de Prisma con el objeto de datos limpio
+  return prisma.useraccount.update({
+    where: { id_user: userId },
+    data: updateData, // <--- La corrección clave está aquí
+    // Devolvemos solo los campos públicos del usuario
+    select: {
+      id_user: true,
+      name: true,
+      email: true,
+      phone: true,
+      type: true,
+    },
+  });
+}

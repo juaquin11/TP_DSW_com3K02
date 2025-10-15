@@ -1,6 +1,6 @@
 .container {
-  width: 95%; /* Opcional: define un ancho base */
-  max-width: none; /* Quitamos el max-width fijo */
+  width: 85%; 
+  max-width: none; 
   padding: 2rem;
   margin: 2rem auto;
   color: var(--restaurant-cream);

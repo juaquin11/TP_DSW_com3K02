@@ -8,5 +8,6 @@ router.get('/status', requireAuth, userController.getUserStatus);
 
 router.get('/profile', requireAuth, userController.getProfile);
 
+router.patch('/profile', requireAuth, userController.updateProfile);
 
 export default router;
