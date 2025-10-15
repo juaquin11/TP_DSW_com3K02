@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import styles from './Navbar.module.css';
 
 interface ProfileIconProps {
@@ -7,33 +6,57 @@ interface ProfileIconProps {
   hasSubscription: boolean;
   notificationCount: number;
   hasPenalty: boolean;
+  onClick?: () => void;
+  isMenuOpen?: boolean;
+  label?: string;
 }
 
-const ProfileIcon: React.FC<ProfileIconProps> = ({ userType, hasSubscription, notificationCount, hasPenalty }) => {
+const ProfileIcon: React.FC<ProfileIconProps> = ({
+  userType,
+  hasSubscription,
+  notificationCount,
+  hasPenalty,
+  onClick,
+  isMenuOpen = false,
+  label = 'Mi cuenta',
+}) => {
   const profileImage = 'login.svg';
   const notificationBadgeColor = hasPenalty ? styles.notificationBadgeRed : styles.notificationBadgeYellow;
 
+  const buttonClasses = [
+    styles.profileButton,
+    hasSubscription ? styles.profileButtonSubscribed : '',
+    isMenuOpen ? styles.profileButtonOpen : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const ariaLabel = userType === 'owner' ? 'Menú de dueño' : 'Menú de cliente';
+
   return (
-    <div className={styles.profileContainer}>
-      <Link to="/profile" className={`${styles.profileIcon} ${hasSubscription ? styles.subscribed : ''}`}>
-        <img 
-          src={profileImage} 
-          alt={`${userType} profile`} 
-          className={styles.profileImage} 
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            display: 'block',
-          }}
-          />
-            {notificationCount > 0 && (
+    <button
+      type="button"
+      className={buttonClasses}
+      onClick={onClick}
+      aria-haspopup="true"
+      aria-expanded={isMenuOpen}
+      aria-label={ariaLabel}
+    >
+      <span className={styles.profileAvatar}>
+        <img
+          src={profileImage}
+          alt={`${userType} profile`}
+          className={styles.profileImage}
+        />
+        {notificationCount > 0 && (
           <span className={`${styles.notificationBadge} ${notificationBadgeColor}`}>
             {notificationCount}
           </span>
         )}
-      </Link>
-    </div>
+      </span>
+      <span className={styles.profileLabel}>{label}</span>
+      <span className={`${styles.caret} ${isMenuOpen ? styles.caretOpen : ''}`} aria-hidden="true" />
+    </button>
   );
 };
 

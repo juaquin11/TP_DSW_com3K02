@@ -12,8 +12,8 @@ import CreateRestaurantPage from "./pages/CreateRestaurantPage";
 import RestaurantDetail from "./pages/RestaurantDetail";
 import RestaurantReservation from "./components/RestaurantReservation";
 import { useAuth } from "./context/AuthContext";
-import ProfilePage from "./pages/ProfilePage"; 
-
+import ProfilePage from "./pages/ProfilePage";
+import HelpPage from "./pages/HelpPage";
 
 const ProtectedRoute = ({ children }: { children: ReactElement }) => {
   const { token } = useAuth();
@@ -38,6 +38,7 @@ export default function App() {
             <ProfilePage />
           </ProtectedRoute>
         } />
+        <Route path= "/help" element={<HelpPage />} />
         <Route path="/ownerDashboard" element={<OwnerHome />} />
         <Route path="/ownerDashboard/restaurant/:id" element={<OwnerRestaurantPanel />} />
         <Route path="/ownerDashboard/new-restaurant" element={<CreateRestaurantPage />} /> {/* <-- NUEVA RUTA */}
