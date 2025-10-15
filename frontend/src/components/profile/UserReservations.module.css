@@ -1,0 +1,93 @@
+/* frontend/src/components/profile/UserReservations.module.css */
+
+.container {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.title {
+  color: var(--restaurant-gold);
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+}
+
+.noReservations {
+  text-align: center;
+  color: var(--restaurant-muted);
+  padding: 3rem 0;
+  font-style: italic;
+}
+
+.tableContainer {
+  overflow-x: auto; /* Para que la tabla sea responsive en móviles */
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th, .table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--restaurant-border);
+}
+
+.table th {
+  color: var(--restaurant-muted);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.restaurantLink {
+  color: var(--restaurant-cream);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.restaurantLink:hover {
+  color: var(--restaurant-gold);
+  text-decoration: underline;
+}
+
+.status {
+  padding: 0.3rem 0.7rem;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+  color: #fff;
+}
+
+/* Colores de estado similares a los del panel de dueño */
+.status.pendiente { background-color: #f0ad4e; color: #333; }
+.status.aceptada { background-color: #5cb85c; }
+.status.rechazada { background-color: #d9534f; }
+.status.asistencia { background-color: #337ab7; }
+.status.ausencia { background-color: #777; }
+.status.cancelada { background-color: #c9302c; }
+
+.reviewButton {
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  color: var(--restaurant-gold);
+  border: 1px solid var(--restaurant-gold);
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reviewButton:hover {
+  background-color: var(--restaurant-gold);
+  color: var(--restaurant-dark);
+}

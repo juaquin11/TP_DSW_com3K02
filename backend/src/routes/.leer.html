@@ -1,0 +1,21 @@
+Principios de ordenamiento de RUTAS
+
+-------------------------------------------------------------------------------------
+
+
+** De lo específico a lo general:
+    Comienza con rutas que coinciden con patrones muy concretos (como /usuarios/nuevo) 
+    y luego incluye rutas más amplias (como /usuarios). 
+
+** Rutas estáticas primero: 
+    Las rutas que son cadenas exactas y sin parámetros (por ejemplo, /home) 
+    deben definirse antes que las rutas con parámetros dinámicos. 
+
+** Rutas con parámetros dinámicos: 
+    Las rutas que incluyen parámetros (como /usuarios/:id) deben ir después de 
+    las rutas estáticas, pero antes de las comodín. 
+
+** Ruta de "comodín" o de respaldo al final: 
+    La ruta comodín (a menudo ** o /) debe ser la última definición 
+    en la lista para que solo se use cuando ninguna otra ruta coincida. Esto es
+    crucial para manejar el enrutamiento de páginas no encontradas (404). 

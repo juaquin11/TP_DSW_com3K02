@@ -33,8 +33,9 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/districts', districtRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/reservations', reservationRoutes); 
-app.use('/api/subscriptions', subscriptionRoutes); 
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/subscriptions', subscriptionRoutes); 
+
 
 // Rutas de prueba
 app.get('/', (req, res) => {

@@ -8,3 +8,11 @@ export async function fetchReviewsByRestaurant(
 
   return response.data;
 }
+
+export const postReview = async (data: { reservationId: string; rating: number; comment: string }, token: string): Promise<void> => {
+  await apiClient.post('/reviews', data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};

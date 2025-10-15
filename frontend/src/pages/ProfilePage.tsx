@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; 
 import { useAuth } from '../context/AuthContext';
 import { fetchUserProfile } from '../services/userService';
 import type { UserProfile } from '../types/user';
 import styles from './ProfilePage.module.css';
 import UserData from '../components/profile/UserData';
+import UserReservations from '../components/profile/UserReservations'; 
 
 
-// componentes placeholder por ahora
+// componentes placeholder, ire borrando a medida que los agregue
 // const UserData = ({ profile }: { profile: UserProfile }) => <div>Datos del Usuario: {profile.name}</div>;
-const UserReservations = ({ profile }: { profile: UserProfile }) => <div>{profile.reservations.length} Reservas</div>;
+// const UserReservations = ({ profile }: { profile: UserProfile }) => <div>{profile.reservations.length} Reservas</div>;
 const UserSubscription = ({ profile }: { profile: UserProfile }) => <div>Suscripción: {profile.subscription?.plan_name || 'Ninguna'}</div>;
 const UserPenalties = ({ profile }: { profile: UserProfile }) => <div>{profile.penalties.length} Penalizaciones</div>;
 
@@ -18,35 +19,35 @@ const ProfilePage: React.FC = () => {
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('reservations');
+  const [activeTab, setActiveTab] = useState('data');
+
+  const loadProfile = useCallback(async () => {
+    if (!token) {
+      setError("No estás autenticado.");
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const data = await fetchUserProfile(token);
+      setProfileData(data);
+    } catch (err) {
+      setError("No se pudo cargar tu perfil. Intenta de nuevo.");
+      console.error(err);
+      if ((err as any).response?.status === 401) {
+        logout();
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [token, logout]);
 
   useEffect(() => {
-    const loadProfile = async () => {
-      if (!token) {
-        setError("No estás autenticado.");
-        setLoading(false);
-        return;
-      }
-      try {
-        const data = await fetchUserProfile(token);
-        setProfileData(data);
-      } catch (err) {
-        setError("No se pudo cargar tu perfil. Intenta de nuevo.");
-        console.error(err);
-        // token = inválido, cerramos sesión
-        if ((err as any).response?.status === 401) {
-          logout();
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
     loadProfile();
-  }, [token, logout]);
+  }, [loadProfile]);
 
   const handleProfileUpdate = (updatedProfileData: Partial<UserProfile>) => {
     setProfileData(prev => prev ? { ...prev, ...updatedProfileData } : null);
-    // Refrescamos el estado global para que el Navbar, por ejemplo, se actualice.
     refreshUserStatus();
   };
 
@@ -57,7 +58,7 @@ const ProfilePage: React.FC = () => {
       case 'data':
         return <UserData profile={profileData} onProfileUpdate={handleProfileUpdate} />;
       case 'reservations':
-        return <UserReservations profile={profileData} />;
+        return <UserReservations reservations={profileData.reservations} onReviewSubmit={loadProfile} />;
       case 'subscription':
         return <UserSubscription profile={profileData} />;
       case 'penalties':
@@ -76,6 +77,7 @@ const ProfilePage: React.FC = () => {
     adminOptions.push({ id: 'subscription', label: 'Suscripción' });
     adminOptions.push({ id: 'penalties', label: 'Penalizaciones' });
   }
+
 
 
   if (loading) return <main className={styles.container}><p>Cargando perfil...</p></main>;

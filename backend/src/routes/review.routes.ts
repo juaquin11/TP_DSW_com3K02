@@ -1,9 +1,11 @@
 import { Router } from 'express';
-import { getRestaurantReviews } from '../controllers/review.controller';
+import { getRestaurantReviews, postReview } from '../controllers/review.controller';
+import { requireAuth } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// Ruta pública para obtener reseñas de un restaurante
 router.get('/byrestaurant/:restaurantId', getRestaurantReviews);
+
+router.post('/', requireAuth, postReview);
 
 export default router;
