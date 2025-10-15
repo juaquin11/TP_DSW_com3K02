@@ -20,7 +20,7 @@ interface RestaurantCarouselProps {
   emptyMessage?: string;
 }
 
-const SCROLL_EASING = 0.9;
+const SCROLL_TOLERANCE = 2;
 
 const RestaurantCarousel: React.FC<RestaurantCarouselProps> = ({
   title,
@@ -42,8 +42,8 @@ const RestaurantCarousel: React.FC<RestaurantCarouselProps> = ({
     }
 
     const { scrollLeft, scrollWidth, clientWidth } = node;
-    setCanScrollLeft(scrollLeft > 8);
-    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 8);
+    setCanScrollLeft(scrollLeft > SCROLL_TOLERANCE);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - SCROLL_TOLERANCE);
   }, []);
 
   useEffect(() => {
@@ -65,16 +65,33 @@ const RestaurantCarousel: React.FC<RestaurantCarouselProps> = ({
     updateScrollState();
   }, [items.length, updateScrollState]);
 
-  const scrollBy = (direction: "left" | "right") => {
-    const node = scrollRef.current;
-    if (!node) return;
+  const scrollBy = useCallback(
+    (direction: "left" | "right") => {
+      const node = scrollRef.current;
+      if (!node) return;
 
-    const scrollAmount = node.clientWidth * SCROLL_EASING;
-    node.scrollBy({
-      left: direction === "left" ? -scrollAmount : scrollAmount,
-      behavior: "smooth",
-    });
-  };
+      const firstItem = node.querySelector<HTMLElement>(`[data-carousel-item="true"]`);
+      const isBrowser = typeof window !== "undefined";
+      const computedStyles = isBrowser ? window.getComputedStyle(node) : null;
+      const gapValue = computedStyles?.columnGap || computedStyles?.gap || "0";
+      const gap = Number.parseFloat(gapValue) || 0;
+      const itemWidth = firstItem?.getBoundingClientRect().width ?? 0;
+      const fallbackAmount = node.clientWidth * 0.9;
+      const scrollAmount = itemWidth > 0 ? itemWidth + gap : fallbackAmount;
+
+      node.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+
+      if (isBrowser) {
+        window.requestAnimationFrame(updateScrollState);
+      } else {
+        updateScrollState();
+      }
+    },
+    [updateScrollState]
+  );
 
   const carouselItems = items.filter((item): item is CarouselItem => Boolean(item?.restaurant));
 
@@ -123,20 +140,25 @@ const RestaurantCarousel: React.FC<RestaurantCarouselProps> = ({
       <div className={styles.carouselWrapper}>
         <div className={styles.carousel} ref={scrollRef}>
           {carouselItems.map(({ restaurant, badgeLabel, badgeVariant, highlightText }) => (
-            <RestaurantCard
+            <div
               key={restaurant.id_restaurant}
-              id={restaurant.id_restaurant}
-              name={restaurant.name}
-              image={restaurant.image || ""}
-              street={restaurant.street}
-              height={restaurant.height}
-              rating={restaurant.avgRating ?? 0}
-              subscriptionNames={restaurant.subscriptionNames}
-              onClick={onRestaurantClick}
-              badgeLabel={badgeLabel}
-              badgeVariant={badgeVariant}
-              highlightText={highlightText}
-            />
+              className={styles.carouselItem}
+              data-carousel-item="true"
+            >
+              <RestaurantCard
+                id={restaurant.id_restaurant}
+                name={restaurant.name}
+                image={restaurant.image || ""}
+                street={restaurant.street}
+                height={restaurant.height}
+                rating={restaurant.avgRating ?? 0}
+                subscriptionNames={restaurant.subscriptionNames}
+                onClick={onRestaurantClick}
+                badgeLabel={badgeLabel}
+                badgeVariant={badgeVariant}
+                highlightText={highlightText}
+              />
+            </div>
           ))}
         </div>
       </div>
@@ -144,4 +166,4 @@ const RestaurantCarousel: React.FC<RestaurantCarouselProps> = ({
   );
 };
 
-export default RestaurantCarousel
+export default RestaurantCarousel;

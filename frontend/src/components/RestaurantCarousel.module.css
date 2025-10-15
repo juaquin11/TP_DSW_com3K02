@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: 1.5rem;
   padding: 2.5rem 0;
+  min-width: 0;
 }
 
 .header {
@@ -60,17 +61,26 @@
 
 .carouselWrapper {
   position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-width: 0;
 }
 
 .carousel {
+  --carousel-card-width: clamp(260px, 27vw, 320px);
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(280px, 320px);
+  grid-auto-columns: var(--carousel-card-width);
   gap: 1.5rem;
   overflow-x: auto;
+  width: 100%;
+  min-width: 0;
   padding-bottom: 0.5rem;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  contain: content;
 }
 
 .carousel::-webkit-scrollbar {
@@ -87,8 +97,10 @@
   border-radius: 999px;
 }
 
-.carousel > * {
+.carouselItem{
   scroll-snap-align: start;
+  width: 100%;
+  min-width: 0;
 }
 
 .emptyState {
@@ -109,7 +121,13 @@
     font-size: 1.6rem;
   }
 
+ .carousel {
+    --carousel-card-width: clamp(240px, 75vw, 320px);
+  }
+}
+
+@supports (contain: inline-size) {
   .carousel {
-    grid-auto-columns: minmax(240px, 75vw);
+    contain: inline-size;
   }
 }
