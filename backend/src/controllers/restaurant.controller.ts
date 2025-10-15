@@ -71,7 +71,7 @@ export async function createRestaurant(req: Request, res: Response) {
         return res.status(400).json({ error: 'Debes seleccionar al menos una categoría.' });
     }
 
-      const tempPath = req.file.path;
+    const tempPath = req.file.path;
     const extension = path.extname(req.file.filename); // Usamos la extensión del archivo temporal
     const uniqueSuffix = Date.now();
     
@@ -167,5 +167,99 @@ export async function searchRestaurants(req: Request, res: Response) {
   } catch (err: any) {
     console.error('Error searching restaurants', err);
     return res.status(500).json({ error: 'No pudimos realizar la búsqueda.' });
+  }
+}
+
+export async function getRestaurantDetailsForOwner(req: Request, res: Response) {
+  try {
+    const  id  = req.params.id;
+    const user = (req as any).user as JwtPayload;
+
+    if (!id) {
+      return res.status(404).json({ error: 'No se recibio correctamente el id.' });
+    }
+
+    if (!user || user.type !== 'owner') {
+      return res.status(403).json({ error: 'Forbidden: only owners can access this endpoint.' });
+    }
+
+    const restaurant = await restaurantService.getRestaurantDetailsForOwner(id, user.id_user);
+
+    if (!restaurant) {
+      return res.status(404).json({ error: 'Restaurant not found or you do not have permission to view it.' });
+    }
+
+    res.json(restaurant);
+  } catch (error: any) {
+    console.error('Error fetching restaurant details:', error);
+    res.status(500).json({ error: 'Failed to fetch restaurant details.' });
+  }
+}
+
+export async function updateRestaurant(req: Request, res: Response) {
+  try {
+    const id  = req.params.id;
+    const user = (req as any).user as JwtPayload;
+
+    if (!id) {
+      return res.status(404).json({ error: 'No se recibio correctamente el id.' });
+    }
+    if (!user || user.type !== 'owner') {
+      return res.status(403).json({ error: 'Forbidden: only owners can update restaurants.' });
+    }
+
+    const data = { ...req.body };
+
+    // Parsear id_category si existe
+    if (data.id_category) {
+      data.id_category = JSON.parse(data.id_category);
+    }
+
+    if (req.file) {
+      const tempPath = req.file.path;
+      const extension = path.extname(req.file.filename);
+      const uniqueSuffix = Date.now();
+      const newFileName = `${slugify(data.name)}-${uniqueSuffix}${extension}`;
+      const newPath = path.join(path.dirname(tempPath), newFileName);
+
+      // Renombra el archivo en el sistema de archivos
+      fs.renameSync(tempPath, newPath);
+      data.image = `/uploads/${newFileName}`;
+    }
+
+    const updatedRestaurant = await restaurantService.updateRestaurant(id, data, user.id_user);
+
+    res.json(updatedRestaurant);
+  } catch (error: any) {
+    console.error('Error updating restaurant:', error);
+    if (error.message.includes('not found') || error.message.includes('permission')) {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ error: 'Failed to update restaurant.' });
+  }
+}
+
+export async function deleteRestaurant(req: Request, res: Response) {
+  try {
+    const  id  = req.params.id;
+    const user = (req as any).user as JwtPayload;
+
+    if (!id) {
+      return res.status(404).json({ error: 'No se recibio correctamente el id.' });
+    }
+
+    if (!user || user.type !== 'owner') {
+      return res.status(403).json({ error: 'Forbidden: only owners can delete restaurants.' });
+    }
+
+    await restaurantService.deleteRestaurant(id, user.id_user);
+
+    res.json({ message: 'Restaurant deleted successfully.' });
+  } catch (error: any) {
+    console.error('Error deleting restaurant:', error);
+    if (error.message.includes('not found') || error.message.includes('permission')) {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ error: 'Failed to delete restaurant.' });
   }
 }

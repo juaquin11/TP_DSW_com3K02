@@ -76,6 +76,39 @@ export async function searchRestaurants(
   return response.data;
 }
 
+
+
+export async function fetchRestaurantDetailsForOwner(id: string, token: string) {
+  const res = await apiClient.get(`/restaurants/${id}/details`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+}
+
+export async function updateRestaurant(id: string, data: FormData, token: string): Promise<OwnerRestaurantDTO> {
+  const res = await apiClient.put(`/restaurants/${id}`, data, {
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return res.data;
+}
+
+export async function deleteRestaurant(id: string, token: string): Promise<void> {
+  await apiClient.delete(`/restaurants/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+
+
+
+
 export async function fetchSearchSuggestions(
   query: string,
   suggestionsLimit = 6,

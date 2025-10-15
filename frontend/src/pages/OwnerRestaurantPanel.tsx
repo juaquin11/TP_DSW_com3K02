@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import styles from './OwnerRestaurantPanel.module.css';
 import ReservationsToday from '../components/ReservationsToday';
 import DishManagement from '../components/DishManagement'; 
-
+import RestaurantDetailsAdmin from '../components/RestaurantDetailsAdmin.tsx';
 
 // Opciones del panel de administración
 const adminOptions = [
@@ -24,6 +24,8 @@ const OwnerRestaurantPanel: React.FC = () => {
         return <ReservationsToday restaurantId={id!} />;
       case 'dishes': 
         return <DishManagement restaurantId={id!} />;
+      case 'details':
+        return <RestaurantDetailsAdmin restaurantId={id!} />;
       default:
         return (
           <div className={styles.comingSoon}>

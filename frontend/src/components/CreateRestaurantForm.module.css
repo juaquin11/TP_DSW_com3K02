@@ -73,7 +73,7 @@
   background-color: var(--restaurant-card);
   padding: 0 0.25rem;
 }
-/* Estilo similar para el select */
+
 .select:focus + .label, .select[data-filled="true"] + .label {
   top: -0.5rem;
   left: 0.5rem;
@@ -119,7 +119,7 @@
   grid-column: 1 / -1;
 }
 
-.navButton, .submitButton {
+.navButton, .submitButton, .deleteButton {
   padding: 0.75rem 2rem;
   border: 1px solid var(--restaurant-gold);
   border-radius: 8px;
@@ -151,8 +151,80 @@
   border-color: #c19b26;
 }
 
-.submitButton:disabled {
+.submitButton:disabled, .deleteButton:disabled {
   background-color: var(--restaurant-muted);
   border-color: var(--restaurant-muted);
   cursor: not-allowed;
+}
+
+.deleteButton {
+  background-color: transparent;
+  color: #e57373;
+  border-color: #e57373;
+}
+
+.deleteButton:hover:not(:disabled) {
+  background-color: #e57373;
+  color: var(--restaurant-dark);
+}
+
+.deleteModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.deleteModalContent {
+  background-color: var(--restaurant-card);
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  border: 1px solid var(--restaurant-border);
+}
+
+.deleteModalContent h3 {
+  color: var(--restaurant-gold);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.deleteModalContent p {
+  color: var(--restaurant-cream);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.deleteModalButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.deleteConfirmButton {
+  padding: 0.75rem 2rem;
+  background-color: #e57373;
+  color: var(--restaurant-dark);
+  border: 1px solid #e57373;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteConfirmButton:hover {
+  background-color: #d32f2f;
+  border-color: #d32f2f;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
 }
