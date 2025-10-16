@@ -1,0 +1,128 @@
+/* frontend/src/components/profile/UserSubscription.module.css */
+
+.container {
+  animation: fadeIn 0.5s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+
+.title {
+  color: var(--restaurant-gold);
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+/* Estilos para cuando el usuario YA tiene un plan */
+.currentPlan {
+  background: linear-gradient(145deg, var(--restaurant-dark), #2c2c2c);
+  border: 1px solid var(--restaurant-gold);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.2);
+}
+
+.planIcon {
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+
+.currentPlan h3 {
+  font-size: 1.5rem;
+  color: var(--restaurant-cream);
+  margin-bottom: 0.5rem;
+}
+
+.currentPlan p {
+  color: var(--restaurant-muted);
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.cancelButton {
+  background: transparent;
+  color: #d9534f;
+  border: 1px solid #d9534f;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelButton:hover {
+  background: #d9534f;
+  color: white;
+}
+
+/* Estilos para mostrar los planes disponibles */
+.plansGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.planCard {
+  background-color: var(--restaurant-dark);
+  border: 1px solid var(--restaurant-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.planCard:hover {
+  transform: translateY(-5px);
+  border-color: var(--restaurant-gold);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.planCard h3 {
+  font-size: 1.4rem;
+  color: var(--restaurant-cream);
+  margin-bottom: 0.5rem;
+}
+
+.price {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--restaurant-gold);
+  margin-bottom: 0.5rem;
+}
+
+.duration {
+  color: var(--restaurant-muted);
+  margin-bottom: 1.5rem;
+}
+
+.subscribeButton {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: var(--restaurant-gold);
+  color: var(--restaurant-dark);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.subscribeButton:hover:not(:disabled) {
+  background-color: #c19b26;
+}
+.subscribeButton:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.error {
+  text-align: center;
+  color: #e57373;
+  margin-top: 1.5rem;
+}

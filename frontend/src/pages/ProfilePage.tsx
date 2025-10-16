@@ -6,12 +6,12 @@ import type { UserProfile } from '../types/user';
 import styles from './ProfilePage.module.css';
 import UserData from '../components/profile/UserData';
 import UserReservations from '../components/profile/UserReservations';
-
+import UserSubscription from '../components/profile/UserSubscription'; 
 
 // componentes placeholder, ire borrando a medida que los agregue
 // const UserData = ({ profile }: { profile: UserProfile }) => <div>Datos del Usuario: {profile.name}</div>;
 // const UserReservations = ({ profile }: { profile: UserProfile }) => <div>{profile.reservations.length} Reservas</div>;
-const UserSubscription = ({ profile }: { profile: UserProfile }) => <div>Suscripción: {profile.subscription?.plan_name || 'Ninguna'}</div>;
+// const UserSubscription = ({ profile }: { profile: UserProfile }) => <div>Suscripción: {profile.subscription?.plan_name || 'Ninguna'}</div>;
 const UserPenalties = ({ profile }: { profile: UserProfile }) => <div>{profile.penalties.length} Penalizaciones</div>;
 
 

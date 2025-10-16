@@ -28,6 +28,7 @@ export interface UserProfile {
   subscription?: {
     plan_name: string;
     adhesion_date: string;
+    expiry_date: string; 
   } | null;
   penalties: UserProfilePenalty[];
   reservations: UserProfileReservation[];
