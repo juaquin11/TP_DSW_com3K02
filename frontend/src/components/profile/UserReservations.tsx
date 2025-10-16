@@ -26,7 +26,7 @@ const statusMap: { [key: number]: { text: string; className: string } } = {
 
 const UserReservations: React.FC<Props> = ({ reservations, onReviewSubmit }) => { // 2. Recibimos la prop
   
-  const { token, refreshUserStatus } = useAuth(); // <-- Obtén el token
+  const { token } = useAuth(); // <-- Obtén el token
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<UserProfileReservation | null>(null);
 
