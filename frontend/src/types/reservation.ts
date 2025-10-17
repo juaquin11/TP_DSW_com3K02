@@ -14,3 +14,11 @@ export interface Reservation {
   diners: number;
   status: ReservationStatus;
 }
+
+export interface ReservationDTO {
+  id: string;
+  clientName: string;
+  reservationDateTime: string; // ISO format desde backend
+  diners: number;
+  status: ReservationStatus;
+}

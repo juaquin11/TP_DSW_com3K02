@@ -5,6 +5,7 @@ import { CreateReservationPayload, JwtPayload } from '../models/types';
 
 // Mapeo de texto a estado numérico para guardar en la BD
 const statusToDbMap: { [key: string]: number } = {
+  'pendiente': 0,
   'aceptada': 1,
   'rechazada': 2,
   'asistencia': 3,
@@ -116,3 +117,32 @@ export async function createReservation(req: Request, res: Response) {
     res.status(500).json({ error: 'Failed to create reservation.' });
   }
 }
+export async function getUpcomingReservations(req: Request, res: Response) {
+  try {
+    const { id_restaurant } = req.params;
+    const user = (req as any).user as JwtPayload | undefined;
+
+    if (!id_restaurant) {
+      return res.status(400).json({ error: 'Restaurant ID is required.' });
+    }
+
+    if (!user || !user.id_user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
+    }
+
+    if (user.type !== 'owner') {
+      return res.status(403).json({ error: 'Forbidden: only restaurant owners can access this endpoint.' });
+    }
+
+    const reservations = await reservationService.getUpcomingReservations(id_restaurant, user.id_user);
+    return res.status(200).json(reservations);
+  } catch (error: any) {
+    console.error('Error fetching upcoming reservations:', error);
+    // Si se envía un error claro desde el service, dejarlo pasar
+    if (error?.status && error?.message) {
+      return res.status(error.status).json({ error: error.message });
+    }
+    return res.status(500).json({ error: 'Failed to fetch upcoming reservations.' });
+  }
+}
+

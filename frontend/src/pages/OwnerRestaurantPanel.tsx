@@ -4,6 +4,7 @@ import styles from './OwnerRestaurantPanel.module.css';
 import ReservationsToday from '../components/ReservationsToday';
 import DishManagement from '../components/DishManagement'; 
 import RestaurantDetailsAdmin from '../components/RestaurantDetailsAdmin.tsx';
+import ReservationHistory from '../components/ReservationHistory';
 
 // Opciones del panel de administración
 const adminOptions = [
@@ -26,6 +27,8 @@ const OwnerRestaurantPanel: React.FC = () => {
         return <DishManagement restaurantId={id!} />;
       case 'details':
         return <RestaurantDetailsAdmin restaurantId={id!} />;
+      case 'history':
+        return <ReservationHistory idRestaurant={id!} />;
       default:
         return (
           <div className={styles.comingSoon}>

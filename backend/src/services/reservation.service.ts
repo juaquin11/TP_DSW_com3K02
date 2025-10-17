@@ -1,7 +1,6 @@
 // backend/src/services/reservation.service.ts
 import prisma from '../prisma/client';
 import { CreateReservationData } from '../models/types';
-// import { reservation_status } from '../generated/prisma';
 
 // Mapeo de estado numérico a texto para consistencia con el frontend
 const statusMap: { [key: number]: string } = {
@@ -12,7 +11,6 @@ const statusMap: { [key: number]: string } = {
   4: 'ausencia',
   5: 'cancelada',
 };
-
 
 export async function getReservationsForToday(restaurantId: string, ownerId: string) {
   const today = new Date();
@@ -63,24 +61,24 @@ export async function getReservationsForToday(restaurantId: string, ownerId: str
 }
 
 export async function updateReservationStatus(reservationId: string, newStatus: number, ownerId: string) {
-    // Verificamos que el dueño que hace la petición es el dueño del restaurante de la reserva.
-    const reservation = await prisma.reservation.findFirstOrThrow({
-        where: {
-            id_reservation: reservationId,
-            restaurant: {
-                id_owner: ownerId,
-            }
-        }
-    });
+  // Verificamos que el dueño que hace la petición es el dueño del restaurante de la reserva.
+  const reservation = await prisma.reservation.findFirstOrThrow({
+    where: {
+      id_reservation: reservationId,
+      restaurant: {
+        id_owner: ownerId,
+      }
+    }
+  });
 
-    return prisma.reservation.update({
-        where: {
-            id_reservation: reservation.id_reservation
-        },
-        data: {
-            status: newStatus
-        }
-    });
+  return prisma.reservation.update({
+    where: {
+      id_reservation: reservation.id_reservation
+    },
+    data: {
+      status: newStatus
+    }
+  });
 }
 
 export async function createReservation(
@@ -129,5 +127,62 @@ export async function createReservation(
       reservation_date: reservationDate,
       diners,
     },
+  });
+}
+
+export async function getUpcomingReservations(restaurantId: string, ownerId: string) {
+  // Verificamos que el restaurante pertenezca al owner
+  const restaurant = await prisma.restaurant.findUnique({
+    where: { id_restaurant: restaurantId },
+    select: { id_restaurant: true, id_owner: true },
+  });
+
+  if (!restaurant) {
+    const err: any = new Error('Restaurant not found');
+    err.status = 404;
+    err.message = 'Restaurant not found';
+    throw err;
+  }
+
+  if (restaurant.id_owner !== ownerId) {
+    const err: any = new Error('Forbidden');
+    err.status = 403;
+    err.message = 'You do not have permission to access reservations for this restaurant';
+    throw err;
+  }
+
+  const now = new Date();
+
+  const reservations = await prisma.reservation.findMany({
+    where: {
+      id_restaurant: restaurantId,
+      reservation_date: {
+        gte: now, // fecha/hora >= ahora => aún no cumplió
+      },
+    },
+    include: {
+      useraccount: {
+        select: {
+          name: true,
+          id_user: true,
+        },
+      },
+    },
+    orderBy: {
+      reservation_date: 'asc',
+    },
+  });
+
+  // Mapear a formato frontend-friendly con ISO DateTime completo
+  return reservations.map((r) => {
+    const reservationDateObj = new Date(r.reservation_date);
+
+    return {
+      id: r.id_reservation,
+      clientName: r.useraccount?.name ?? 'Anónimo',
+      time: reservationDateObj.toISOString(), // Fecha completa ISO: YYYY-MM-DDTHH:mm:ss.sssZ
+      diners: r.diners,
+      status: statusMap[r.status] ?? 'desconocido',
+    };
   });
 }

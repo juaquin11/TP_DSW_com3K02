@@ -13,6 +13,8 @@ router.post('/', reservationController.createReservation);
 // Obtener las reservas de hoy para un restaurante específico
 router.get('/restaurant/:id/today', reservationController.getTodayReservations);
 
+router.get('/upcoming/:id_restaurant', reservationController.getUpcomingReservations);
+
 // Actualizar el estado de una reserva específica
 router.patch('/:id/status', reservationController.updateStatus);
 

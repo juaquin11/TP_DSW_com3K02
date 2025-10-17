@@ -53,3 +53,10 @@ export const createReservation = async (
     }
   );
 };
+
+export async function getUpcomingReservations(idRestaurant: string, token: string) {
+  const response = await apiClient.get(`/reservations/upcoming/${idRestaurant}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+}
