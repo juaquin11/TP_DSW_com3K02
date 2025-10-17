@@ -11,8 +11,8 @@ const adminOptions = [
   { id: 'reservations', label: 'Reservas de Hoy' },
   { id: 'dishes', label: 'Gestión de Platos' },
   { id: 'details', label: 'Datos del Restaurante' },
-  { id: 'stats', label: 'Estadísticas' },
   { id: 'history', label: 'Historial de Reservas' },
+  { id: 'stats', label: 'Estadísticas' },
 ];
 
 const OwnerRestaurantPanel: React.FC = () => {

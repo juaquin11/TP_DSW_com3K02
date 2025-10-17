@@ -36,7 +36,7 @@ const EditRestaurantForm: React.FC<EditRestaurantFormProps> = ({ restaurantData,
   );
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>(
-    restaurantData.image ? `${import.meta.env.VITE_API_URL}${restaurantData.image}` : ''
+    restaurantData.image ? `${API_BASE_URL}${restaurantData.image}` : ''
   );
   
   const [categories, setCategories] = useState<Category[]>([]);
@@ -194,8 +194,6 @@ const EditRestaurantForm: React.FC<EditRestaurantFormProps> = ({ restaurantData,
   const districtOptions = districts.map(d => ({ value: d.id_district, label: d.name }));
   const stepSubtitles = ['', formData.name.trim() || null];
 
-  const imageUrl = restaurantData.image ? `${API_BASE_URL}${restaurantData.image}` : '/default-restaurant.webp';
-
   return (
     <div className={styles.card}>
       <Stepper steps={formSteps} subtitles={stepSubtitles} currentStep={currentStep} />
@@ -269,7 +267,7 @@ const EditRestaurantForm: React.FC<EditRestaurantFormProps> = ({ restaurantData,
                         </div>
                         <div className={`${styles.inputGroup} ${styles.fullWidth}`}>
                              <label>Imagen del Restaurante</label>
-                             <ImageDropzone onFileSelect={handleImageSelect} imagePreview={imageUrl} />
+                             <ImageDropzone onFileSelect={handleImageSelect} imagePreview={imagePreview} />
                         </div>
                     </div>
                 </fieldset>

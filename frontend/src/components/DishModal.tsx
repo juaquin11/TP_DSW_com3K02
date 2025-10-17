@@ -6,6 +6,7 @@ import type { subscription } from '../types/subscription';
 import { createDish, updateDish } from '../services/dishService';
 import { fetchSubscriptions } from '../services/subscriptionService';
 import ImageDropzone from './ImageDropzone';
+import { API_BASE_URL } from '../services/apiClient';
 
 interface Props {
   isOpen: boolean;
@@ -23,7 +24,10 @@ const DishModal: React.FC<Props> = ({ isOpen, onClose, onSave, dishToEdit, resta
     current_price: '',
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    dishToEdit?.image ? `${API_BASE_URL}${dishToEdit.image}` : ''
+  );
+  console.log(dishToEdit);
   const [subscriptions, setSubscriptions] = useState<subscription[]>([]);
   const [discounts, setDiscounts] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +43,8 @@ const DishModal: React.FC<Props> = ({ isOpen, onClose, onSave, dishToEdit, resta
         current_price: String(dishToEdit.current_price),
       });
       if (dishToEdit.image) {
-        setImagePreview(dishToEdit.image);
+        setImagePreview(`${API_BASE_URL}${dishToEdit.image}`);
+
       }
     } else {
       // Reset form for creation
