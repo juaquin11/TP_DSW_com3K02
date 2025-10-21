@@ -8,8 +8,8 @@
 
 
 ### Repositorio
-* [frontend app](https://github.com/juaquin11/TP_DSW_com3K02/tree/main/backend)
-* [backend app](https://github.com/juaquin11/TP_DSW_com3K02/tree/main/frontend)
+* [frontend app](https://github.com/juaquin11/TP_DSW_com3K02/tree/main/frontend)
+* [backend app](https://github.com/juaquin11/TP_DSW_com3K02/tree/main/backend)
 
 ## Tema
 ### Descripción
