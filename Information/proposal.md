@@ -7,9 +7,9 @@
 * Waniewski, Albano - 52706
 
 
-### Repositorios
-* [frontend app](http://hyperlinkToGihubOrGitlab)
-* [backend app](http://hyperlinkToGihubOrGitlab)
+### Repositorio
+* [frontend app](https://github.com/juaquin11/TP_DSW_com3K02/tree/main/backend)
+* [backend app](https://github.com/juaquin11/TP_DSW_com3K02/tree/main/frontend)
 
 ## Tema
 ### Descripción
