@@ -7,6 +7,7 @@ import styles from './UserReservations.module.css';
 import ReviewModal from './ReviewModal'; 
 import { postReview } from '../../services/reviewService'; 
 import { useAuth } from '../../context/AuthContext'; 
+import { useToast } from '../../context/ToastContext';
 
 
 interface Props {
@@ -24,9 +25,9 @@ const statusMap: { [key: number]: { text: string; className: string } } = {
   5: { text: 'Cancelada', className: 'cancelada' },
 };
 
-const UserReservations: React.FC<Props> = ({ reservations, onReviewSubmit }) => { // 2. Recibimos la prop
-  
-  const { token } = useAuth(); // <-- Obtén el token
+const UserReservations: React.FC<Props> = ({ reservations, onReviewSubmit }) => {
+  const { token } = useAuth();
+  const { success, error: showError } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<UserProfileReservation | null>(null);
 
@@ -52,12 +53,19 @@ const UserReservations: React.FC<Props> = ({ reservations, onReviewSubmit }) => 
   };
 
   const handleSubmitReview = async (reservationId: string, rating: number, comment: string) => {
-    if (!token) throw new Error("No estás autenticado.");
-    await postReview({ reservationId, rating, comment }, token);
-
-    onReviewSubmit();
-
-    alert("¡Gracias por tu reseña!");
+    if (!token) {
+      showError("No estás autenticado.");
+      return;
+    }
+    
+    try {
+      await postReview({ reservationId, rating, comment }, token);
+      onReviewSubmit();
+      success("¡Gracias por tu reseña!");
+      handleCloseModal();
+    } catch (err: any) {
+      showError(err.response?.data?.error || "Error al enviar la reseña.");
+    }
   };
 
 

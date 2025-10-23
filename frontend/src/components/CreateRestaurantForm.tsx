@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { createRestaurant } from '../services/restaurantService';
 import { fetchCategories, fetchDistricts } from '../services/dataService';
 import type { Category } from '../types/category';
@@ -36,6 +37,7 @@ const CreateRestaurantForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { token } = useAuth();
+  const { success, error: showError } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -159,10 +161,12 @@ const CreateRestaurantForm: React.FC = () => {
 
     try {
       const newRestaurant = await createRestaurant(data, token);
-      alert('¡Restaurante creado exitosamente!');
+      success('¡Restaurante creado exitosamente!');
       navigate(`/ownerDashboard/restaurant/${newRestaurant.id_restaurant}`);
     } catch (err: any) {
-      setErrors({ form: err.response?.data?.error || 'No se pudo crear el restaurante.' });
+      const errorMsg = err.response?.data?.error || 'No se pudo crear el restaurante.';
+      setErrors({ form: errorMsg });
+      showError(errorMsg);
     } finally {
       setIsLoading(false);
     }

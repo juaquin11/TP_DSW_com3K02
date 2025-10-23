@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import type { UserProfile } from '../../types/user';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { updateUserProfile } from '../../services/userService';
 import styles from './UserData.module.css';
 
@@ -13,6 +14,7 @@ interface Props {
 
 const UserData: React.FC<Props> = ({ profile, onProfileUpdate }) => {
   const { token } = useAuth();
+  const { success, error: showError } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: profile.name || '',
@@ -50,10 +52,11 @@ const UserData: React.FC<Props> = ({ profile, onProfileUpdate }) => {
       const updatedUser = await updateUserProfile(formData, token);
       onProfileUpdate(updatedUser); // Notifica al componente padre
       setIsEditing(false);
-      alert('¡Datos actualizados con éxito!');
-    } catch (err) {
-      setError('No se pudieron guardar los cambios. Inténtalo de nuevo.');
-      console.error(err);
+      success('¡Datos actualizados con éxito!');
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.error || 'No se pudieron guardar los cambios. Inténtalo de nuevo.';
+      setError(errorMsg);
+      showError(errorMsg);
     } finally {
       setIsLoading(false);
     }

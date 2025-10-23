@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { fetchDishesByRestaurant, updateDish } from '../services/dishService';
 import type { Dish } from '../types/dish';
 import styles from './DishManagement.module.css';
 import { API_BASE_URL } from '../services/apiClient';
-import DishModal from './DishModal'; // <-- Descomentar/Añadir
+import DishModal from './DishModal';
 
 interface Props {
   restaurantId: string;
@@ -15,6 +16,7 @@ const DishManagement: React.FC<Props> = ({ restaurantId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { token } = useAuth();
+  const { success, error: showError } = useToast();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
@@ -59,9 +61,9 @@ const DishManagement: React.FC<Props> = ({ restaurantId }) => {
         setDishes(prevDishes => prevDishes.map(d => 
           d.dish_name === dish.dish_name ? { ...d, status: newStatus } : d
         ));
-      } catch (err) {
-        alert('Error al cambiar el estado del plato.');
-        console.error(err);
+        success(`Plato ${newStatus === 1 ? 'activado' : 'desactivado'} correctamente.`);
+      } catch (err: any) {
+        showError(err.response?.data?.error || 'Error al cambiar el estado del plato.');
       }
     }
   };

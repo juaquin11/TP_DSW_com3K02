@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import styles from './Register.module.css';
 
 function Register() {
@@ -12,6 +13,7 @@ function Register() {
   const [type, setType] = useState<'client' | 'owner'>('client');
   const [error, setError] = useState<string | null>(null);
   const { login } = useAuth();
+  const { success, error: showError } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,23 +21,27 @@ function Register() {
     setError(null);
 
     if (!name || !email || !phone || !password) {
-      setError('Todos los campos son obligatorios.');
+      const errorMsg = 'Todos los campos son obligatorios.';
+      setError(errorMsg);
+      showError(errorMsg);
       return;
     }
 
     try {
       const result = await registerUser({ name, email, phone, password, type });
       login(result.token);
-      alert('Usuario registrado y logueado exitosamente.');
+      success('Usuario registrado exitosamente. ¡Bienvenido!');
 
       if (result.user.type === 'owner') {
-        navigate('/owner-dashboard'); // Redirige a una ruta para dueños
+        navigate('/owner-dashboard');
       } else {
-        navigate('/'); // Redirige al inicio para clientes
+        navigate('/');
       }
     } catch (err: any) {
       console.error('❌ Error al registrar:', err.response?.data || err.message);
-      setError(err.response?.data?.error || 'Error al registrar el usuario. Intente nuevamente.');
+      const errorMsg = err.response?.data?.error || 'Error al registrar el usuario. Intente nuevamente.';
+      setError(errorMsg);
+      showError(errorMsg);
     }
   };
 

@@ -1,6 +1,7 @@
 // frontend/src/components/ReservationsToday.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { fetchReservationsForToday, updateReservationStatus } from '../services/reservationService';
 import type { Reservation } from '../types/reservation';
 import styles from './ReservationsToday.module.css';
@@ -15,6 +16,7 @@ const ReservationsToday: React.FC<Props> = ({ restaurantId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { token } = useAuth();
+  const { success, error: showError } = useToast();
 
   const loadReservations = useCallback(async () => {
     if (!token) return;
@@ -41,13 +43,11 @@ const ReservationsToday: React.FC<Props> = ({ restaurantId }) => {
       // Actualiza el estado visualmente de forma optimista
       setReservations(prev => prev.map(r => r.id === id ? { ...r, status: newStatus as any } : r));
       await updateReservationStatus(id, newStatus, token);
-      // Opcional: Recargar los datos para asegurar consistencia total
-      // await loadReservations(); 
-    } catch (err) {
+      success('Estado de la reserva actualizado correctamente.');
+    } catch (err: any) {
       console.error("Error al actualizar el estado:", err);
-      alert("No se pudo actualizar la reserva. Reintentando...");
-      // Revertir el cambio visual si la API falla
-      loadReservations(); 
+      showError(err.response?.data?.error || "No se pudo actualizar la reserva.");
+      loadReservations();
     }
   };
 

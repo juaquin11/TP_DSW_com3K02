@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { loginUser } from '../services/authService';
 import styles from './Login.module.css';
 import type { LoginDTO } from '../types/auth';
@@ -12,6 +13,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const { login } = useAuth();
+  const { success, error: showError } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,16 +23,11 @@ function Login() {
     const loginData: LoginDTO = { email, password };
 
     try {
-      // 1. Llamar al servicio de la API
       const result = await loginUser(loginData);
-      
-      // 2. Llamar a la función login del contexto y ESPERAR a que termine.
-      //    Esta función ahora actualiza todo el estado del usuario.
       const loggedInUser = await login(result.token);
       
-      alert('¡Bienvenido! Has iniciado sesión correctamente.');
+      success('¡Bienvenido! Has iniciado sesión correctamente.');
 
-      // 3. Redirigir basándose en los datos del usuario ya actualizados en el contexto.
       if (loggedInUser.type === 'owner') {
         navigate('/ownerDashboard');
       } else {
@@ -38,7 +35,9 @@ function Login() {
       }
     } catch (err: any) {
       console.error('❌ Error al iniciar sesión:', err.response?.data || err.message);
-      setError(err.response?.data?.error || 'Email o contraseña incorrectos.');
+      const errorMsg = err.response?.data?.error || 'Email o contraseña incorrectos.';
+      setError(errorMsg);
+      showError(errorMsg);
     }
   };
 

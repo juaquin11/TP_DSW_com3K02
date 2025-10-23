@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { updateRestaurant, deleteRestaurant } from '../services/restaurantService';
 import { fetchCategories, fetchDistricts } from '../services/dataService';
 import type { Category } from '../types/category';
@@ -47,6 +48,7 @@ const EditRestaurantForm: React.FC<EditRestaurantFormProps> = ({ restaurantData,
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const { token } = useAuth();
+  const { success, error: showError } = useToast();
 
   useEffect(() => {
     if (!token) return;
@@ -167,10 +169,12 @@ const EditRestaurantForm: React.FC<EditRestaurantFormProps> = ({ restaurantData,
 
     try {
       await updateRestaurant(restaurantData.id_restaurant, data, token);
-      alert('¡Restaurante actualizado exitosamente!');
+      success('¡Restaurante actualizado exitosamente!');
       onSuccess();
     } catch (err: any) {
-      setErrors({ form: err.response?.data?.error || 'No se pudo actualizar el restaurante.' });
+      const errorMsg = err.response?.data?.error || 'No se pudo actualizar el restaurante.';
+      setErrors({ form: errorMsg });
+      showError(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -181,10 +185,10 @@ const EditRestaurantForm: React.FC<EditRestaurantFormProps> = ({ restaurantData,
     setIsLoading(true);
     try {
       await deleteRestaurant(restaurantData.id_restaurant, token);
-      alert('Restaurante eliminado exitosamente.');
+      success('Restaurante eliminado exitosamente.');
       onSuccess();
     } catch (err: any) {
-      alert(err.response?.data?.error || 'No se pudo eliminar el restaurante.');
+      showError(err.response?.data?.error || 'No se pudo eliminar el restaurante.');
     } finally {
       setIsLoading(false);
       setShowDeleteConfirm(false);

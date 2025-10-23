@@ -3,6 +3,7 @@ import styles from './ReservationHistory.module.css';
 import type { Reservation, ReservationStatus } from '../types/reservation';
 import { getUpcomingReservations, updateReservationStatus } from '../services/reservationService';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 interface Props {
   idRestaurant: string;
@@ -10,6 +11,7 @@ interface Props {
 
 const ReservationHistory: React.FC<Props> = ({ idRestaurant }) => {
   const { token } = useAuth();
+  const { success, error: showError } = useToast();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [filtered, setFiltered] = useState<Reservation[]>([]);
   const [statusFilter, setStatusFilter] = useState<ReservationStatus | ''>('');
@@ -83,10 +85,11 @@ const ReservationHistory: React.FC<Props> = ({ idRestaurant }) => {
 
     try {
       await updateReservationStatus(id, newStatus, token!);
+      success('Estado actualizado correctamente.');
     } catch (error: any) {
       console.error('Error al actualizar estado:', error);
       setFiltered(previous);
-      alert(error?.response?.data?.error || 'No se pudo actualizar el estado.');
+      showError(error?.response?.data?.error || 'No se pudo actualizar el estado.');
     }
   };
 
