@@ -6,18 +6,22 @@ import { JwtPayload } from '../models/types';
 
 // --- Controlador para Stripe ---
 export async function createStripeCheckoutSession(req: Request, res: Response) {
+  console.log("Recibida petición para crear sesión de Stripe..."); // Log 1
   try {
     const user = (req as any).user as JwtPayload;
     const { subscriptionId } = req.body; // El ID del plan que viene del frontend
+    console.log("UserID:", user.id_user, "SubscriptionID recibido:", subscriptionId); // Log 2
 
     if (!subscriptionId) {
       return res.status(400).json({ error: 'El ID de la suscripción es requerido.' });
     }
+    
 
-    // 1. Busca los detalles del plan en tu BD
+    console.log("Buscando plan en DB..."); // Log 3
     const subscriptionPlan = await prisma.subscription.findUnique({
       where: { id_subscription: subscriptionId },
     });
+  console.log("Plan encontrado:", subscriptionPlan); // Log 4
 
     if (!subscriptionPlan) {
       return res.status(404).json({ error: 'Plan de suscripción no encontrado.' });
@@ -32,7 +36,9 @@ export async function createStripeCheckoutSession(req: Request, res: Response) {
       line_items: [
         {
           price_data: {
-            currency: 'ars', // Moneda (Pesos Argentinos)
+          // currency: 'ars', 
+            currency: 'usd',    // <-- En dolares para que funcione 
+                                // (los precios en pesos son muy bajos y stripe no los procesa)
             product_data: {
               name: `Suscripción: ${subscriptionPlan.plan_name}`,
               // Puedes añadir descripción e imágenes aquí si quieres
