@@ -1,5 +1,3 @@
-// frontend/src/context/AuthContext.tsx
-
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import type { JwtPayload, AuthenticatedUser, UserStatus } from '../types/auth';

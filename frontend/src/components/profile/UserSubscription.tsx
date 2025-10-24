@@ -1,9 +1,10 @@
 // frontend/src/components/profile/UserSubscription.tsx
 
 import React, { useState, useEffect } from 'react';
+import { useStripe } from '@stripe/react-stripe-js';
 import { useAuth } from '../../context/AuthContext';
 import { fetchSubscriptions } from '../../services/subscriptionService';
-import { createPaymentPreference } from '../../services/paymentService';
+import { createStripeCheckoutSession } from '../../services/paymentService';
 import type { UserProfile } from '../../types/user';
 import type { subscription as SubscriptionPlan } from '../../types/subscription';
 import styles from './UserSubscription.module.css';
@@ -12,10 +13,11 @@ interface Props {
   profile: UserProfile;
 }
 
-const UserSubscription: React.FC<Props> = ({ profile }) => {
+  const UserSubscription: React.FC<Props> = ({ profile }) => {
   const { token } = useAuth();
+  const stripe = useStripe();
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
 
   // Cargar los planes disponibles cuando el componente se monta
@@ -34,16 +36,34 @@ const UserSubscription: React.FC<Props> = ({ profile }) => {
   }, [profile.subscription, token]);
 
   const handleSubscribe = async (subscriptionId: string) => {
-    if (!token) return;
-    setIsLoading(true);
+    if (!stripe || !token) {
+      console.error("Stripe.js no se ha cargado o no estás autenticado.");
+      setError("Error al iniciar el pago. Refresca la página.");
+      return;
+    }
+
+    setIsLoading(prev => ({ ...prev, [subscriptionId]: true }));
     setError(null);
+
     try {
-      const paymentUrl = await createPaymentPreference(subscriptionId, token);
-      // Redirección a Mercado Pago
-      window.location.href = paymentUrl;
-    } catch (err) {
-      setError('Error al iniciar el proceso de pago. Inténtalo de nuevo.');
-      setIsLoading(false);
+      // 1. Llama a tu backend para crear la sesión de checkout
+      const { sessionId } = await createStripeCheckoutSession(subscriptionId, token);
+
+      // 2. Redirige al usuario a la página de pago de Stripe
+      const { error: stripeError } = await stripe.redirectToCheckout({
+        sessionId: sessionId,
+      });
+
+      // Si redirectToCheckout falla (raro), muestra un error
+      if (stripeError) {
+        console.error("Error al redirigir a Stripe:", stripeError);
+        setError(stripeError.message || "No se pudo redirigir a la página de pago.");
+      }
+    } catch (err: any) {
+      console.error("Error al crear la sesión de checkout:", err);
+      setError(err.response?.data?.error || 'Error al iniciar el proceso de pago. Inténtalo de nuevo.');
+    } finally {
+      setIsLoading(prev => ({ ...prev, [subscriptionId]: false }));
     }
   };
 
@@ -53,7 +73,7 @@ const UserSubscription: React.FC<Props> = ({ profile }) => {
     });
   };
 
-  // Si el usuario ya está suscrito, muestra su estado actual
+  // Si el usuario ya está suscrito
   if (profile.subscription) {
     return (
       <div className={styles.container}>
@@ -68,7 +88,7 @@ const UserSubscription: React.FC<Props> = ({ profile }) => {
     );
   }
 
-  // Si no está suscrito, muestra los planes disponibles
+  // Si no está suscrito muestra los planes disponibles ...
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Elige tu Plan</h2>
@@ -82,7 +102,7 @@ const UserSubscription: React.FC<Props> = ({ profile }) => {
             </p>
             <button
               onClick={() => handleSubscribe(plan.id_subscription)}
-              disabled={isLoading}
+              disabled={isLoading[plan.id_subscription]} 
               className={styles.subscribeButton}
             >
               {isLoading ? 'Procesando...' : 'Suscribirme'}

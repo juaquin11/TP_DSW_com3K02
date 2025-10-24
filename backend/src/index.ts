@@ -37,6 +37,7 @@ app.use('/api/reservations', reservationRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/subscriptions', subscriptionRoutes); 
 app.use('/api/payments', paymentRoutes); 
+
 // Rutas de prueba
 app.get('/', (req, res) => {
   res.send('Servidor funcionando 🚀');

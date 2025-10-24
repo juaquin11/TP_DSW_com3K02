@@ -15,6 +15,8 @@ import { ToastProvider } from './context/ToastContext';
 import { useAuth } from "./context/AuthContext";
 import ProfilePage from "./pages/ProfilePage";
 import HelpPage from "./pages/HelpPage";
+import PaymentSuccessPage from '../src/pages/PaymentSuccessPage'; // Crea este componente
+import PaymentCancelPage from '../src/pages/PaymentCancelPage'; // Crea este componente
 
 const ProtectedRoute = ({ children }: { children: ReactElement }) => {
   const { token } = useAuth();
@@ -42,11 +44,13 @@ export default function App() {
                   <ProfilePage />
                 </ProtectedRoute>
               } />
-              <Route path= "/help" element={<HelpPage />} />
+              <Route path="/help" element={<HelpPage />} />
               <Route path="/ownerDashboard" element={<OwnerHome />} />
-              <Route path="/ownerDashboard/restaurant/:id" element={<OwnerRestaurantPanel />} />
               <Route path="/ownerDashboard/new-restaurant" element={<CreateRestaurantPage />} /> {/* <-- NUEVA RUTA */}
+              <Route path="/payment-success" element={<PaymentSuccessPage />} />
+              <Route path="/payment-cancel" element={<PaymentCancelPage />} />
               <Route path="/restaurant/:id" element={<RestaurantDetail />} />
+              <Route path="/ownerDashboard/restaurant/:id" element={<OwnerRestaurantPanel />} />
               <Route
                 path="/restaurant/:id/reservar"
                 element={(
