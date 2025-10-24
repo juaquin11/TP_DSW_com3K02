@@ -1,8 +1,11 @@
 // backend/src/controllers/payment.controller.ts
 import { Request, Response } from 'express';
-import { stripe } from '../config/stripe'; // Asumiendo que inicializaste stripe aquí
+import { stripe } from '../config/stripe'; // Asegúrate que la ruta sea correcta
 import prisma from '../prisma/client';
 import { JwtPayload } from '../models/types';
+import dotenv from 'dotenv'; // Asegúrate de importar dotenv si usas process.env aquí
+
+dotenv.config(); // Carga las variables de entorno
 
 // --- Controlador para Stripe ---
 export async function createStripeCheckoutSession(req: Request, res: Response) {
@@ -15,37 +18,41 @@ export async function createStripeCheckoutSession(req: Request, res: Response) {
     if (!subscriptionId) {
       return res.status(400).json({ error: 'El ID de la suscripción es requerido.' });
     }
-    
 
     console.log("Buscando plan en DB..."); // Log 3
     const subscriptionPlan = await prisma.subscription.findUnique({
       where: { id_subscription: subscriptionId },
     });
-  console.log("Plan encontrado:", subscriptionPlan); // Log 4
+    console.log("Plan encontrado:", subscriptionPlan); // Log 4
 
     if (!subscriptionPlan) {
       return res.status(404).json({ error: 'Plan de suscripción no encontrado.' });
     }
 
-    // 2. Define las URLs de éxito y cancelación (del Frontend)
-    const YOUR_DOMAIN = 'http://localhost:5173'; // Cambia esto en producción
+    const unitAmount = Math.round(Number(subscriptionPlan.price) * 100);
+    console.log("Calculado unit_amount (centavos):", unitAmount); // Log 5
+    if (isNaN(unitAmount)) {
+        throw new Error('El precio del plan no es un número válido.');
+    }
 
-    // 3. Crea la Sesión de Checkout en Stripe
+    // Define las URLs de éxito y cancelación (del Frontend)
+    // Asegúrate de que esta URL base sea correcta para tu entorno (desarrollo/producción)
+    const YOUR_DOMAIN = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+    console.log("Creando sesión en Stripe..."); // Log 6
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
-          // currency: 'ars', 
-            currency: 'usd',    // <-- En dolares para que funcione 
-                                // (los precios en pesos son muy bajos y stripe no los procesa)
+            currency: 'usd', // Cambiado a USD como solicitaste para probar
             product_data: {
               name: `Suscripción: ${subscriptionPlan.plan_name}`,
               // Puedes añadir descripción e imágenes aquí si quieres
               // description: 'Acceso mensual a beneficios...',
               // images: ['url_a_imagen_del_plan'],
             },
-            unit_amount: Math.round(Number(subscriptionPlan.price) * 100), // Precio en centavos
+            unit_amount: unitAmount, // Precio en centavos de USD
           },
           quantity: 1,
         },
@@ -58,18 +65,29 @@ export async function createStripeCheckoutSession(req: Request, res: Response) {
         userId: user.id_user,
         subscriptionId: subscriptionPlan.id_subscription,
       },
-      // (Opcional) Puedes pre-rellenar el email del cliente
-      // customer_email: userEmailFromDB,
+      // (Opcional) Puedes pre-rellenar el email del cliente si lo tienes
+      // customer_email: user.email, // Asumiendo que tienes el email en JwtPayload o lo buscas
     });
+    console.log("Sesión de Stripe creada:", session.id); // Log 7
 
-    // 4. Devuelve el ID de la sesión al frontend
-    res.json({ sessionId: session.id });
+    // --- CAMBIO CLAVE AQUÍ ---
+    // Devuelve la URL completa de la sesión de checkout
+    if (!session.url) {
+        throw new Error("Stripe no devolvió una URL para la sesión de checkout.");
+    }
+    res.json({ url: session.url });
+    // -------------------------
 
   } catch (error: any) {
-    console.error('Error al crear la sesión de checkout de Stripe:', error);
-    res.status(500).json({ error: error.message || 'Error interno del servidor.' });
+    // --- Log de Error Detallado ---
+    console.error('Error DETALLADO al crear la sesión de checkout de Stripe:', error); // Log 8 (Error)
+    // Devuelve un mensaje genérico o el específico si es seguro
+    const errorMessage = error instanceof Error ? error.message : 'Error interno del servidor.';
+    res.status(500).json({ error: errorMessage });
   }
 }
+
+
 
 // --- (Opcional) Controlador para Webhooks ---
 // export async function handleStripeWebhook(req: Request, res: Response) {

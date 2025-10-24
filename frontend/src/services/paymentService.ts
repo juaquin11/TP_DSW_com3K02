@@ -2,14 +2,15 @@
 import apiClient from './apiClient';
 
 interface CreateCheckoutSessionResponse {
-  sessionId: string; // El ID de la sesión de Stripe
+  url: string; // Esperamos la URL de checkout directamente
 }
 
 /**
  * Llama al backend para crear una sesión de checkout de Stripe.
  * @param subscriptionId El ID del plan que se quiere comprar.
  * @param token El token de autenticación del usuario.
- * @returns El ID de la sesión de checkout.
+ * @returns Un objeto con la URL a la página de checkout de Stripe.
+ * @throws {Error} Si la respuesta del backend no contiene la URL.
  */
 export const createStripeCheckoutSession = async (subscriptionId: string, token: string): Promise<CreateCheckoutSessionResponse> => {
   const response = await apiClient.post<CreateCheckoutSessionResponse>(
@@ -17,9 +18,16 @@ export const createStripeCheckoutSession = async (subscriptionId: string, token:
     { subscriptionId }, // Datos enviados al backend
     {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`, // Asegura que el token se envíe
       },
     }
   );
-  return response.data; // Devuelve { sessionId: 'cs_test_...' }
+
+  // Validación extra: Asegurarse de que la URL viene en la respuesta
+  if (!response.data || !response.data.url) {
+    console.error("Respuesta inesperada del backend:", response);
+    throw new Error("El servidor no devolvió la URL de pago necesaria.");
+  }
+
+  return response.data; // Devuelve { url: 'https://checkout.stripe.com/...' }
 };
