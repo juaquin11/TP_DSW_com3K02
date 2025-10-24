@@ -1,0 +1,16 @@
+{
+  "name": "FoodApp",
+  "short_name": "FoodApp",
+  "description": "Tu app para reservar restaurantes.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a", 
+  "theme_color": "#d4af37", 
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any", 
+      "type": "image/svg+xml"
+    }
+  ]
+}

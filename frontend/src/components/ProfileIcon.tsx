@@ -20,7 +20,7 @@ const ProfileIcon: React.FC<ProfileIconProps> = ({
   isMenuOpen = false,
   label = 'Mi cuenta',
 }) => {
-  const profileImage = 'login.svg';
+  const profileImage = 'user.svg';
   const notificationBadgeColor = hasPenalty ? styles.notificationBadgeRed : styles.notificationBadgeYellow;
 
   const buttonClasses = [
