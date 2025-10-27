@@ -8,11 +8,10 @@ import fs from 'fs'; // Importamos el módulo File System
 export async function listRestaurants(req: Request, res: Response) {
   try {
     const restaurants = await restaurantService.getAllRestaurantsOrderedByRating();
-    // return JSON (frontend will filter & render)
     return res.json(restaurants);
   } catch (err: any) {
-    console.error('Error listing restaurants', err);
-    return res.status(500).json({ error: 'Failed to fetch restaurants' });
+    console.error('Error al listar restaurantes:', err);
+    return res.status(500).json({ error: 'No se pudieron obtener los restaurantes.' });
   }
 }
 
@@ -20,14 +19,14 @@ export async function listOwnerRestaurants(req: Request, res: Response) {
   try {
     const user = (req as any).user as JwtPayload;
     if (!user || user.type !== 'owner') {
-      return res.status(403).json({ error: 'Access denied' });
+      return res.status(403).json({ error: 'Acceso denegado.' });
     }
 
     const restaurants = await restaurantService.getOwnerRestaurants(user.id_user);
     return res.json(restaurants);
   } catch (err: any) {
-    console.error('Error listing owner restaurants', err);
-    return res.status(500).json({ error: 'Failed to fetch restaurants for owner' });
+    console.error('Error al listar restaurantes del dueño:', err);
+    return res.status(500).json({ error: 'No se pudieron obtener los restaurantes del dueño.' });
   }
 }
 
@@ -111,19 +110,19 @@ export async function getRestaurantById(req: Request, res: Response) {
     const { id } = req.params;
     
     if (!id) {
-      return res.status(400).json({ error: 'Restaurant ID is required' });
+      return res.status(400).json({ error: 'El ID del restaurante es requerido.' });
     }
     
     const restaurant = await restaurantService.getRestaurantById(id);
     
     if (!restaurant) {
-      return res.status(404).json({ error: 'Restaurant not found' });
+      return res.status(404).json({ error: 'Restaurante no encontrado.' });
     }
     
     return res.json(restaurant);
   } catch (err: any) {
-    console.error('Error fetching restaurant by ID', err);
-    return res.status(500).json({ error: 'Failed to fetch restaurant' });
+    console.error('Error al obtener restaurante por ID:', err);
+    return res.status(500).json({ error: 'No se pudo obtener el restaurante.' });
   }
 }
 
@@ -132,8 +131,8 @@ export async function listRestaurantsWithDiscounts(req: Request, res: Response) 
     const restaurants = await restaurantService.getRestaurantsWithSubscriptionDiscounts();
     return res.json(restaurants);
   } catch (err: any) {
-    console.error('Error listing restaurants with discounts', err);
-    return res.status(500).json({ error: 'Failed to fetch restaurants with discounts' });
+    console.error('Error al listar restaurantes con descuentos:', err);
+    return res.status(500).json({ error: 'No se pudieron obtener los restaurantes con descuentos.' });
   }
 }
 
@@ -165,7 +164,7 @@ export async function searchRestaurants(req: Request, res: Response) {
 
     return res.json(data);
   } catch (err: any) {
-    console.error('Error searching restaurants', err);
+    console.error('Error al buscar restaurantes:', err);
     return res.status(500).json({ error: 'No pudimos realizar la búsqueda.' });
   }
 }
@@ -186,13 +185,13 @@ export async function getRestaurantDetailsForOwner(req: Request, res: Response) 
     const restaurant = await restaurantService.getRestaurantDetailsForOwner(id, user.id_user);
 
     if (!restaurant) {
-      return res.status(404).json({ error: 'Restaurant not found or you do not have permission to view it.' });
+      return res.status(404).json({ error: 'Restaurante no encontrado o no tienes permiso para verlo.' });
     }
 
     res.json(restaurant);
   } catch (error: any) {
-    console.error('Error fetching restaurant details:', error);
-    res.status(500).json({ error: 'Failed to fetch restaurant details.' });
+    console.error('Error al obtener los detalles del restaurante:', error);
+    res.status(500).json({ error: 'Error al obtener los detalles del restaurante.' });
   }
 }
 
@@ -205,7 +204,7 @@ export async function updateRestaurant(req: Request, res: Response) {
       return res.status(404).json({ error: 'No se recibio correctamente el id.' });
     }
     if (!user || user.type !== 'owner') {
-      return res.status(403).json({ error: 'Forbidden: only owners can update restaurants.' });
+      return res.status(403).json({ error: 'Forbidden: solo los dueños pueden modificar restaurantes.' });
     }
 
     const data = { ...req.body };
@@ -231,11 +230,11 @@ export async function updateRestaurant(req: Request, res: Response) {
 
     res.json(updatedRestaurant);
   } catch (error: any) {
-    console.error('Error updating restaurant:', error);
+    console.error('Error al actualizar el restaurante:', error);
     if (error.message.includes('not found') || error.message.includes('permission')) {
       return res.status(404).json({ error: error.message });
     }
-    res.status(500).json({ error: 'Failed to update restaurant.' });
+    res.status(500).json({ error: 'Error al actualizar el restaurante.' });
   }
 }
 
@@ -249,17 +248,21 @@ export async function deleteRestaurant(req: Request, res: Response) {
     }
 
     if (!user || user.type !== 'owner') {
-      return res.status(403).json({ error: 'Forbidden: only owners can delete restaurants.' });
+      return res.status(403).json({ error: 'Forbidden: solo los dueños pueden modificar restaurantes.' });
     }
 
-    await restaurantService.deleteRestaurant(id, user.id_user);
+    const updatedRestaurant = await restaurantService.deleteRestaurant(id, user.id_user);
 
-    res.json({ message: 'Restaurant deleted successfully.' });
+    const message = updatedRestaurant.status === 0 
+      ? 'Restaurante dado de baja correctamente.' 
+      : 'Restaurante dado de alta correctamente.';
+
+    res.json({ message, status: updatedRestaurant.status });
   } catch (error: any) {
-    console.error('Error deleting restaurant:', error);
+    console.error('Error al cambiar el estado del restaurante:', error);
     if (error.message.includes('not found') || error.message.includes('permission')) {
       return res.status(404).json({ error: error.message });
     }
-    res.status(500).json({ error: 'Failed to delete restaurant.' });
+    res.status(500).json({ error: 'Error al cambiar el estado del restaurante.' });
   }
 }

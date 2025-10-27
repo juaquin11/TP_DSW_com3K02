@@ -119,7 +119,7 @@
   grid-column: 1 / -1;
 }
 
-.navButton, .submitButton, .deleteButton {
+.navButton, .submitButton, .deleteButton, .activateButton {
   padding: 0.75rem 2rem;
   border: 1px solid var(--restaurant-gold);
   border-radius: 8px;
@@ -151,20 +151,47 @@
   border-color: #c19b26;
 }
 
-.submitButton:disabled, .deleteButton:disabled {
+.submitButton:disabled, .deleteButton:disabled, .activateButton:disabled {
   background-color: var(--restaurant-muted);
   border-color: var(--restaurant-muted);
   cursor: not-allowed;
 }
 
 .deleteButton {
+  padding: 0.75rem 2rem;
   background-color: transparent;
   color: #e57373;
   border-color: #e57373;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .deleteButton:hover:not(:disabled) {
   background-color: #e57373;
+  color: var(--restaurant-dark);
+}
+
+.activateButton {
+  padding: 0.75rem 2rem;
+  background-color: transparent;
+  color: #5cb85c;
+  border-color: #5cb85c;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.activateButton:hover:not(:disabled) {
+  background-color: #5cb85c;
   color: var(--restaurant-dark);
 }
 
@@ -223,6 +250,22 @@
 .deleteConfirmButton:hover {
   background-color: #d32f2f;
   border-color: #d32f2f;
+}
+
+.activateConfirmButton {
+  padding: 0.75rem 2rem;
+  background-color: #5cb85c;
+  color: var(--restaurant-dark);
+  border: 1px solid #5cb85c;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.activateConfirmButton:hover {
+  background-color: #4cae4c;
+  border-color: #4cae4c;
 }
 
 .fullWidth {

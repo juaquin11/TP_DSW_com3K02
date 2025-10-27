@@ -16,7 +16,7 @@ const DishManagement: React.FC<Props> = ({ restaurantId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { token } = useAuth();
-  const { success, error: showError } = useToast();
+  const { success, error: showError, confirm } = useToast();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
@@ -53,19 +53,26 @@ const DishManagement: React.FC<Props> = ({ restaurantId }) => {
   const handleToggleStatus = async (dish: Dish) => {
     if (!token) return;
     const newStatus = dish.status === 1 ? 0 : 1;
-    const confirmation = window.confirm(`¿Estás seguro de que quieres ${newStatus === 1 ? 'activar' : 'desactivar'} el plato "${dish.dish_name}"?`);
+    const action = newStatus === 1 ? 'activar' : 'desactivar';
 
-    if (confirmation) {
-      try {
-        await updateDish(dish.dish_name, restaurantId, { status: newStatus }, token);
-        setDishes(prevDishes => prevDishes.map(d => 
-          d.dish_name === dish.dish_name ? { ...d, status: newStatus } : d
-        ));
-        success(`Plato ${newStatus === 1 ? 'activado' : 'desactivado'} correctamente.`);
-      } catch (err: any) {
-        showError(err.response?.data?.error || 'Error al cambiar el estado del plato.');
+    confirm(
+      `¿Estás seguro de que quieres ${action} el plato "${dish.dish_name}"?`,
+      async () => {
+        try {
+          await updateDish(dish.dish_name, restaurantId, { status: newStatus }, token);
+          setDishes(prevDishes => prevDishes.map(d => 
+            d.dish_name === dish.dish_name ? { ...d, status: newStatus } : d
+          ));
+          success(`Plato ${newStatus === 1 ? 'activado' : 'desactivado'} correctamente.`);
+        } catch (err: any) {
+          showError(err.response?.data?.error || 'Error al cambiar el estado del plato.');
+        }
+      },
+      {
+        confirmText: action === 'activar' ? 'Activar' : 'Desactivar',
+        cancelText: 'Cancelar'
       }
-    }
+    );
   };
 
   if (loading) return <p>Cargando platos...</p>;

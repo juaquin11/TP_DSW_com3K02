@@ -45,10 +45,16 @@ const EditRestaurantForm: React.FC<EditRestaurantFormProps> = ({ restaurantData,
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showStatusChangeConfirm, setShowStatusChangeConfirm] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState(restaurantData.status ?? 1);
 
   const { token } = useAuth();
   const { success, error: showError } = useToast();
+
+
+  useEffect(() => {
+    setCurrentStatus(restaurantData.status ?? 1);
+  }, [restaurantData.status]);
 
   useEffect(() => {
     if (!token) return;
@@ -180,18 +186,21 @@ const EditRestaurantForm: React.FC<EditRestaurantFormProps> = ({ restaurantData,
     }
   };
 
-  const handleDelete = async () => {
+  
+
+  const handleStatusChange = async () => {
     if (!token) return;
     setIsLoading(true);
     try {
-      await deleteRestaurant(restaurantData.id_restaurant, token);
-      success('Restaurante eliminado exitosamente.');
+      const result = await deleteRestaurant(restaurantData.id_restaurant, token);
+      setCurrentStatus(result.status);
+      success(result.message);
       onSuccess();
     } catch (err: any) {
-      showError(err.response?.data?.error || 'No se pudo eliminar el restaurante.');
+      showError(err.response?.data?.error || 'No se pudo cambiar el estado del restaurante.');
     } finally {
       setIsLoading(false);
-      setShowDeleteConfirm(false);
+      setShowStatusChangeConfirm(false);
     }
   };
 
@@ -284,11 +293,11 @@ const EditRestaurantForm: React.FC<EditRestaurantFormProps> = ({ restaurantData,
                     <div style={{ display: 'flex', gap: '1rem' }}>
                         <button 
                             type="button" 
-                            onClick={() => setShowDeleteConfirm(true)} 
-                            className={styles.deleteButton}
+                            onClick={() => setShowStatusChangeConfirm(true)} 
+                            className={currentStatus === 1 ? styles.deleteButton : styles.activateButton}
                             disabled={isLoading}
                         >
-                            Eliminar Restaurante
+                            {currentStatus === 1 ? 'Baja de Restaurante' : 'Alta de Restaurante'}
                         </button>
                         <button type="submit" className={styles.submitButton} disabled={isLoading}>
                             {isLoading ? 'Actualizando...' : 'Guardar Cambios'}
@@ -307,17 +316,25 @@ const EditRestaurantForm: React.FC<EditRestaurantFormProps> = ({ restaurantData,
           onClose={() => setIsModalOpen(false)}
         />
       )}
-      {showDeleteConfirm && (
+      
+      {showStatusChangeConfirm && (
         <div className={styles.deleteModal}>
           <div className={styles.deleteModalContent}>
             <h3>¿Estás seguro?</h3>
-            <p>Esta acción eliminará el restaurante. Esta operación no se puede deshacer.</p>
+            <p>
+              {currentStatus === 1 
+                ? 'Esta acción dará de baja el restaurante. No será visible para los clientes hasta que lo vuelvas a activar.' 
+                : 'Esta acción dará de alta el restaurante nuevamente. Volverá a ser visible para los clientes.'}
+            </p>
             <div className={styles.deleteModalButtons}>
-              <button onClick={() => setShowDeleteConfirm(false)} className={styles.navButton}>
+              <button onClick={() => setShowStatusChangeConfirm(false)} className={styles.navButton}>
                 Cancelar
               </button>
-              <button onClick={handleDelete} className={styles.deleteConfirmButton}>
-                Confirmar Eliminación
+              <button 
+                onClick={handleStatusChange} 
+                className={currentStatus === 1 ? styles.deleteConfirmButton : styles.activateConfirmButton}
+              >
+                {currentStatus === 1 ? 'Confirmar Baja' : 'Confirmar Alta'}
               </button>
             </div>
           </div>
