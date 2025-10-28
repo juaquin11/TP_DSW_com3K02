@@ -97,12 +97,13 @@ export async function updateRestaurant(id: string, data: FormData, token: string
   return res.data;
 }
 
-export async function deleteRestaurant(id: string, token: string): Promise<void> {
-  await apiClient.delete(`/restaurants/${id}`, {
+export async function deleteRestaurant(id: string, token: string): Promise<{ message: string; status: number }> {
+  const response = await apiClient.delete(`/restaurants/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
+  return response.data;
 }
 
 

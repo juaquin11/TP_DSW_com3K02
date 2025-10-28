@@ -423,7 +423,7 @@ export async function updateRestaurant(
   });
 
   if (!restaurant) {
-    throw new Error('Restaurant not found or you do not have permission to modify it.');
+    throw new Error('Restaurante no encontrado o no tienes permiso para modificarlo.');
   }
 
   const { id_category, ...restaurantData } = data;
@@ -486,13 +486,15 @@ export async function deleteRestaurant(id: string, ownerId: string) {
   });
 
   if (!restaurant) {
-    throw new Error('Restaurant not found or you do not have permission to delete it.');
+    throw new Error('Restaurante no encontrado o no tienes permiso para modificarlo.');
   }
 
-  // Eliminación lógica: cambiar status a 0
+  // Cambio de estado: si es 1 lo pasa a 0, si es 0 lo pasa a  1
+  const newStatus = restaurant.status === 1 ? 0 : 1;
+
   return prisma.restaurant.update({
     where: { id_restaurant: id },
-    data: { status: 0 },
+    data: { status: newStatus },
   });
 }
 
