@@ -3,8 +3,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { fetchReservationsForToday, updateReservationStatus } from '../services/reservationService';
-import type { Reservation } from '../types/reservation';
+import type { Reservation, ReservationStatus } from '../types/reservation';
 import styles from './ReservationsToday.module.css';
+import ReservationStatusActions from './ReservationStatusActions';
 
 interface Props {
   restaurantId: string;
@@ -15,6 +16,7 @@ const ReservationsToday: React.FC<Props> = ({ restaurantId }) => {
   const [filter, setFilter] = useState('pendiente');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const { token } = useAuth();
   const { success, error: showError } = useToast();
 
@@ -37,17 +39,21 @@ const ReservationsToday: React.FC<Props> = ({ restaurantId }) => {
     loadReservations();
   }, [loadReservations]);
 
-  const handleUpdateStatus = async (id: string, newStatus: string) => {
+  const handleUpdateStatus = async (id: string, newStatus: ReservationStatus) => {
     if (!token) return;
+    setUpdatingId(id);
+    const previous = reservations.map(r => ({ ...r }));
     try {
       // Actualiza el estado visualmente de forma optimista
-      setReservations(prev => prev.map(r => r.id === id ? { ...r, status: newStatus as any } : r));
+      setReservations(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
       await updateReservationStatus(id, newStatus, token);
       success('Estado de la reserva actualizado correctamente.');
     } catch (err: any) {
       console.error("Error al actualizar el estado:", err);
-      showError(err.response?.data?.error || "No se pudo actualizar la reserva.");
-      loadReservations();
+      showError(err?.response?.data?.error || "No se pudo actualizar la reserva.");
+      setReservations(previous);
+    }finally {
+      setUpdatingId(null);
     }
   };
 
@@ -92,18 +98,11 @@ const ReservationsToday: React.FC<Props> = ({ restaurantId }) => {
                   <td>{res.diners}</td>
                   <td><span className={`${styles.status} ${styles[res.status]}`}>{res.status.replace('_', ' ')}</span></td>
                   <td className={styles.actions}>
-                    {res.status === 'pendiente' && (
-                      <>
-                        <button onClick={() => handleUpdateStatus(res.id, 'aceptada')} className={`${styles.btn} ${styles.btnAccept}`}>Aceptar</button>
-                        <button onClick={() => handleUpdateStatus(res.id, 'rechazada')} className={`${styles.btn} ${styles.btnReject}`}>Rechazar</button>
-                      </>
-                    )}
-                    {(res.status === 'aceptada' || res.status === 'superada') && (
-                       <>
-                         <button onClick={() => handleUpdateStatus(res.id, 'asistencia')} className={`${styles.btn} ${styles.btnAssist}`}>Marcar Asistencia</button>
-                         <button onClick={() => handleUpdateStatus(res.id, 'ausencia')} className={`${styles.btn} ${styles.btnAbsent}`}>Marcar Ausencia</button>
-                       </>
-                    )}
+                    <ReservationStatusActions
+                      status={res.status}
+                      disabled={updatingId === res.id}
+                      onChange={nextStatus => handleUpdateStatus(res.id, nextStatus)}
+                    />
                   </td>
                 </tr>
               ))}

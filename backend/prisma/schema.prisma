@@ -60,19 +60,18 @@ model district {
 }
 
 model has_subscription {
-  id_client       String    @id @db.Char(36)
-  id_subscription String    @db.Char(36)
-  adhesion_date   DateTime  @db.Date
-  expiry_date     DateTime  @db.Date           // Añadido: Fecha de vencimiento
-  status          String    @default("active") @db.VarChar(20) // Añadido: 'active', 'cancelled', 'expired'
-  last_payment_id String?   @db.VarChar(100)  // Añadido: ID de Mercado Pago
+  id_client       String   @id @db.Char(36)
+  id_subscription String   @db.Char(36)
+  adhesion_date   DateTime @db.Date
+  expiry_date     DateTime @db.Date // Añadido: Fecha de vencimiento
+  status          String   @default("active") @db.VarChar(20) // Añadido: 'active', 'cancelled', 'expired'
+  last_payment_id String?  @db.VarChar(100) // Añadido: ID de Mercado Pago
 
   useraccount  useraccount  @relation(fields: [id_client], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "has_subscription_ibfk_1")
   subscription subscription @relation(fields: [id_subscription], references: [id_subscription], onDelete: NoAction, onUpdate: NoAction, map: "has_subscription_ibfk_2")
 
   @@index([id_subscription], map: "id_subscription")
 }
-
 
 model penalty {
   penalty_number     Int         @default(autoincrement())
