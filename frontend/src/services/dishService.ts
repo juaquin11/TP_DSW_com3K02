@@ -5,19 +5,6 @@ export interface DishWithDiscount extends Dish {
   subscription_discount?: number;
 }
 
-const appendFormData = (formData: FormData, data: Record<string, any>) => {
-  Object.keys(data).forEach(key => {
-    const value = data[key];
-    if (value !== null && value !== undefined) {
-      if (typeof value === 'object' && !(value instanceof File)) {
-        formData.append(key, JSON.stringify(value));
-      } else {
-        formData.append(key, value.toString());
-      }
-    }
-  });
-};
-
 export async function fetchDishesByRestaurant(
   restaurantId: string,
   token?: string

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import styles from './DishModal.module.css';
 import type { Dish } from '../types/dish';
@@ -17,161 +17,145 @@ interface Props {
   restaurantId: string;
 }
 
-// Interfaz local para manejar descuentos que pueden venir al editar
-interface EditableDish extends Dish {
-  discounts?: Record<string, number>; 
-}
+const initializeDiscounts = (dish: Dish | null): Record<string, string> => {
+  if (!dish || !dish.dish_subscription) {
+    return {};
+  }
+  // Convierte el array de relaciones en un mapa [id_subscription]: "descuento"
+  return dish.dish_subscription.reduce((acc, sub) => {
+    acc[sub.id_subscription] = String(sub.discount || 0);
+    return acc;
+  }, {} as Record<string, string>);
+};
 
 const DishModal: React.FC<Props> = ({ isOpen, onClose, onSave, dishToEdit, restaurantId }) => {
   const { token } = useAuth();
-  const { success: showSuccess, error: showError } = useToast();
   const [formData, setFormData] = useState({
     dish_name: '',
     description: '',
     current_price: '',
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>('');
+  
   const [subscriptions, setSubscriptions] = useState<subscription[]>([]);
-  const [discounts, setDiscounts] = useState<Record<string, string>>({}); // Usar string para input
+  // Estado para manejar los valores de los inputs de descuento
+  const [discounts, setDiscounts] = useState<Record<string, string>>(() => initializeDiscounts(dishToEdit));
+  
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isEditing = !!dishToEdit;
+  const isEditing = dishToEdit !== null;
 
-  // Cargar suscripciones (sólo en modo edición)
   useEffect(() => {
-    const loadSubscriptions = async () => {
-      if (!token) return;
-      try {
-        const subs = await fetchSubscriptions(token);
-        setSubscriptions(subs);
-      } catch (err) {
-        console.error("Error loading subscriptions:", err);
-        showError("No se pudieron cargar los tipos de suscripción.");
-      }
-    };
-
-    if (isOpen && isEditing) {
-      loadSubscriptions();
+    // Cargar suscripciones (siempre que haya token)
+    if (token) {
+      fetchSubscriptions(token).then(setSubscriptions).catch(console.error);
     }
-  }, [token, isOpen, isEditing, showError]);
-
-  // Resetear formulario al abrir
-  useEffect(() => {
-    if (isOpen) {
-      if (dishToEdit) {
-        setFormData({
-          dish_name: dishToEdit.dish_name,
-          description: dishToEdit.description || '',
-          current_price: dishToEdit.current_price.toString(),
-        });
-        setImagePreview(dishToEdit.image ? `${API_BASE_URL}${dishToEdit.image}` : null);
-        
-        // Cargar descuentos existentes si vienen en el objeto
-        const existingDiscounts = (dishToEdit as EditableDish).discounts || {};
-        const stringDiscounts: Record<string, string> = {};
-        for (const key in existingDiscounts) {
-            stringDiscounts[key] = existingDiscounts[key].toString();
-        }
-        setDiscounts(stringDiscounts);
-        
+    
+    // Configurar formulario si estamos editando
+    if (dishToEdit) {
+      setFormData({
+        dish_name: dishToEdit.dish_name,
+        description: dishToEdit.description,
+        current_price: String(dishToEdit.current_price),
+      });
+      // Inicializar vista previa de imagen
+      if (dishToEdit.image) {
+        setImagePreview(`${API_BASE_URL}${dishToEdit.image}`);
       } else {
-        // Reset para plato nuevo
-        setFormData({ dish_name: '', description: '', current_price: '' });
         setImagePreview(null);
-        setDiscounts({});
       }
+      // Inicializar estado de descuentos
+      setDiscounts(initializeDiscounts(dishToEdit));
+    } else {
+      // Resetear formulario para creación
+      setFormData({ dish_name: '', description: '', current_price: '' });
       setImageFile(null);
-      setError(null);
+      setImagePreview(null);
+      setDiscounts({});
     }
-  }, [dishToEdit, isOpen]);
+    
+    // Limpiar errores y carga al abrir/cambiar modo
+    setError(null);
+    setIsLoading(false);
+
+  }, [dishToEdit, token, isOpen]); // Reactualizar cuando se abre/cierra o cambia el plato
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleImageSelect = (file: File | null) => {
+  const handleImageSelect = (file: File) => {
     setImageFile(file);
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setImagePreview(dishToEdit?.image ? `${API_BASE_URL}${dishToEdit.image}` : null);
-    }
+    setImagePreview(URL.createObjectURL(file));
   };
-
-  const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>, subscriptionId: string) => {
-    const { value } = e.target;
-    // Permitir solo números entre 0-100 o vacío
-    if (/^(\d{1,2}|100)?$/.test(value)) {
-      setDiscounts(prev => ({ ...prev, [subscriptionId]: value }));
+  
+  // Manejador para los inputs de descuento
+  const handleDiscountChange = (subscriptionId: string, value: string) => {
+    // Validar que sea un número entre 0 y 100, o un string vacío
+    if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
+      setDiscounts(prev => ({
+        ...prev,
+        [subscriptionId]: value,
+      }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) {
-      setError("No estás autenticado.");
-      return;
-    }
+    if (!token) return;
+
     setIsLoading(true);
     setError(null);
 
-    // Procesar descuentos de string a number
-    const processedDiscounts: Record<string, number> = {};
-    Object.entries(discounts).forEach(([key, value]) => {
-      if (value !== '') {
-        const numValue = parseInt(value, 10);
-        if (!isNaN(numValue)) {
-          processedDiscounts[key] = numValue;
-        }
-      }
-    });
-
     try {
-      if (isEditing && dishToEdit) {
-        const data = new FormData();
-        // Agregamos los campos que SÍ se actualizan
-        data.append('description', formData.description);
-        data.append('current_price', formData.current_price);
-        // dish_name no se puede editar (es clave primaria), así que no se envía en el body
+      // Prepara el FormData
+      const data = new FormData();
+      data.append('description', formData.description);
+      data.append('current_price', formData.current_price);
+      
+      if (imageFile) { // Si se seleccionó una nueva imagen
+        data.append('image', imageFile);
+      }
+      
+      if (isEditing) {
+        // --- LÓGICA DE EDICIÓN ---
         
-        // Si el usuario seleccionó una NUEVA imagen, la añadimos
-        if (imageFile) {
-          data.append('image', imageFile);
-        }
+        // 1. Convertir el estado de descuentos a un array para el backend
+        const discountData = Object.entries(discounts)
+          .map(([id_subscription, discount]) => ({
+            id_subscription,
+            discount: parseInt(discount, 10) || 0, // Convertir a número, default 0
+          }));
+          // Nota: Filtramos discounts > 0 en el backend (servicio)
+
+        // 2. Añadir el array como un JSON string al FormData
+        data.append('discounts', JSON.stringify(discountData));
         
+        // 3. Llamar al servicio de actualización
         await updateDish(dishToEdit.dish_name, restaurantId, data, token);
+
       } else {
-        // Lógica de Creación
-        const data = new FormData();
+        // --- LÓGICA DE CREACIÓN ---
         data.append('dish_name', formData.dish_name);
-        data.append('description', formData.description);
-        data.append('current_price', formData.current_price);
         data.append('id_restaurant', restaurantId);
-        if (imageFile) {
-          data.append('image', imageFile);
-        }
+        // (En creación, no enviamos descuentos. Se podrían añadir después si se quisiera).
         
-        // Llama al servicio del frontend
         await createDish(data, token);
       }
-      onSave();
-      onClose();
+      
+      onSave(); // Refresca la lista de platos
+      onClose(); // Cierra el modal
+      
     } catch (err: any) {
-      const errorMessage = err.response?.data?.error || err.message || 'Ocurrió un error.';
-      setError(errorMessage);
-      showError(errorMessage);
+      setError(err.response?.data?.error || 'Ocurrió un error al guardar el plato.');
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   if (!isOpen) return null;
 
   return (
@@ -183,24 +167,24 @@ const DishModal: React.FC<Props> = ({ isOpen, onClose, onSave, dishToEdit, resta
             <div className={styles.inputGroup}>
               <label htmlFor="dish_name">Nombre del Plato</label>
               <input
-                type="text"
                 id="dish_name"
                 name="dish_name"
+                type="text"
                 value={formData.dish_name}
                 onChange={handleChange}
+                disabled={isEditing} // El nombre (PK) no se puede editar
                 required
               />
             </div>
             <div className={styles.inputGroup}>
-              <label htmlFor="current_price">Precio Actual ($)</label>
+              <label htmlFor="current_price">Precio</label>
               <input
-                type="number"
                 id="current_price"
                 name="current_price"
+                type="number"
+                step="0.01"
                 value={formData.current_price}
                 onChange={handleChange}
-                step="0.01"
-                min="0"
                 required
               />
             </div>
@@ -209,35 +193,34 @@ const DishModal: React.FC<Props> = ({ isOpen, onClose, onSave, dishToEdit, resta
               <textarea
                 id="description"
                 name="description"
+                rows={3}
                 value={formData.description}
                 onChange={handleChange}
-                rows={4}
+                required
               />
             </div>
             <div className={`${styles.inputGroup} ${styles.fullWidth}`}>
-              <label>Imagen del Plato {isEditing ? '(Opcional: solo si quieres cambiarla)' : '(Requerida)'}</label>
-              <ImageDropzone
-                onFileSelect={handleImageSelect}
-                imagePreview={imagePreview}
-              />
+              <label>Imagen del Plato</label>
+              <ImageDropzone onFileSelect={handleImageSelect} imagePreview={imagePreview} />
             </div>
           </div>
 
+          {/* Mostrar sección de descuentos SOLO al editar Y si hay suscripciones cargadas */}
           {isEditing && subscriptions.length > 0 && (
             <div className={styles.subscriptionSection}>
-              <h4>Descuentos por Suscripción (%)</h4>
+              <h4>Descuentos por Suscripción</h4>
               {subscriptions.map(sub => (
                 <div key={sub.id_subscription} className={styles.subscriptionRow}>
                   <label htmlFor={`discount-${sub.id_subscription}`}>{sub.plan_name}</label>
                   <input
                     id={`discount-${sub.id_subscription}`}
-                    name={`discount-${sub.id_subscription}`}
                     type="number"
-                    placeholder="%"
+                    placeholder="0" // %
                     min="0"
                     max="100"
-                    value={discounts[sub.id_subscription] || ''}
-                    onChange={(e) => handleDiscountChange(e, sub.id_subscription)}
+                    // Componente controlado: valor y onChange conectados al estado 'discounts'
+                    value={discounts[sub.id_subscription] || ''} 
+                    onChange={(e) => handleDiscountChange(sub.id_subscription, e.target.value)}
                   />
                 </div>
               ))}
@@ -245,11 +228,11 @@ const DishModal: React.FC<Props> = ({ isOpen, onClose, onSave, dishToEdit, resta
           )}
 
           {error && <p className={styles.errorMessage}>{error}</p>}
-
+          
           <div className={styles.actions}>
             <button type="button" onClick={onClose} className={styles.cancelButton}>Cancelar</button>
             <button type="submit" className={styles.saveButton} disabled={isLoading}>
-              {isLoading ? (isEditing ? 'Actualizando...' : 'Creando...') : (isEditing ? 'Guardar Cambios' : 'Crear Plato')}
+              {isLoading ? 'Guardando...' : 'Guardar Cambios'}
             </button>
           </div>
         </form>
@@ -257,5 +240,6 @@ const DishModal: React.FC<Props> = ({ isOpen, onClose, onSave, dishToEdit, resta
     </div>
   );
 };
+
 
 export default DishModal;

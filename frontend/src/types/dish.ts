@@ -5,4 +5,10 @@ export type Dish = {
     id_restaurant: string;
     image?: string | null;
     status: number;
+    dish_subscription?: DishSubscription[];
+};
+
+export type DishSubscription = {
+  id_subscription: string;
+  discount: number;
 };

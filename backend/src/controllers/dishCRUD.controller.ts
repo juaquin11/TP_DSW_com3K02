@@ -3,7 +3,7 @@ import { dishService } from '../services/dishCRUD.service';
 import * as subscriptionService from '../services/subscription.service';
 import path from 'path';
 import fs from 'fs';
-import { dish } from '../generated/prisma'; 
+import { dish, Prisma } from '../generated/prisma'; 
 import { Decimal } from '@prisma/client/runtime/library';
 
 function slugify(text: string): string {
@@ -147,53 +147,77 @@ export const updateDish = async (req: Request, res: Response) => {
   try {
     const { dish_name, id_restaurant } = req.params;
 
+    // 1. Validación de parámetros de URL
     if (!dish_name || !id_restaurant) {
-      return res.status(400).json({ error: 'Se requieren dish_name e id_restaurant' });
+      return res.status(400).json({ error: 'Faltan parámetros en la URL' });
     }
-
-    const updateData: Partial<dish> = {}; // Objeto para los datos a actualizar
+    
     const bodyData = req.body;
+    // Preparamos el DTO para los datos básicos del plato
+    const updateData: Partial<Omit<dish, 'dish_name' | 'id_restaurant'>> = {};
 
+    // 2. Mapeo de campos opcionales del FormData
     if (bodyData.description) {
       updateData.description = bodyData.description;
     }
     if (bodyData.current_price) {
-      updateData.current_price = Decimal(bodyData.current_price); 
+      updateData.current_price = Decimal(bodyData.current_price); // Conversión
     }
     if (bodyData.status !== undefined) {
-      updateData.status = parseInt(bodyData.status, 10); 
+      updateData.status = parseInt(bodyData.status, 10); // Conversión
     }
 
+    // 3. Procesamiento de nueva imagen (si se envió una)
     if (req.file) {
       const tempPath = req.file.path;
       const extension = path.extname(req.file.filename);
       const uniqueSuffix = Date.now();
-      // Usamos el dish_name de la URL (parámetro) ya que no se puede cambiar
       const newFileName = `${slugify(dish_name)}-${uniqueSuffix}${extension}`;
       const newPath = path.join(path.dirname(tempPath), newFileName);
       
       fs.renameSync(tempPath, newPath);
       updateData.image = `/uploads/${newFileName}`;
       
-      // (Opcional: Borrar la imagen antigua si existe)
-    }
-    
-
-    const existingDish = await dishService.getDish(dish_name, id_restaurant);
-    if (!existingDish) {
-      return res.status(404).json({ error: 'Plato no encontrado' });
+      // TODO: Implementar borrado de imagen antigua si se reemplaza
     }
 
-    const updatedDish = await dishService.updateDish(dish_name, id_restaurant, updateData);
+    // 4. Parsear descuentos
+    // El frontend los envía como un JSON string en el campo 'discounts'
+    let discountsToUpdate: any[] | null = null;
+    if (bodyData.discounts) {
+      try {
+        discountsToUpdate = JSON.parse(bodyData.discounts);
+        if (!Array.isArray(discountsToUpdate)) {
+          discountsToUpdate = null; // Ignorar si no es un array
+        }
+      } catch (e) {
+        console.warn('Error parsing discounts JSON', e);
+        // No hacer nada, se tratará como si no se hubieran enviado descuentos (null)
+      }
+    }
+
+    // 5. Llamada al servicio
+    const updatedDish = await dishService.updateDish(
+      dish_name, 
+      id_restaurant, 
+      updateData,
+      discountsToUpdate // Pasa los descuentos (sea el array o null)
+    );
     
     return res.status(200).json({
       message: 'Plato actualizado exitosamente',
       data: updatedDish
     });
+
   } catch (error: any) {
+    if (error.code === 'P2025') { // Error "Not Found" de Prisma
+       return res.status(404).json({ error: 'Plato no encontrado' });
+    }
+    console.error('Error interno en updateDish:', error);
     res.status(500).json({ error: 'Error interno del servidor', details: error.message });
   }
 };
+
 
 export const deleteDish = async (req: Request, res: Response) => {
   try {
