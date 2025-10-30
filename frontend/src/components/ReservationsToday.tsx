@@ -13,7 +13,7 @@ interface Props {
 
 const ReservationsToday: React.FC<Props> = ({ restaurantId }) => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [filter, setFilter] = useState('pendiente');
+  const [filter, setFilter] = useState('todas');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
