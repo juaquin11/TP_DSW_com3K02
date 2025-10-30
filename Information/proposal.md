@@ -13,7 +13,7 @@
 
 ## Tema
 ### Descripción
-El sistema consiste en una web diseñada para la búsqueda, reserva, valoración y presentación de un restaurante. Donde un usuario busca la disponibilidad para un restaurante en el día y hora que desee, permitiéndole buscar por zona, según la valoración de los restaurantes y por precios.<br>El cliente podrá suscribirse, pagando un monto por mercado pago, para poder acceder a los descuentos y beneficios de los restaurantes. Luego de cumplir la reserva del cliente, el sistema le enviará un mail para que registre su valoración del restaurante.<br>El dueño del restaurante podrá gestionar penalidades a los clientes dependiendo del comportamiento del cliente en la reserva y las repetidas ausencias a la misma.
+El sistema consiste en una web diseñada para la búsqueda, reserva, valoración y presentación de un restaurante. Donde un usuario busca la disponibilidad para un restaurante en el día y hora que desee, permitiéndole buscar por zona, según la valoración de los restaurantes y por precios.<br>El cliente podrá suscribirse, pagando un monto por stripe, para poder acceder a los descuentos y beneficios de los restaurantes. Luego de cumplir la reserva del cliente, el sistema le enviará un mail para que registre su valoración del restaurante.<br>El dueño del restaurante podrá gestionar penalidades a los clientes dependiendo del comportamiento del cliente en la reserva y las repetidas ausencias a la misma.
 
 
 ### Modelo
@@ -41,7 +41,7 @@ Adicionales para Aprobación
 |Req|Detalle|
 |:-|:-|
 |CRUD |1. CRUD - Categoría<br>2. CRUD - Distrito<br>3. CRUD - Usuario<br>4. CRUD - Reserva<br>5. CRUD - Plato<br>6. CRUD - Restaurante<br>7. CRUD - Reseña<br>8. CRUD - Políticas<br>9. CRUD - Suscripción<br>10. CRUD - Penalidad|
-|CUU/Epic|1. Gestionar sesion de usuario<br>2. Gestionar asistencia de reserva.<br>3.Realizar reseña de restaurante<br>4. Realizar suscripción (Mediante mercado pago).|
+|CUU/Epic|1. Gestionar sesion de usuario<br>2. Gestionar asistencia de reserva.<br>3.Realizar reseña de restaurante<br>4. Realizar suscripción (Mediante Stripe).|
 
 
 ### Alcance Adicional Voluntario
