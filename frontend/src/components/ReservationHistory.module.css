@@ -216,6 +216,9 @@
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .actionsLabel {
@@ -223,33 +226,6 @@
   color: var(--restaurant-muted);
   margin-bottom: 0.5rem;
   display: block;
-}
-
-.actions select {
-  width: 100%;
-  padding: 0.6rem 0.75rem;
-  border-radius: 6px;
-  border: 1px solid var(--restaurant-border);
-  background-color: rgba(0, 0, 0, 0.25);
-  color: var(--restaurant-cream);
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.actions select:focus {
-  outline: none;
-  border-color: var(--restaurant-gold);
-  background-color: var(--restaurant-card);
-}
-
-.actions select:hover {
-  border-color: var(--restaurant-gold);
-}
-
-.actions select option {
-  background-color: var(--restaurant-dark);
-  color: var(--restaurant-cream);
 }
 
 /* === ESTADOS VACÍOS === */

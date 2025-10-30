@@ -4,10 +4,48 @@ import type { Reservation, ReservationStatus } from '../types/reservation';
 import { getUpcomingReservations, updateReservationStatus } from '../services/reservationService';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import ReservationStatusActions from './ReservationStatusActions';
 
 interface Props {
   idRestaurant: string;
 }
+
+const HISTORY_STATUSES: ReservationStatus[] = [
+  'aceptada',
+  'rechazada',
+  'asistencia',
+  'ausencia',
+  'superada',
+  'cancelada',
+];
+
+const filterHistoryReservations = (reservations: Reservation[]) =>
+  reservations.filter(reservation => HISTORY_STATUSES.includes(reservation.status));
+
+const applyFiltersToData = (
+  data: Reservation[],
+  status: ReservationStatus | '',
+  date: string
+) => {
+  let filteredData = [...data];
+  
+  if (status) {
+    filteredData = filteredData.filter(reservation => reservation.status === status);
+  }
+
+  if (date) {
+    filteredData = filteredData.filter(reservation => {
+      const reservationDate = new Date(reservation.time);
+      const year = reservationDate.getFullYear();
+      const month = String(reservationDate.getMonth() + 1).padStart(2, '0');
+      const day = String(reservationDate.getDate()).padStart(2, '0');
+      const dateOnly = `${year}-${month}-${day}`;
+      return dateOnly === date;
+    });
+  }
+
+  return filteredData;
+};
 
 const ReservationHistory: React.FC<Props> = ({ idRestaurant }) => {
   const { token } = useAuth();
@@ -18,6 +56,7 @@ const ReservationHistory: React.FC<Props> = ({ idRestaurant }) => {
   const [dateFilter, setDateFilter] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchReservations = async () => {
@@ -28,8 +67,9 @@ const ReservationHistory: React.FC<Props> = ({ idRestaurant }) => {
       
       try {
         const data = await getUpcomingReservations(idRestaurant, token);
-        setReservations(data);
-        setFiltered(data);
+        const sanitized = filterHistoryReservations(data);
+        setReservations(sanitized);
+        setFiltered(sanitized);
       } catch (err: any) {
         console.error('Error al obtener reservas:', err);
         setError(err?.response?.data?.error || 'Error al cargar las reservas');
@@ -41,55 +81,44 @@ const ReservationHistory: React.FC<Props> = ({ idRestaurant }) => {
     fetchReservations();
   }, [idRestaurant, token]);
 
-  const applyFilters = (status: ReservationStatus | '', date: string) => {
-    let filteredData = [...reservations];
-
-    if (status) {
-      filteredData = filteredData.filter(r => r.status === status);
-    }
-
-    if (date) {
-      filteredData = filteredData.filter(r => {
-        // Extraer solo la fecha (YYYY-MM-DD) del ISO string
-        const reservationDate = new Date(r.time);
-        const year = reservationDate.getFullYear();
-        const month = String(reservationDate.getMonth() + 1).padStart(2, '0');
-        const day = String(reservationDate.getDate()).padStart(2, '0');
-        const dateOnly = `${year}-${month}-${day}`;
-        return dateOnly === date;
-      });
-    }
-
-    setFiltered(filteredData);
-  };
-
   const handleStatusFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value as ReservationStatus | '';
     setStatusFilter(value);
-    applyFilters(value, dateFilter);
+    setFiltered(applyFiltersToData(reservations, value, dateFilter));
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setDateFilter(value);
-    applyFilters(statusFilter, value);
+    setFiltered(applyFiltersToData(reservations, statusFilter, value));
   };
 
   const handleStatusUpdate = async (id: string, newStatus: ReservationStatus) => {
-    const previous = [...filtered];
+    if (!token) return;
+
+    const previousReservations = reservations.map(r => ({ ...r }));
+    const previousFiltered = filtered.map(r => ({ ...r }));
+    setUpdatingId(id);
     
     // Actualización optimista
-    setFiltered(prev =>
-      prev.map(r => (r.id === id ? { ...r, status: newStatus } : r))
-    );
+    setReservations(prev => {
+      const updated = prev
+        .map(reservation => (reservation.id === id ? { ...reservation, status: newStatus } : reservation))
+        .filter(reservation => HISTORY_STATUSES.includes(reservation.status));
+      setFiltered(applyFiltersToData(updated, statusFilter, dateFilter));
+      return updated;
+    });
 
     try {
-      await updateReservationStatus(id, newStatus, token!);
+      await updateReservationStatus(id, newStatus, token);
       success('Estado actualizado correctamente.');
     } catch (error: any) {
       console.error('Error al actualizar estado:', error);
-      setFiltered(previous);
+      setReservations(previousReservations);
+      setFiltered(previousFiltered);
       showError(error?.response?.data?.error || 'No se pudo actualizar el estado.');
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -167,9 +196,9 @@ const ReservationHistory: React.FC<Props> = ({ idRestaurant }) => {
             className={styles.select}
           >
             <option value="">Todos los estados</option>
-            {Object.entries(statusLabels).map(([key, label]) => (
-              <option key={key} value={key}>
-                {label}
+            {HISTORY_STATUSES.map(status => (
+              <option key={status} value={status}>
+                {statusLabels[status]}
               </option>
             ))}
           </select>
@@ -223,19 +252,12 @@ const ReservationHistory: React.FC<Props> = ({ idRestaurant }) => {
                 </div>
 
                 <div className={styles.actions}>
-                  <label className={styles.actionsLabel}>Cambiar estado:</label>
-                  <select
-                    value={r.status}
-                    onChange={(e) =>
-                      handleStatusUpdate(r.id, e.target.value as ReservationStatus)
-                    }
-                  >
-                    {Object.entries(statusLabels).map(([key, label]) => (
-                      <option key={key} value={key}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
+                  <span className={styles.actionsLabel}>Gestionar estado</span>
+                  <ReservationStatusActions
+                    status={r.status}
+                    disabled={updatingId === r.id}
+                    onChange={nextStatus => handleStatusUpdate(r.id, nextStatus)}
+                  />
                 </div>
               </div>
             );

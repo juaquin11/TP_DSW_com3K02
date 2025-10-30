@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import styles from "./RestaurantDetail.module.css";
 import type { RestaurantDTO } from "../types/restaurant";
@@ -19,7 +19,6 @@ const SearchIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" heig
 const RestaurantDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user, token } = useAuth();
-  const navigate = useNavigate();
   const [restaurant, setRestaurant] = useState<RestaurantDTO | null>(null);
   const [dishes, setDishes] = useState<DishWithDiscount[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -69,19 +68,6 @@ const RestaurantDetail: React.FC = () => {
 
     loadRestaurantData();
   }, [id, token]);
-
- const handleReservationClick = () => {
-    if (!id) {
-      return;
-    }
-
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
-    navigate(`/restaurant/${id}/reservar`);
-  };
 
   if (loading) {
     return <main className={styles.container}><div className={styles.loading}>Cargando...</div></main>;
@@ -176,6 +162,8 @@ const RestaurantDetail: React.FC = () => {
               {showReservationForm && (
                 <RestaurantReservation
                   restaurantId={restaurant.id_restaurant}
+                  openingTime={restaurant.opening_time}
+                  closingTime={restaurant.closing_time}
                   onClose={() => setShowReservationForm(false)}
                 />
               )}

@@ -18,7 +18,7 @@ model category {
 model consumption {
   id_client     String      @db.Char(36)
   dish_name     String      @db.VarChar(100)
-  id_restaurant String      @db.Char(36)
+  id_restaurant String     @db.Char(36)
   useraccount   useraccount @relation(fields: [id_client], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "consumption_ibfk_1")
   dish          dish        @relation(fields: [dish_name, id_restaurant], references: [dish_name, id_restaurant], onDelete: NoAction, onUpdate: NoAction, map: "consumption_ibfk_2")
 
@@ -69,7 +69,6 @@ model has_subscription {
 
   @@index([id_subscription], map: "id_subscription")
 }
-
 
 model penalty {
   penalty_number     Int         @default(autoincrement())

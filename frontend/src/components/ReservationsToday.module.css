@@ -71,35 +71,17 @@
   text-transform: capitalize;
 }
 
-.status.pendiente { background-color: #f0ad4e; color: #333; }
+.status.pendiente { background-color: #f0ad4e; color: #332600; }
 .status.aceptada { background-color: #5cb85c; color: #fff; }
 .status.rechazada { background-color: #d9534f; color: #fff; }
 .status.superada { background-color: #5bc0de; color: #fff; }
-.status.ausente { background-color: red; color: #fff; }
 .status.asistencia { background-color: #337ab7; color: #fff; }
-.status.cancelada { background-color: darkred; color: #fff; } 
+.status.ausencia { background-color: #6c757d; color: #fff; }
+.status.cancelada { background-color: #a94442; color: #fff; }
 
 
 .actions {
   display: flex;
-  gap: 0.5rem;
+  justify-content: flex-start;
+  min-width: 220px;
 }
-
-.btn {
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px;
-  border: none;
-  color: white;
-  cursor: pointer;
-  font-weight: 500;
-  transition: opacity 0.2s;
-}
-
-.btn:hover {
-  opacity: 0.85;
-}
-
-.btnAccept { background-color: #5cb85c; }
-.btnReject { background-color: #d9534f; }
-.btnAbsent { background-color: #777; }
-.btnAssist { background-color: #337ab7; }
