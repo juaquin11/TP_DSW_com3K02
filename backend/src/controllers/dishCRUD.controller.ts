@@ -3,7 +3,8 @@ import { dishService } from '../services/dishCRUD.service';
 import * as subscriptionService from '../services/subscription.service';
 import path from 'path';
 import fs from 'fs';
-
+import { dish } from '../generated/prisma'; 
+import { Decimal } from '@prisma/client/runtime/library';
 
 function slugify(text: string): string {
   return text.toString().toLowerCase()
@@ -14,17 +15,20 @@ function slugify(text: string): string {
 }
 
 
-// Crear un nuevo plato
 export const createDish = async (req: Request, res: Response) => {
   try {
     const dishData = req.body;
     
-    // Validación básica
     if (!dishData.dish_name || !dishData.id_restaurant || !dishData.current_price) {
       return res.status(400).json({ 
         error: 'Faltan campos requeridos: dish_name, id_restaurant, current_price' 
       });
     }
+
+    const dataToCreate = {
+      ...dishData,
+      current_price: parseFloat(dishData.current_price), // Convertir a número
+    };
 
     let imagePath = '/uploads/default_Dish.jpg'; // Imagen por defecto
     if (req.file) {
@@ -38,7 +42,8 @@ export const createDish = async (req: Request, res: Response) => {
         imagePath = `/uploads/${newFileName}`;
     }
 
-    const newDish = await dishService.createDish({ ...dishData, image: imagePath });
+    const newDish = await dishService.createDish({ ...dataToCreate, image: imagePath });
+
     return res.status(201).json({
       message: 'Plato creado exitosamente',
       data: newDish
@@ -141,11 +146,38 @@ export const getDish = async (req: Request, res: Response) => {
 export const updateDish = async (req: Request, res: Response) => {
   try {
     const { dish_name, id_restaurant } = req.params;
-    const updateData = req.body;
 
     if (!dish_name || !id_restaurant) {
       return res.status(400).json({ error: 'Se requieren dish_name e id_restaurant' });
     }
+
+    const updateData: Partial<dish> = {}; // Objeto para los datos a actualizar
+    const bodyData = req.body;
+
+    if (bodyData.description) {
+      updateData.description = bodyData.description;
+    }
+    if (bodyData.current_price) {
+      updateData.current_price = Decimal(bodyData.current_price); 
+    }
+    if (bodyData.status !== undefined) {
+      updateData.status = parseInt(bodyData.status, 10); 
+    }
+
+    if (req.file) {
+      const tempPath = req.file.path;
+      const extension = path.extname(req.file.filename);
+      const uniqueSuffix = Date.now();
+      // Usamos el dish_name de la URL (parámetro) ya que no se puede cambiar
+      const newFileName = `${slugify(dish_name)}-${uniqueSuffix}${extension}`;
+      const newPath = path.join(path.dirname(tempPath), newFileName);
+      
+      fs.renameSync(tempPath, newPath);
+      updateData.image = `/uploads/${newFileName}`;
+      
+      // (Opcional: Borrar la imagen antigua si existe)
+    }
+    
 
     const existingDish = await dishService.getDish(dish_name, id_restaurant);
     if (!existingDish) {
@@ -163,7 +195,6 @@ export const updateDish = async (req: Request, res: Response) => {
   }
 };
 
-// Eliminar un plato
 export const deleteDish = async (req: Request, res: Response) => {
   try {
     const { dish_name, id_restaurant } = req.params;
@@ -172,7 +203,6 @@ export const deleteDish = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Se requieren dish_name e id_restaurant' });
     }
 
-    // Verificar que el plato existe
     const existingDish = await dishService.getDish(dish_name, id_restaurant);
     if (!existingDish) {
       return res.status(404).json({ error: 'Plato no encontrado' });

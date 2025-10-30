@@ -4,7 +4,6 @@ import { requireAuth } from '../middlewares/auth.middleware';
 import { upload } from '../config/multer.config'; 
 
 import { 
-  validateCreateDish, 
   validateUpdateDish, 
   validateDishParams 
 } from '../middlewares/dishCRUD.middleware';
@@ -17,7 +16,7 @@ const router = Router();
 // GET /api/dishes/restaurant/:id_restaurant/:id_subscription/discounts - Obtener platos con descuentos
 router.get('/restaurant/discounts/:id_restaurant/:id_subscription', dishController.getDishesByRestaurantWithDiscounts);
 
-router.post('/', requireAuth, upload.single('image'), validateCreateDish, dishController.createDish);
+router.post('/', requireAuth, upload.single('image'), dishController.createDish);
 
 // router.post('/:dish_name/:id_restaurant/subscriptions', requireAuth, dishController.addDiscountSubscription);
 
@@ -26,7 +25,7 @@ router.get('/', dishController.getAllDishes);
 router.get('/restaurant/:id_restaurant', dishController.getDishesByRestaurant);
 router.get('/:dish_name/:id_restaurant', validateDishParams, dishController.getDish);
 
-router.put('/:dish_name/:id_restaurant', validateUpdateDish, dishController.updateDish);
+router.put('/:dish_name/:id_restaurant', requireAuth, upload.single('image'), dishController.updateDish);
 
 router.delete('/:dish_name/:id_restaurant', validateDishParams, dishController.deleteDish);
 

@@ -20,6 +20,8 @@
   max-width: 700px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   border: 1px solid var(--restaurant-border);
+  max-height: 85vh; 
+  overflow-y: auto; 
 }
 
 .modal h3 {
@@ -67,7 +69,7 @@
 }
 
 .subscriptionSection {
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   border-top: 1px solid var(--restaurant-border);
   padding-top: 1.5rem;
 }
@@ -75,6 +77,7 @@
 .subscriptionSection h4 {
   color: var(--restaurant-gold);
   margin-bottom: 1rem;
+  font-size: 1.2rem;
 }
 
 .subscriptionRow {
@@ -82,15 +85,25 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.75rem;
+  padding: 0.5rem 0;
 }
 
 .subscriptionRow label {
   font-weight: 500;
+  color: var(--restaurant-cream); 
+  flex: 1;
+  margin-right: 1rem;
 }
 
 .subscriptionRow input {
-  width: 80px;
-  text-align: right;
+width: 70px; 
+  padding: 0.5rem 0.75rem; 
+  background-color: var(--restaurant-input-bg);
+  border: 1px solid var(--restaurant-border);
+  border-radius: 6px;
+  color: var(--restaurant-cream);
+  font-size: 0.95rem; 
+  text-align: right; 
 }
 
 .errorMessage {
@@ -140,4 +153,10 @@
 .saveButton:disabled {
   background-color: var(--restaurant-muted);
   cursor: not-allowed;
+}
+
+.subscriptionRow input::-webkit-outer-spin-button,
+.subscriptionRow input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
