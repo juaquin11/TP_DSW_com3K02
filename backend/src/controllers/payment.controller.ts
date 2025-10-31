@@ -3,7 +3,9 @@ import { Request, Response } from 'express';
 import { stripe } from '../config/stripe'; // Asegúrate que la ruta sea correcta
 import prisma from '../prisma/client';
 import { JwtPayload } from '../models/types';
-import dotenv from 'dotenv'; // Asegúrate de importar dotenv si usas process.env aquí
+import dotenv from 'dotenv'; 
+import Stripe from 'stripe'; 
+
 
 dotenv.config(); // Carga las variables de entorno
 
@@ -88,35 +90,113 @@ export async function createStripeCheckoutSession(req: Request, res: Response) {
 }
 
 
+export async function handleStripeWebhook(req: Request, res: Response) {
+  
+  // LOG 1: ¿Llegó la petición?
+  console.log('--- WEBHOOK /api/payments/webhook RECIBIDO ---'); 
+  
+  const sig = req.headers['stripe-signature'];
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-// --- (Opcional) Controlador para Webhooks ---
-// export async function handleStripeWebhook(req: Request, res: Response) {
-//   const sig = req.headers['stripe-signature'];
-//   let event;
-//   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!; // Necesitas configurar esto en Stripe y .env
+  if (!sig || !webhookSecret) {
+    // LOG 2: Error de configuración
+    console.error('--- WEBHOOK ERROR: Falta signature o secret en .env ---');
+    return res.status(400).send('Webhook Error: Missing secret or signature.');
+  }
+  
+  // LOG 3: ¿Se leyeron las claves?
+  console.log('--- WEBHOOK: Firma y Secret encontrados. Intentando verificar... ---');
 
-//   try {
-//     event = stripe.webhooks.constructEvent(req.body, sig!, webhookSecret);
-//   } catch (err: any) {
-//     console.log(`⚠️  Webhook signature verification failed.`, err.message);
-//     return res.sendStatus(400);
-//   }
+  let event: Stripe.Event;
 
-//   // Maneja el evento
-//   switch (event.type) {
-//     case 'checkout.session.completed':
-//       const session = event.data.object;
-//       console.log('CheckoutSession completed:', session);
-//       // Aquí actualizas tu base de datos:
-//       // const userId = session.metadata?.userId;
-//       // const subscriptionId = session.metadata?.subscriptionId;
-//       // await updateSubscriptionStatus(userId, subscriptionId, 'active');
-//       break;
-//     // ... maneja otros tipos de eventos si es necesario
-//     default:
-//       console.log(`Unhandled event type ${event.type}`);
-//   }
+  try {
+    // 4. Verificar firma
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+  } catch (err: any) {
+    // LOG 5: ¡LA FIRMA FALLÓ!
+    console.error(`--- WEBHOOK ERROR: VERIFICACIÓN DE FIRMA FALLIDA! ---`, err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+  
+  // LOG 6: ¡Éxito en la firma!
+  console.log(`--- WEBHOOK ÉXITO: Firma verificada. Evento: ${event.type} ---`);
 
-//   // Devuelve una respuesta 200 a Stripe para confirmar la recepción
-//   res.json({ received: true });
-// }
+  // 7. Manejar el evento
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object as Stripe.Checkout.Session;
+    
+    // LOG 7: Evento correcto
+    console.log(`--- WEBHOOK: Procesando checkout.session.completed para session ${session.id} ---`);
+
+    const userId = session.metadata?.userId;
+    const subscriptionId = session.metadata?.subscriptionId;
+
+    if (!userId || !subscriptionId) {
+      // LOG 8: Error en metadata
+      console.error('--- WEBHOOK ERROR: Faltan metadata (userId o subscriptionId) en la sesión. ---');
+      return res.status(400).send('Error: Missing metadata in session.');
+    }
+
+    // LOG 9: Metadata OK
+    console.log(`--- WEBHOOK: Metadata OK. UserID: ${userId}, SubscriptionID: ${subscriptionId} ---`);
+
+    try {
+      const plan = await prisma.subscription.findUnique({
+        where: { id_subscription: subscriptionId },
+      });
+
+      if (!plan) {
+        // LOG 10: Error, no se encontró el plan
+        console.error(`--- WEBHOOK ERROR: Plan con ID ${subscriptionId} no encontrado en la BD. ---`);
+        throw new Error(`Plan with ID ${subscriptionId} not found.`);
+      }
+
+      // LOG 11: Plan OK
+      console.log(`--- WEBHOOK: Plan encontrado: ${plan.plan_name}, Duración: ${plan.duration} días ---`);
+
+      const adhesionDate = new Date();
+      const expiryDate = new Date();
+      expiryDate.setDate(adhesionDate.getDate() + plan.duration);
+
+      // LOG 12: A punto de escribir en la BD
+      console.log(`--- WEBHOOK: Intentando 'upsert' en has_subscription para usuario ${userId} ---`);
+
+      // 
+      // Revisa tu migración 20251015235210_updated_subscription_model/migration.sql
+      // Agregaste `expiry_date` (NOT NULL), `last_payment_id` (NULL), `status` (NOT NULL DEFAULT 'active')
+      //
+      await prisma.has_subscription.upsert({
+        where: { id_client: userId }, 
+        update: {
+          id_subscription: subscriptionId,
+          adhesion_date: adhesionDate,
+          expiry_date: expiryDate, // <-- ¡CAMPO IMPORTANTE AÑADIDO!
+          status: 'active',        // <-- ¡CAMPO IMPORTANTE AÑADIDO!
+          last_payment_id: session.payment_intent as string | null, // <-- ¡CAMPO IMPORTANTE AÑADIDO!
+        },
+        create: {
+          id_client: userId,
+          id_subscription: subscriptionId,
+          adhesion_date: adhesionDate,
+          expiry_date: expiryDate, // <-- ¡CAMPO IMPORTANTE AÑADIDO!
+          status: 'active',        // <-- ¡CAMPO IMPORTANTE AÑADIDO!
+          last_payment_id: session.payment_intent as string | null, // <-- ¡CAMPO IMPORTANTE AÑADIDO!
+        },
+      });
+      
+      // LOG 13: ¡ÉXITO TOTAL!
+      console.log(`--- WEBHOOK ÉXITO: 'has_subscription' guardada para usuario ${userId} ---`);
+
+    } catch (dbError: any) {
+      // LOG 14: Error de base de datos
+      console.error("--- WEBHOOK ERROR: Error de base de datos ---", dbError);
+      return res.status(500).send('Internal server error while updating subscription.');
+    }
+  } else {
+    // LOG 15: Evento no manejado
+    console.log(`--- WEBHOOK: Evento ${event.type} recibido, pero no se maneja. ---`);
+  }
+
+  // 8. Enviar respuesta 200 a Stripe
+  res.json({ received: true });
+}

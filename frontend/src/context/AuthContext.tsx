@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import type { JwtPayload, AuthenticatedUser, UserStatus } from '../types/auth';
 import { fetchUserStatus } from '../services/userService';
@@ -6,7 +6,6 @@ import { fetchUserStatus } from '../services/userService';
 interface AuthContextType {
   user: AuthenticatedUser | null;
   token: string | null;
-  // La función login ahora es asíncrona
   login: (token: string) => Promise<AuthenticatedUser>;
   logout: () => void;
   refreshUserStatus: () => Promise<void>;
@@ -18,18 +17,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
 
-  // ... (el useEffect y logout se mantienen igual)
+  // logout 
   const logout = useCallback(() => {
     setToken(null);
     setUser(null);
     localStorage.removeItem('token');
-  }, []);
+  }, []); // Dependencia vacía
 
   useEffect(() => {
-    // Este efecto se encargará de rehidratar el estado si ya hay un token en localStorage
-    // al recargar la página.
     const initializeUser = async () => {
-      if (token && !user) { // Solo se ejecuta si hay token pero no usuario
+      if (token && !user) { 
         try {
           const decodedJwt = jwtDecode<JwtPayload>(token);
           if (decodedJwt.exp && decodedJwt.exp * 1000 < Date.now()) {
@@ -48,41 +45,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [token, user, logout]);
 
 
-  // --- FUNCIÓN LOGIN MODIFICADA ---
-  const login = async (newToken: string): Promise<AuthenticatedUser> => {
-    // 1. Decodificar el JWT
+  const login = useCallback(async (newToken: string): Promise<AuthenticatedUser> => {
     const decodedJwt = jwtDecode<JwtPayload>(newToken);
-    
-    // 2. Obtener el estado del usuario desde el backend
     const userStatus = await fetchUserStatus(newToken);
-
-    // 3. Crear el objeto de usuario completo
     const fullUser: AuthenticatedUser = { ...decodedJwt, ...userStatus };
 
-    // 4. Actualizar el estado del contexto y el localStorage
     localStorage.setItem('token', newToken);
     setUser(fullUser);
     setToken(newToken);
     
-    // 5. Devolver el usuario completo para que el componente Login pueda usarlo
     return fullUser;
-  };
+  }, []); // Dependencia vacía
+
   
-  // ... (el resto del componente se mantiene igual)
-  
-  const refreshUserStatus = async () => {
+  const refreshUserStatus = useCallback(async () => {
     if (token) {
       try {
         const userStatus = await fetchUserStatus(token);
         setUser(prevUser => prevUser ? { ...prevUser, ...userStatus } : null);
       } catch (error) {
         console.error("Error al refrescar el estado del usuario", error);
-        logout();
+        logout(); // 'logout' es estable gracias a su propio useCallback
       }
     }
-  };
+  }, [token, logout]); // Depende de 'token' y 'logout'
 
-  const value = { user, token, login, logout, refreshUserStatus };
+
+  const value = useMemo(() => ({ 
+    user, 
+    token, 
+    login, 
+    logout, 
+    refreshUserStatus 
+  }), [user, token, login, logout, refreshUserStatus]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

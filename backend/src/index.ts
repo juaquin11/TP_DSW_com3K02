@@ -14,10 +14,18 @@ import reservationRoutes from './routes/reservation.routes';
 import subscriptionRoutes from './routes/subscription.routes';
 import reviewRoutes from './routes/review.routes';
 import paymentRoutes from './routes/payment.routes'; 
+import * as paymentController from './controllers/payment.controller';
 
 
 const app = express();
 app.use(cors());
+
+app.post(
+  '/api/payments/webhook', 
+  express.raw({type: 'application/json'}), 
+  paymentController.handleStripeWebhook
+);
+
 app.use(express.json());
 
 
