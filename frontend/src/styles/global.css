@@ -10,7 +10,18 @@
   --restaurant-emerald: #2ecc71;
   --restaurant-rose: #ff7675;
   --restaurant-ink: #0f0f0f;
+  
+    /*  COLORES PARA SUSCRIPCIONES  */
+  --color-bronce: #cd7f32;
+  --color-bronce-bg: #fff5eb; 
+  
+  --color-plata: #c0c0c0;
+  --color-plata-bg: #f8f8f8; 
+
+  --color-oro: #ffd700;
+  --color-oro-bg: #fffbeb; 
 }
+
 * {
   box-sizing: border-box;
   margin: 0px;
