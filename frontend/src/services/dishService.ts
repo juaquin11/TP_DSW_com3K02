@@ -27,8 +27,9 @@ export async function fetchDishesWithDiscounts(
   const headers: Record<string, string> = {
     "Authorization": `Bearer ${token}`
   };
-  const res = await apiClient.get<{ data: DishWithDiscount[] }>(`/dishes/restaurant/${restaurantId}/discounts/${subscriptionId}`, {
-    headers,
+  const encodedSubscriptionId = encodeURIComponent(subscriptionId);
+
+const res = await apiClient.get<{ data: DishWithDiscount[] }>(`/dishes/restaurant/${restaurantId}/discounts/${encodedSubscriptionId}`, {    headers,
   });
   return res.data.data;
 }

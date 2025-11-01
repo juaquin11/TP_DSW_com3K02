@@ -14,7 +14,7 @@ const router = Router();
 // router.use(requireAuth);   EN REVISION
 
 // GET /api/dishes/restaurant/:id_restaurant/:id_subscription/discounts - Obtener platos con descuentos
-router.get('/restaurant/discounts/:id_restaurant/:id_subscription', dishController.getDishesByRestaurantWithDiscounts);
+router.get('/restaurant/:id_restaurant/discounts/:id_subscription', dishController.getDishesByRestaurantWithDiscounts);
 
 router.post('/', requireAuth, upload.single('image'), dishController.createDish);
 
