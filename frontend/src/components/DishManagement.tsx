@@ -54,6 +54,7 @@ const DishManagement: React.FC<Props> = ({ restaurantId }) => {
     if (!token) return;
     const newStatus = dish.status === 1 ? 0 : 1;
     const action = newStatus === 1 ? 'activar' : 'desactivar';
+    const variant = newStatus === 1 ? 'success' : 'danger';
 
     confirm(
       `¿Estás seguro de que quieres ${action} el plato "${dish.dish_name}"?`,
@@ -69,8 +70,9 @@ const DishManagement: React.FC<Props> = ({ restaurantId }) => {
         }
       },
       {
-        confirmText: action === 'activar' ? 'Activar' : 'Desactivar',
-        cancelText: 'Cancelar'
+        confirmText: newStatus === 1 ? 'Activar' : 'Desactivar',
+        cancelText: 'Cancelar',
+        variant: variant
       }
     );
   };

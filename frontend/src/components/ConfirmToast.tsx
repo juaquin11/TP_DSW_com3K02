@@ -7,7 +7,8 @@ const ConfirmToast: React.FC<ConfirmToastProps> = ({
   onConfirm, 
   onCancel,
   confirmText = 'Confirmar',
-  cancelText = 'Cancelar'
+  cancelText = 'Cancelar',
+  variant = 'default'
 }) => {
   const handleConfirm = () => {
     onConfirm();
@@ -17,24 +18,25 @@ const ConfirmToast: React.FC<ConfirmToastProps> = ({
     onCancel();
   };
 
+  const confirmButtonClass = `${styles.confirmButton} ${
+    variant === 'danger' ? styles.danger : 
+    variant === 'success' ? styles.success : 
+    ''
+  }`;
+
   return (
     <div className={styles.confirmToast}>
-      <div className={styles.iconContainer}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M12 8v4"/>
-          <path d="M12 16h.01"/>
-        </svg>
-      </div>
-      <div className={styles.content}>
-        <p className={styles.message}>{message}</p>
-        <div className={styles.actions}>
-          <button onClick={handleCancel} className={styles.cancelButton}>
-            {cancelText}
-          </button>
-          <button onClick={handleConfirm} className={styles.confirmButton}>
-            {confirmText}
-          </button>
+      <div className={styles.confirmToastContent}>
+        <div className={styles.content}>
+          <p className={styles.message}>{message}</p>
+          <div className={styles.actions}>
+            <button onClick={handleCancel} className={styles.cancelButton}>
+              {cancelText}
+            </button>
+            <button onClick={handleConfirm} className={confirmButtonClass}>
+              {confirmText}
+            </button>
+          </div>
         </div>
       </div>
     </div>

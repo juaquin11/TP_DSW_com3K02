@@ -15,7 +15,6 @@ const HISTORY_STATUSES: ReservationStatus[] = [
   'rechazada',
   'asistencia',
   'ausencia',
-  'superada',
   'cancelada',
 ];
 
@@ -134,7 +133,6 @@ const ReservationHistory: React.FC<Props> = ({ idRestaurant }) => {
     rechazada: 'Rechazada',
     asistencia: 'Asistencia',
     ausencia: 'Ausencia',
-    superada: 'Superada',
     cancelada: 'Cancelada',
   };
 

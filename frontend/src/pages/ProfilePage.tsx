@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { fetchUserProfile } from '../services/userService';
 import type { UserProfile } from '../types/user';
@@ -8,39 +7,28 @@ import UserData from '../components/profile/UserData';
 import UserReservations from '../components/profile/UserReservations';
 import UserSubscription from '../components/profile/UserSubscription'; 
 
-// componentes placeholder, ire borrando a medida que los agregue
-// const UserData = ({ profile }: { profile: UserProfile }) => <div>Datos del Usuario: {profile.name}</div>;
-// const UserReservations = ({ profile }: { profile: UserProfile }) => <div>{profile.reservations.length} Reservas</div>;
-// const UserSubscription = ({ profile }: { profile: UserProfile }) => <div>Suscripción: {profile.subscription?.plan_name || 'Ninguna'}</div>;
 const UserPenalties = ({ profile }: { profile: UserProfile }) => <div>{profile.penalties.length} Penalizaciones</div>;
-
 
 type ProfileTab = 'data' | 'reservations' | 'subscription' | 'penalties';
 
 const ProfilePage: React.FC = () => {
   const { user, token, logout, refreshUserStatus } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<ProfileTab>('data');
 
-  const availableTabs = useMemo(() => {
-    const baseTabs: { id: ProfileTab; label: string }[] = [
-      { id: 'data', label: 'Mis Datos' },
-    ];
 
-    if (user?.type === 'client') {
-      baseTabs.push({ id: 'reservations', label: 'Mis Reservas' });
-      baseTabs.push({ id: 'subscription', label: 'Suscripción' });
-      baseTabs.push({ id: 'penalties', label: 'Penalizaciones' });
-    }
-
-    return baseTabs;
-  }, [user?.type]);
-
-  const tabSet = useMemo(() => new Set<ProfileTab>(availableTabs.map(opt => opt.id)), [availableTabs]);
+  const userOptions: { id: ProfileTab; label: string }[] = user?.type === 'client' 
+    ? [
+        { id: 'data', label: 'Mis Datos' },
+        { id: 'reservations', label: 'Mis Reservas' },
+        { id: 'subscription', label: 'Suscripción' },
+        { id: 'penalties', label: 'Penalizaciones' },
+      ]
+    : [
+        { id: 'data', label: 'Mis Datos' },
+      ];
 
   const loadProfile = useCallback(async () => {
     if (!token) {
@@ -66,38 +54,6 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     loadProfile();
   }, [loadProfile]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const requestedTab = params.get('tab') as ProfileTab | null;
-
-    if (requestedTab && tabSet.has(requestedTab)) {
-      setActiveTab(prev => (prev === requestedTab ? prev : requestedTab));
-      return;
-    }
-
-    if (requestedTab && !tabSet.has(requestedTab)) {
-      navigate({ pathname: location.pathname }, { replace: true });
-      return;
-    }
-
-    if (!requestedTab && !tabSet.has(activeTab)) {
-      setActiveTab('data');
-    }
-  }, [location.search, location.pathname, tabSet, navigate, activeTab]);
-
-  const handleTabChange = (tabId: ProfileTab) => {
-    setActiveTab(tabId);
-    const params = new URLSearchParams(location.search);
-    if (tabId === 'data') {
-      params.delete('tab');
-    } else {
-      params.set('tab', tabId);
-    }
-
-    const search = params.toString();
-    navigate({ pathname: location.pathname, search: search ? `?${search}` : '' }, { replace: true });
-  };
 
   const handleProfileUpdate = (updatedProfileData: Partial<UserProfile>) => {
     setProfileData(prev => prev ? { ...prev, ...updatedProfileData } : null);
@@ -130,11 +86,11 @@ const ProfilePage: React.FC = () => {
       <p className={styles.mainSubtitle}>Gestiona tu información personal, reservas y suscripciones.</p>
 
       <div className={styles.adminNav}>
-        {availableTabs.map(opt => (
+        {userOptions.map(opt => (
           <button
             key={opt.id}
             className={`${styles.navButton} ${activeTab === opt.id ? styles.active : ''}`}
-            onClick={() => handleTabChange(opt.id)}
+            onClick={() => setActiveTab(opt.id)}
           >
             {opt.label}
           </button>

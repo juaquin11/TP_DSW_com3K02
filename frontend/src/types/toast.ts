@@ -19,6 +19,7 @@ export interface ConfirmToastProps {
   onCancel: () => void;
   confirmText?: string;
   cancelText?: string;
+  variant?: 'default' | 'danger' | 'success';
 }
 
 export interface ConfirmMessage {
@@ -28,6 +29,13 @@ export interface ConfirmMessage {
   onCancel: () => void;
   confirmText?: string;
   cancelText?: string;
+  variant?: 'default' | 'danger' | 'success';
+}
+
+export interface ConfirmOptions {
+  confirmText?: string;
+  cancelText?: string;
+  variant?: 'default' | 'danger' | 'success';
 }
 
 export interface ToastContextType {
@@ -36,5 +44,5 @@ export interface ToastContextType {
   error: (message: string) => void;
   warning: (message: string) => void;
   info: (message: string) => void;
-  confirm: (message: string, onConfirm: () => void, options?: { confirmText?: string; cancelText?: string }) => void;
+  confirm: (message: string, onConfirm: () => void, options?: ConfirmOptions) => void;
 }

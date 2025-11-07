@@ -45,11 +45,10 @@ const EditRestaurantForm: React.FC<EditRestaurantFormProps> = ({ restaurantData,
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showStatusChangeConfirm, setShowStatusChangeConfirm] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(restaurantData.status ?? 1);
 
   const { token } = useAuth();
-  const { success, error: showError } = useToast();
+  const { success, error: showError, confirm } = useToast();
 
 
   useEffect(() => {
@@ -186,22 +185,34 @@ const EditRestaurantForm: React.FC<EditRestaurantFormProps> = ({ restaurantData,
     }
   };
 
-  
-
   const handleStatusChange = async () => {
     if (!token) return;
-    setIsLoading(true);
-    try {
-      const result = await deleteRestaurant(restaurantData.id_restaurant, token);
-      setCurrentStatus(result.status);
-      success(result.message);
-      onSuccess();
-    } catch (err: any) {
-      showError(err.response?.data?.error || 'No se pudo cambiar el estado del restaurante.');
-    } finally {
-      setIsLoading(false);
-      setShowStatusChangeConfirm(false);
-    }
+    const newStatus = currentStatus === 1 ? 0 : 1;
+    const variant = newStatus === 1 ? 'success' : 'danger';
+
+    confirm(
+      newStatus === 1 
+        ? 'Esta acción dará de alta el restaurante nuevamente. Volverá a ser visible para los clientes.' 
+        : 'Esta acción dará de baja el restaurante. No será visible para los clientes hasta que lo vuelvas a activar.',
+      async () => {
+        setIsLoading(true);
+        try {
+          const result = await deleteRestaurant(restaurantData.id_restaurant, token);
+          setCurrentStatus(result.status);
+          success(result.message);
+          onSuccess();
+        } catch (err: any) {
+          showError(err.response?.data?.error || 'No se pudo cambiar el estado del restaurante.');
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      {
+        confirmText: newStatus === 1 ? 'Confirmar Alta' : 'Confirmar Baja',
+        cancelText: 'Cancelar',
+        variant: variant
+      }
+    );
   };
 
   const districtOptions = districts.map(d => ({ value: d.id_district, label: d.name }));
@@ -293,7 +304,7 @@ const EditRestaurantForm: React.FC<EditRestaurantFormProps> = ({ restaurantData,
                     <div style={{ display: 'flex', gap: '1rem' }}>
                         <button 
                             type="button" 
-                            onClick={() => setShowStatusChangeConfirm(true)} 
+                            onClick={handleStatusChange} 
                             className={currentStatus === 1 ? styles.deleteButton : styles.activateButton}
                             disabled={isLoading}
                         >
@@ -315,30 +326,6 @@ const EditRestaurantForm: React.FC<EditRestaurantFormProps> = ({ restaurantData,
           onToggle={handleToggleCategory}
           onClose={() => setIsModalOpen(false)}
         />
-      )}
-      
-      {showStatusChangeConfirm && (
-        <div className={styles.deleteModal}>
-          <div className={styles.deleteModalContent}>
-            <h3>¿Estás seguro?</h3>
-            <p>
-              {currentStatus === 1 
-                ? 'Esta acción dará de baja el restaurante. No será visible para los clientes hasta que lo vuelvas a activar.' 
-                : 'Esta acción dará de alta el restaurante nuevamente. Volverá a ser visible para los clientes.'}
-            </p>
-            <div className={styles.deleteModalButtons}>
-              <button onClick={() => setShowStatusChangeConfirm(false)} className={styles.navButton}>
-                Cancelar
-              </button>
-              <button 
-                onClick={handleStatusChange} 
-                className={currentStatus === 1 ? styles.deleteConfirmButton : styles.activateConfirmButton}
-              >
-                {currentStatus === 1 ? 'Confirmar Baja' : 'Confirmar Alta'}
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );

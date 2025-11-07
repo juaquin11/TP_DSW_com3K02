@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import Toast from '../components/Toast';
 import ConfirmToast from '../components/ConfirmToast';
-import type { ToastMessage, ToastContextType, ToastType, ConfirmMessage } from '../types/toast';
+import type { ToastMessage, ToastContextType, ToastType, ConfirmMessage,ConfirmOptions } from '../types/toast';
 import styles from './ToastContext.module.css';
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -26,7 +26,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const confirm = useCallback((
     message: string, 
     onConfirm: () => void,
-    options?: { confirmText?: string; cancelText?: string }
+    options?: ConfirmOptions
   ) => {
     const id = Date.now().toString();
     setConfirms((prev) => [...prev, { 
@@ -38,7 +38,8 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       },
       onCancel: () => removeConfirm(id),
       confirmText: options?.confirmText,
-      cancelText: options?.cancelText
+      cancelText: options?.cancelText,
+      variant: options?.variant as 'default' | 'danger' | 'success' | undefined
     }]);
   }, [removeConfirm]);
 
@@ -59,6 +60,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             onCancel={confirmMsg.onCancel}
             confirmText={confirmMsg.confirmText}
             cancelText={confirmMsg.cancelText}
+            variant={confirmMsg.variant}
           />
         ))}
         {toasts.map((toast) => (
