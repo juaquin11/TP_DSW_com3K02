@@ -12,13 +12,46 @@ function Register() {
   const [password, setPassword] = useState('');
   const [type, setType] = useState<'client' | 'owner'>('client');
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { login } = useAuth();
   const { success, error: showError } = useToast();
   const navigate = useNavigate();
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone: string): boolean => {
+    const phoneRegex = /^\d+$/;
+    return phoneRegex.test(phone);
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Solo permitir números
+    if (value === '' || /^\d+$/.test(value)) {
+      setPhone(value);
+      if (fieldErrors.phone) {
+        setFieldErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors.phone;
+          return newErrors;
+        });
+      }
+    }
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setFieldErrors({});
+
+    const newFieldErrors: Record<string, string> = {};
 
     if (!name || !email || !phone || !password) {
       const errorMsg = 'Todos los campos son obligatorios.';
@@ -27,8 +60,32 @@ function Register() {
       return;
     }
 
+    if (!validateEmail(email)) {
+      newFieldErrors.email = 'El email no tiene un formato válido.';
+    }
+
+    if (!validatePhone(phone)) {
+      newFieldErrors.phone = 'El teléfono solo debe contener números.';
+    }
+
+    if (password.length < 6) {
+      newFieldErrors.password = 'La contraseña debe tener al menos 6 caracteres.';
+    }
+
+    if (Object.keys(newFieldErrors).length > 0) {
+      setFieldErrors(newFieldErrors);
+      showError('Por favor, corrija los errores en el formulario.');
+      return;
+    }
+
     try {
-      const result = await registerUser({ name, email, phone, password, type });
+      const result = await registerUser({ 
+        name, 
+        email, 
+        phone, 
+        password, 
+        type
+      });
       login(result.token);
       success('Usuario registrado exitosamente. ¡Bienvenido!');
 
@@ -38,7 +95,7 @@ function Register() {
         navigate('/');
       }
     } catch (err: any) {
-      console.error('❌ Error al registrar:', err.response?.data || err.message);
+      console.error('Error al registrar:', err.response?.data || err.message);
       const errorMsg = err.response?.data?.error || 'Error al registrar el usuario. Intente nuevamente.';
       setError(errorMsg);
       showError(errorMsg);
@@ -65,17 +122,21 @@ function Register() {
             type="text"
             id="phone"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={handlePhoneChange}
+            placeholder="Ej: 3512345678"
           />
+          {fieldErrors.phone && <span className={styles.fieldError}>{fieldErrors.phone}</span>}
         </div>
         <div className={styles.inputGroup}>
           <label htmlFor="email">Email:</label>
           <input
-            type="email"
+            type="text"
             id="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
+            placeholder="ejemplo@correo.com"
           />
+          {fieldErrors.email && <span className={styles.fieldError}>{fieldErrors.email}</span>}
         </div>
         <div className={styles.inputGroup}>
           <label htmlFor="password">Contraseña:</label>
@@ -84,7 +145,9 @@ function Register() {
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="Mínimo 6 caracteres"
           />
+          {fieldErrors.password && <span className={styles.fieldError}>{fieldErrors.password}</span>}
         </div>
         <div className={styles.inputGroup}>
           <label htmlFor="userType">Tipo de usuario:</label>

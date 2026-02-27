@@ -84,3 +84,14 @@
   border-radius: 4px;
   border: 1px solid #d62839;
 }
+
+.fieldError {
+  color: #e57373;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.inputGroup input.invalid {
+  border-color: #e57373;
+}

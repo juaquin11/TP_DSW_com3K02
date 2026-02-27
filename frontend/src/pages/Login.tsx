@@ -34,7 +34,7 @@ function Login() {
         navigate('/');
       }
     } catch (err: any) {
-      console.error('❌ Error al iniciar sesión:', err.response?.data || err.message);
+      console.error(' Error al iniciar sesión:', err.response?.data || err.message);
       const errorMsg = err.response?.data?.error || 'Email o contraseña incorrectos.';
       setError(errorMsg);
       showError(errorMsg);

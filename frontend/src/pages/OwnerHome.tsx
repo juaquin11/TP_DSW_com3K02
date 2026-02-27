@@ -11,15 +11,12 @@ const OwnerHome: React.FC = () => {
   const [restaurants, setRestaurants] = useState<OwnerRestaurantDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { token, user } = useAuth();
+  const { token } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     async function getOwnerRestaurants() {
-      if (!token || user?.type !== 'owner') {
-        navigate('/login');
-        return;
-      }
+      if (!token) return;
 
       try {
         const data = await fetchOwnerRestaurants(token);
@@ -33,7 +30,7 @@ const OwnerHome: React.FC = () => {
     }
 
     getOwnerRestaurants();
-  }, [token, user, navigate]);
+  }, [token]);
 
   const handleAdminClick = (id: string) => {
     navigate(`/ownerDashboard/restaurant/${id}`);
@@ -107,7 +104,6 @@ const OwnerHome: React.FC = () => {
         </table>
       </div>
       <div className={styles.actionsContainer}>
-        {/* Este botón ahora navega a la nueva página */}
         <button onClick={() => navigate('/ownerDashboard/new-restaurant')} className={styles.addButton}>
           ＋ Agregar Restaurante
         </button>
