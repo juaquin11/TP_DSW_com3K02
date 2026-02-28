@@ -42,7 +42,7 @@ export async function getReservationsForToday(restaurantId: string, ownerId: str
 
   const now = new Date();
 
-  return reservations.map(res => {
+  return reservations.map((res: any) => {
     let currentStatus = statusMap[res.status] || 'desconocido';
 
     // Lógica para determinar si la reserva "superó la hora"
@@ -120,6 +120,27 @@ export async function createReservation(
     throw error;
   }
 
+  const targetDate = new Date(reservationDate);
+  const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
+  const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
+
+  const existingClientReservation = await prisma.reservation.findFirst({
+    where: {
+      id_client: clientId,
+      status: { in: [0, 1] }, // 0: pendiente, 1: aceptada
+      reservation_date: {
+        gte: startOfDay,
+        lte: endOfDay,
+      }
+    }
+  });
+
+  if (existingClientReservation) {
+    const error: any = new Error('El cliente ya tiene una reserva pendiente o aceptada para este día');
+    error.code = 'CLIENT_RESERVATION_LIMIT';
+    throw error;
+  }
+
   return prisma.reservation.create({
     data: {
       id_restaurant: restaurantId,
@@ -174,7 +195,7 @@ export async function getUpcomingReservations(restaurantId: string, ownerId: str
   });
 
   // Mapear a formato frontend-friendly con ISO DateTime completo
-  return reservations.map((r) => {
+  return reservations.map((r: any) => {
     const reservationDateObj = new Date(r.reservation_date);
 
     return {

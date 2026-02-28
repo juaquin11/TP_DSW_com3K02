@@ -16,7 +16,7 @@ const statusToDbMap: { [key: string]: number } = {
 export async function getTodayReservations(req: Request, res: Response) {
   try {
     const { id } = req.params; // id del restaurante
-        
+
     if (!id) {
       return res.status(400).json({ error: 'Restaurant ID is required.' });
     }
@@ -36,30 +36,30 @@ export async function getTodayReservations(req: Request, res: Response) {
 }
 
 export async function updateStatus(req: Request, res: Response) {
-    try {
-        const { id } = req.params; // id de la reserva
-        const { status } = req.body; // nuevo estado en formato string
-        const user = (req as any).user as JwtPayload;
+  try {
+    const { id } = req.params; // id de la reserva
+    const { status } = req.body; // nuevo estado en formato string
+    const user = (req as any).user as JwtPayload;
 
-        if (!id) {
-            return res.status(400).json({ error: 'Reservation ID is required.' });
-        }
-        
-        const numericStatus = statusToDbMap[status];
-        if (numericStatus === undefined) {
-            return res.status(400).json({ error: 'Invalid status provided.' });
-        }
-
-        await reservationService.updateReservationStatus(id, numericStatus, user.id_user);
-        res.status(200).json({ message: 'Reservation status updated successfully.' });
-
-    } catch (error: any) {
-        console.error('Error updating reservation status:', error);
-        if (error.code === 'P2025') {
-             return res.status(404).json({ error: 'Reservation not found or you do not have permission to modify it.' });
-        }
-        res.status(500).json({ error: 'Failed to update reservation status.' });
+    if (!id) {
+      return res.status(400).json({ error: 'Reservation ID is required.' });
     }
+
+    const numericStatus = statusToDbMap[status];
+    if (numericStatus === undefined) {
+      return res.status(400).json({ error: 'Invalid status provided.' });
+    }
+
+    await reservationService.updateReservationStatus(id, numericStatus, user.id_user);
+    res.status(200).json({ message: 'Reservation status updated successfully.' });
+
+  } catch (error: any) {
+    console.error('Error updating reservation status:', error);
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Reservation not found or you do not have permission to modify it.' });
+    }
+    res.status(500).json({ error: 'Failed to update reservation status.' });
+  }
 }
 
 export async function createReservation(req: Request, res: Response) {
@@ -113,6 +113,9 @@ export async function createReservation(req: Request, res: Response) {
     }
     if (error.code === 'INSUFFICIENT_CAPACITY') {
       return res.status(409).json({ error: 'The restaurant does not have enough availability for the requested diners.' });
+    }
+    if (error.code === 'CLIENT_RESERVATION_LIMIT') {
+      return res.status(400).json({ error: 'Ya tienes una reserva pendiente o aceptada para este día.' });
     }
     res.status(500).json({ error: 'Failed to create reservation.' });
   }

@@ -1,7 +1,8 @@
-export type ReservationStatus = 
-  | 'pendiente' 
-  | 'aceptada' 
-  | 'rechazada' 
+export type ReservationStatus =
+  | 'pendiente'
+  | 'aceptada'
+  | 'rechazada'
+  | 'superada'
   | 'asistencia'
   | 'ausencia'
   | 'cancelada';
