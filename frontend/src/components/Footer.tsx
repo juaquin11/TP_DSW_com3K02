@@ -2,8 +2,12 @@ import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 import styles from "./Footer.module.css";
 import Logo from "./logo";
+import { useAuth } from "../context/AuthContext";
 
 const Footer = () => {
+  const { user } = useAuth();
+  const isOwner = user?.type === "owner";
+
   const handleNewsletterSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
   };
@@ -14,7 +18,11 @@ const Footer = () => {
     <footer className={styles.footer}>
       <div className={styles.content}>
         <div className={styles.brandSection}>
-          <Link to="/" className={styles.brandLink} aria-label="Volver al inicio">
+          <Link
+            to={isOwner ? "/ownerDashboard" : "/"}
+            className={styles.brandLink}
+            aria-label="Volver al inicio"
+          >
             <Logo width="5.5rem" height="5.5rem" />
           </Link>
           <p className={styles.brandDescription}>
@@ -24,15 +32,15 @@ const Footer = () => {
           <div className={styles.socials} aria-label="Redes sociales">
             <a href="https://www.instagram.com" target="_blank" rel="noreferrer">
               <span aria-hidden>📸</span>
-              
+
             </a>
             <a href="https://www.facebook.com" target="_blank" rel="noreferrer">
               <span aria-hidden>👍</span>
-             
+
             </a>
             <a href="https://www.twitter.com" target="_blank" rel="noreferrer">
               <span aria-hidden>🐦</span>
-              
+
             </a>
           </div>
         </div>
@@ -40,18 +48,26 @@ const Footer = () => {
         <nav className={styles.linksSection} aria-label="Enlaces útiles">
           <h2>Explorá</h2>
           <ul>
-            <li>
-              <Link to="/">Inicio</Link>
-            </li>
-            <li>
-              <Link to="/profile">Mi perfil</Link>
-            </li>
-            <li>
-              <Link to="/ownerDashboard">Panel de dueños</Link>
-            </li>
-            <li>
-              <Link to="/register">Registrate</Link>
-            </li>
+            {!isOwner && (
+              <>
+                <li>
+                  <Link to="/">Inicio</Link>
+                </li>
+                <li>
+                  <Link to="/profile">Mi perfil</Link>
+                </li>
+              </>
+            )}
+            {isOwner && (
+              <li>
+                <Link to="/ownerDashboard">Panel de dueños</Link>
+              </li>
+            )}
+            {!user && (
+              <li>
+                <Link to="/register">Registrate</Link>
+              </li>
+            )}
           </ul>
         </nav>
 
