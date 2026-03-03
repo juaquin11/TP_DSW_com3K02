@@ -125,6 +125,10 @@ const CreateRestaurantForm: React.FC = () => {
     if (!formData.id_district) newErrors.id_district = "Debe seleccionar un distrito.";
     const chairs = parseInt(formData.chair_amount);
     if (isNaN(chairs) || chairs <= 0) newErrors.chair_amount = "Debe ser un número mayor a 0.";
+
+    const height = parseInt(formData.height);
+    if (isNaN(height) || height <= 0) newErrors.height = "Ingrese una altura válida.";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -200,7 +204,7 @@ const CreateRestaurantForm: React.FC = () => {
                         {errors.street && <span className={styles.errorMessage}>{errors.street}</span>}
                     </div>
                      <div className={styles.inputGroup}>
-                        <input id="height" name="height" type="text" className={styles.input} value={formData.height} onChange={handleChange} placeholder=" " />
+                        <input id="height" name="height" type="number" className={styles.input} value={formData.height} onChange={handleChange} placeholder=" " />
                         <label htmlFor="height" className={styles.label}>Altura</label>
                         {errors.height && <span className={styles.errorMessage}>{errors.height}</span>}
                     </div>

@@ -46,5 +46,7 @@
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
-  }
+  },
+  // Restringe la compilación a src/ para evitar incluir vitest.config.ts y otros archivos de config
+  "include": ["src"]
 }

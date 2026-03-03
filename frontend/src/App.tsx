@@ -16,6 +16,7 @@ import HelpPage from "./pages/HelpPage";
 import PaymentSuccessPage from '../src/pages/PaymentSuccessPage'; // Crea este componente
 import PaymentCancelPage from '../src/pages/PaymentCancelPage'; // Crea este componente
 import ProtectedRoute from './components/ProtectedRoute';
+import GuestRoute from './components/GuestRoute';
 
 export default function App() {
   return (
@@ -24,8 +25,16 @@ export default function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={
+            <GuestRoute>
+              <Login />
+            </GuestRoute>
+          } />
+          <Route path="/register" element={
+            <GuestRoute>
+              <Register />
+            </GuestRoute>
+          } />
           <Route path="/profile" element={
             <ProtectedRoute>
               <ProfilePage />
@@ -42,8 +51,16 @@ export default function App() {
               <CreateRestaurantPage />
             </ProtectedRoute>
           } /> 
-          <Route path="/payment-success" element={<PaymentSuccessPage />} />
-          <Route path="/payment-cancel" element={<PaymentCancelPage />} />
+          <Route path="/payment-success" element={
+            <ProtectedRoute requiredUserType="client">
+              <PaymentSuccessPage/>
+            </ProtectedRoute>
+          } />
+          <Route path="/payment-cancel" element={
+            <ProtectedRoute requiredUserType="client">
+              <PaymentCancelPage />
+            </ProtectedRoute>
+          } />
           <Route path="/restaurant/:id" element={<RestaurantDetail />} />
           <Route path="/ownerDashboard/restaurant/:id" element={
             <ProtectedRoute requiredUserType="owner">

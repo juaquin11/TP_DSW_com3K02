@@ -3,7 +3,7 @@ import prisma from '../prisma/client';
 import { CreateReservationData } from '../models/types';
 
 // Mapeo de estado numérico a texto para consistencia con el frontend
-const statusMap: { [key: number]: string } = {
+const statusMap: Record<number, string> = {
   0: 'pendiente',
   1: 'aceptada',
   2: 'rechazada',
@@ -11,6 +11,25 @@ const statusMap: { [key: number]: string } = {
   4: 'ausencia',
   5: 'cancelada',
 };
+
+/**
+ * Función pura que determina el estado textual de una reserva.
+ * Exportada para permitir test unitario directo sin mocks de infraestructura.
+ * @param statusCode  Código numérico de la reserva (0-5)
+ * @param reservationDate  Fecha/hora de la reserva
+ * @param now  Referencia temporal (inyectable para testing, por defecto Date.now)
+ */
+export function determineReservationStatus(
+  statusCode: number,
+  reservationDate: Date,
+  now: Date = new Date(),
+): string {
+  const status = statusMap[statusCode] ?? 'desconocido';
+  if ((status === 'pendiente' || status === 'aceptada') && reservationDate < now) {
+    return 'superada';
+  }
+  return status;
+}
 
 export async function getReservationsForToday(restaurantId: string, ownerId: string) {
   const today = new Date();
@@ -42,22 +61,13 @@ export async function getReservationsForToday(restaurantId: string, ownerId: str
 
   const now = new Date();
 
-  return reservations.map((res: any) => {
-    let currentStatus = statusMap[res.status] || 'desconocido';
-
-    // Lógica para determinar si la reserva "superó la hora"
-    if ((currentStatus === 'pendiente' || currentStatus === 'aceptada') && res.reservation_date < now) {
-      currentStatus = 'superada';
-    }
-
-    return {
-      id: res.id_reservation,
-      clientName: res.useraccount.name,
-      time: res.reservation_date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
-      diners: res.diners,
-      status: currentStatus,
-    };
-  });
+  return reservations.map(res => ({
+    id: res.id_reservation,
+    clientName: res.useraccount.name,
+    time: res.reservation_date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
+    diners: res.diners,
+    status: determineReservationStatus(res.status, res.reservation_date, now),
+  }));
 }
 
 export async function updateReservationStatus(reservationId: string, newStatus: number, ownerId: string) {
