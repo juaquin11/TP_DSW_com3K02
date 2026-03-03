@@ -83,10 +83,10 @@ INSERT INTO restaurant_category (id_restaurant, id_category) VALUES
 -- -----------------------------------------------------
 
 -- 3 clientes con suscripción
-INSERT INTO has_subscription (id_client, id_subscription, adhesion_date) VALUES
-('client-01', 'sub-oro', '2025-01-15'),
-('client-02', 'sub-plata', '2025-06-20'),
-('client-03', 'sub-bronce', '2025-08-10');
+INSERT INTO has_subscription (id_client, id_subscription, adhesion_date, expiry_date, status, last_payment_id) VALUES
+('client-01', 'sub-oro', '2025-01-15', '2026-01-15', 'active', 'pago_simulado_01'),
+('client-02', 'sub-plata', '2025-06-20', '2025-07-20', 'active', 'pago_simulado_02'),
+('client-03', 'sub-bronce', '2025-08-10', '2025-09-10', 'active', 'pago_simulado_03');
 
 -- 1 cliente penalizado (de los que no tienen suscripción)
 INSERT INTO penalty (id_client, penalty_start_date, penalty_end_date, client_reason) VALUES

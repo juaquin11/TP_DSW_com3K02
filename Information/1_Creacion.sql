@@ -82,17 +82,6 @@ CREATE TABLE dish (
     FOREIGN KEY (id_restaurant) REFERENCES restaurant(id_restaurant)
 );
 
--- -- Tabla discount
--- CREATE TABLE discount (
---     dish_name VARCHAR(100) NOT NULL,
---     id_restaurant CHAR(36) NOT NULL,
---     description TEXT NOT NULL,
---     percentage DECIMAL(5,2) NOT NULL,
---     status TINYINT NOT NULL DEFAULT 1,    -- 0 'inactive'  |  1 'active'
---     PRIMARY KEY (dish_name, id_restaurant),
---     FOREIGN KEY (dish_name, id_restaurant) REFERENCES dish(dish_name, id_restaurant)
--- );
-
 -- Tabla reservation
 CREATE TABLE reservation (
     id_reservation CHAR(36) PRIMARY KEY DEFAULT (UUID()),
@@ -143,6 +132,9 @@ CREATE TABLE has_subscription (
     id_client CHAR(36) PRIMARY KEY,
     id_subscription CHAR(36) NOT NULL,
     adhesion_date DATE NOT NULL,
+    expiry_date DATE NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'active',
+    last_payment_id VARCHAR(100),
     FOREIGN KEY (id_client) REFERENCES useraccount(id_user),
     FOREIGN KEY (id_subscription) REFERENCES subscription(id_subscription)
 );
@@ -156,7 +148,7 @@ CREATE TABLE restaurant_category (
     FOREIGN KEY (id_category) REFERENCES category(id_category)
 );
 
--- Tabla discount_subscription
+-- Tabla dish_subscription
 CREATE TABLE dish_subscription (
     dish_name VARCHAR(100) NOT NULL,
     id_restaurant CHAR(36) NOT NULL,
@@ -167,3 +159,5 @@ CREATE TABLE dish_subscription (
     FOREIGN KEY (dish_name, id_restaurant) REFERENCES dish(dish_name, id_restaurant)
 );
 
+    status TINYINT NOT NULL DEFAULT 1,   -- 0 'inactive'  |  1 'active'
+    status TINYINT NOT NULL DEFAULT 0, -- 0 'pendiente' | 1 'aceptada' | | 2 'rechazada' | 3 'asistencia' | 4 'ausencia' | 5 'cancelada'
