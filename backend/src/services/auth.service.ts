@@ -7,7 +7,7 @@ const SALT_ROUNDS = 10;
 
 export async function registerUser(name: string | null, email: string, phone: string | null, password: string, type: 'client' | 'owner' = 'client') {
   const existing = await prisma.useraccount.findUnique({ where: { email } });
-  if (existing) throw new Error('Email already registered');
+  if (existing) throw new Error('Email ya registrado');
 
   const hashed = await bcrypt.hash(password, SALT_ROUNDS);
 
@@ -29,10 +29,10 @@ export async function registerUser(name: string | null, email: string, phone: st
 
 export async function loginUser(email: string, password: string) {
   const user = await prisma.useraccount.findUnique({ where: { email } });
-  if (!user || !user.password_hash) throw new Error('Invalid credentials');
+  if (!user || !user.password_hash) throw new Error('Credenciales invalidas');
 
   const ok = await bcrypt.compare(password, user.password_hash);
-  if (!ok) throw new Error('Invalid credentials');
+  if (!ok) throw new Error('Credenciales invalidas');
 
   const token = jwt.sign({ id_user: user.id_user, type: user.type }, JWT_SECRET, { expiresIn: '2h' });
   return { user, token };
