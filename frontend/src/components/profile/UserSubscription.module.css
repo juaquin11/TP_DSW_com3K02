@@ -44,21 +44,22 @@
   margin-bottom: 1.5rem;
 }
 
-.cancelButton {
-  background: transparent;
+/* .cancelButton {
+  padding: 0.5rem 1rem;
+  background-color: transparent;
   color: #d9534f;
   border: 1px solid #d9534f;
-  padding: 0.6rem 1.2rem;
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  margin-left: 8px; 
 }
 
 .cancelButton:hover {
   background: #d9534f;
   color: white;
-}
+} */
 
 /* Estilos para mostrar los planes disponibles */
 .plansGrid {

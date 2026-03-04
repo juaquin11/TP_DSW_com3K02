@@ -170,21 +170,21 @@ export async function handleStripeWebhook(req: Request, res: Response) {
         update: {
           id_subscription: subscriptionId,
           adhesion_date: adhesionDate,
-          expiry_date: expiryDate, // <-- ¡CAMPO IMPORTANTE AÑADIDO!
-          status: 'active',        // <-- ¡CAMPO IMPORTANTE AÑADIDO!
-          last_payment_id: session.payment_intent as string | null, // <-- ¡CAMPO IMPORTANTE AÑADIDO!
+          expiry_date: expiryDate, 
+          status: 'active',        
+          last_payment_id: session.payment_intent as string | null, 
         },
         create: {
           id_client: userId,
           id_subscription: subscriptionId,
           adhesion_date: adhesionDate,
-          expiry_date: expiryDate, // <-- ¡CAMPO IMPORTANTE AÑADIDO!
-          status: 'active',        // <-- ¡CAMPO IMPORTANTE AÑADIDO!
-          last_payment_id: session.payment_intent as string | null, // <-- ¡CAMPO IMPORTANTE AÑADIDO!
+          expiry_date: expiryDate, 
+          status: 'active',        
+          last_payment_id: session.payment_intent as string | null, 
         },
       });
       
-      // LOG 13: ¡ÉXITO TOTAL!
+      // LOG 13: exito
       console.log(`--- WEBHOOK ÉXITO: 'has_subscription' guardada para usuario ${userId} ---`);
 
     } catch (dbError: any) {
