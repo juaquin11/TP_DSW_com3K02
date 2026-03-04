@@ -16,12 +16,10 @@ const ACTIONS_BY_STATUS: Record<ReservationStatus, StatusAction[]> = {
   pendiente: [
     { label: 'Aceptar', value: 'aceptada', tone: 'positive' },
     { label: 'Rechazar', value: 'rechazada', tone: 'negative' },
-    { label: 'Cancelar', value: 'cancelada', tone: 'warning' },
   ],
   aceptada: [
     { label: 'Marcar asistencia', value: 'asistencia', tone: 'info' },
     { label: 'Marcar ausencia', value: 'ausencia', tone: 'neutral' },
-    { label: 'Cancelar', value: 'cancelada', tone: 'warning' },
   ],
   rechazada: [
     { label: 'Aceptar', value: 'aceptada', tone: 'positive' },

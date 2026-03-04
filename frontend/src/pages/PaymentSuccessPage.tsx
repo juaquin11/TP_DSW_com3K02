@@ -22,7 +22,7 @@ const PaymentSuccessPage: React.FC = () => {
         {/* Opcional: Mostrar el ID de sesión para depuración */}
         {/* sessionId && <p className={styles.sessionId}>ID de Sesión: {sessionId}</p> */}
         <Link to="/profile?tab=subscription" className={styles.button}>
-          Ver mi Suscripción
+          Volver
         </Link>
       </div>
     </main>

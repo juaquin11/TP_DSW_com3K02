@@ -70,15 +70,15 @@ export async function getReservationsForToday(restaurantId: string, ownerId: str
   }));
 }
 
-export async function updateReservationStatus(reservationId: string, newStatus: number, ownerId: string) {
-  // Verificamos que el dueño que hace la petición es el dueño del restaurante de la reserva.
+export async function updateReservationStatus(reservationId: string, newStatus: number, userId: string, userType: string) {
+  // Si es dueño, verifica que el restaurante le pertenezca.
+  // Si es cliente, verifica que la reserva sea suya.
+  const whereCondition = userType === 'owner'
+    ? { id_reservation: reservationId, restaurant: { id_owner: userId } }
+    : { id_reservation: reservationId, id_client: userId };
+
   const reservation = await prisma.reservation.findFirstOrThrow({
-    where: {
-      id_reservation: reservationId,
-      restaurant: {
-        id_owner: ownerId,
-      }
-    }
+    where: whereCondition
   });
 
   return prisma.reservation.update({

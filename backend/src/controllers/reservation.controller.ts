@@ -37,8 +37,8 @@ export async function getTodayReservations(req: Request, res: Response) {
 
 export async function updateStatus(req: Request, res: Response) {
   try {
-    const { id } = req.params; // id de la reserva
-    const { status } = req.body; // nuevo estado en formato string
+    const { id } = req.params; 
+    const { status } = req.body; 
     const user = (req as any).user as JwtPayload;
 
     if (!id) {
@@ -50,7 +50,13 @@ export async function updateStatus(req: Request, res: Response) {
       return res.status(400).json({ error: 'Invalid status provided.' });
     }
 
-    await reservationService.updateReservationStatus(id, numericStatus, user.id_user);
+    // Seguridad: Un cliente SOLO puede cancelar (estado 5)
+    if (user.type === 'client' && numericStatus !== 5) {
+        return res.status(403).json({ error: 'Los clientes solo pueden cancelar reservas.' });
+    }
+
+    // Le pasamos user.id_user y user.type al servicio
+    await reservationService.updateReservationStatus(id, numericStatus, user.id_user, user.type);
     res.status(200).json({ message: 'Reservation status updated successfully.' });
 
   } catch (error: any) {

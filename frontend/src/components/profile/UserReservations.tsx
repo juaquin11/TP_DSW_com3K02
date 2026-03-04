@@ -1,21 +1,18 @@
-// frontend/src/components/profile/UserReservations.tsx
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { UserProfileReservation } from '../../types/user';
 import styles from './UserReservations.module.css';
 import ReviewModal from './ReviewModal'; 
 import { postReview } from '../../services/reviewService'; 
+import { updateReservationStatus } from '../../services/reservationService'; 
 import { useAuth } from '../../context/AuthContext'; 
 import { useToast } from '../../context/ToastContext';
 
-
 interface Props {
   reservations: UserProfileReservation[];
-  onReviewSubmit: () => void; // 1. Añadimos la nueva prop a la interfaz
+  onReviewSubmit: () => void; 
 }
 
-// Mapeo de estados numéricos a texto y clases CSS para los badges
 const statusMap: { [key: number]: { text: string; className: string } } = {
   0: { text: 'Pendiente', className: 'pendiente' },
   1: { text: 'Aceptada', className: 'aceptada' },
@@ -27,7 +24,7 @@ const statusMap: { [key: number]: { text: string; className: string } } = {
 
 const UserReservations: React.FC<Props> = ({ reservations, onReviewSubmit }) => {
   const { token } = useAuth();
-  const { success, error: showError } = useToast();
+  const { success, error: showError, confirm } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<UserProfileReservation | null>(null);
 
@@ -68,6 +65,30 @@ const UserReservations: React.FC<Props> = ({ reservations, onReviewSubmit }) => 
     }
   };
 
+  const handleCancelReservation = (reservationId: string) => {
+    confirm(
+      '¿Estás seguro de que deseas cancelar esta reserva?',
+      async () => {
+        if (!token) {
+          showError("No estás autenticado.");
+          return;
+        }
+
+        try {
+          await updateReservationStatus(reservationId, 'cancelada', token);
+          success("Reserva cancelada exitosamente.");
+          onReviewSubmit();
+        } catch (err: any) {
+          showError(err.response?.data?.error || "Error al cancelar la reserva.");
+        }
+      },
+      {
+        confirmText: 'Sí, cancelar reserva',
+        cancelText: 'Volver',
+        variant: 'danger'
+      }
+    );
+  };
 
   return (
     <div className={styles.container}>
@@ -92,6 +113,7 @@ const UserReservations: React.FC<Props> = ({ reservations, onReviewSubmit }) => 
                 // Condición para mostrar el botón de reseña:
                 // El estado es 'Asistencia' (3) y la reserva aún no tiene una reseña (review === null)
                 const canReview = res.status === 3 && res.review === null;
+                const canCancel = res.status === 0 || res.status === 1; // 0: pendiente, 1: aceptada
 
                 return (
                   <tr key={res.id_reservation}>
@@ -114,6 +136,14 @@ const UserReservations: React.FC<Props> = ({ reservations, onReviewSubmit }) => 
                           onClick={() => handleOpenReviewModal(res)}
                         >
                           Dejar Reseña
+                        </button>
+                      )}
+                      {canCancel && (
+                        <button 
+                          className={styles.cancelButton} 
+                          onClick={() => handleCancelReservation(res.id_reservation)}
+                        >
+                          Cancelar
                         </button>
                       )}
                     </td>
