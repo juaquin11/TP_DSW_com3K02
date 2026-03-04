@@ -24,7 +24,6 @@ const ProfilePage: React.FC = () => {
         { id: 'data', label: 'Mis Datos' },
         { id: 'reservations', label: 'Mis Reservas' },
         { id: 'subscription', label: 'Suscripción' },
-        { id: 'penalties', label: 'Penalizaciones' },
       ]
     : [
         { id: 'data', label: 'Mis Datos' },
